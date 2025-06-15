@@ -1,609 +1,693 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type Language = 'en' | 'vi' | 'zh' | 'es';
-
-interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
+interface LanguageContextProps {
+  language: string;
+  setLanguage: (language: string) => void;
   t: (key: string) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextProps>({
+  language: 'vi',
+  setLanguage: () => {},
+  t: (key: string) => key,
+});
 
-export const useLanguage = () => {
-  const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
-  return context;
-};
-
-const translations = {
-  en: {
-    // Header
-    'app.name': 'CyberGuard',
-    'app.tagline': 'Check before you trust',
-    'header.login': 'Sign In',
-    
-    // Hero Section
-    'hero.title.line1': 'Received a suspicious message?',
-    'hero.title.line2': 'Check before you trust.',
-    'hero.subtitle': 'CyberGuard is a free community shield that helps you check and report online scams in seconds.',
-    'hero.search.placeholder': 'Enter phone number, bank account, website to check...',
-    'hero.search.button': 'Check',
-    'hero.report.button': 'Report Scam',
-    'hero.examples': 'Try with examples:',
-    'hero.examples.dangerous': '(Dangerous)',
-    'hero.examples.suspicious': '(Suspicious)', 
-    'hero.examples.safe': '(Safe)',
-    
-    // Stats
-    'stats.reports.processed': 'Reports Processed',
-    'stats.users.joined': 'Users Joined',
-    'stats.situations.prevented': 'Situations Prevented',
-    
-    // Recent Warnings
-    'warnings.title': 'Warning Board',
-    'warnings.subtitle': 'Latest warnings from the community',
-    'warnings.reports': 'reports',
-    'warnings.view.details': 'View details →',
-    'warnings.categories.fake.police': 'Fake Police',
-    'warnings.categories.bank.fraud': 'Bank Fraud',
-    'warnings.categories.job.scam': 'Online Job Scam',
-    
-    // How it works
-    'how.title': 'How does CyberGuard work?',
-    'how.step1.title': '1. Instant Search',
-    'how.step1.desc': 'Enter suspicious information in the search bar',
-    'how.step2.title': '2. Get Alerts',
-    'how.step2.desc': 'View results from community database',
-    'how.step3.title': '3. Protect Together',
-    'how.step3.desc': 'Report to help others',
-    
-    // Footer
-    'footer.description': 'Join thousands of users building a safer digital space. Every report you make helps protect the community.',
-    'footer.links': 'Links',
-    'footer.user.guide': 'User Guide',
-    'footer.faq': 'FAQ',
-    'footer.privacy': 'Privacy Policy',
-    'footer.terms': 'Terms of Service',
-    'footer.contact': 'Contact',
-    'footer.email': 'Email: support@cyberguard.com',
-    'footer.hotline': 'Hotline: 1900-xxx-xxx',
-    'footer.copyright': '© 2024 CyberGuard. All rights reserved.',
-    
-    // Search Results
-    'results.title': 'Search Results',
-    'results.searched.for': 'Searched for: ',
-    'results.safe.title': 'INFORMATION SAFE',
-    'results.safe.message': 'No reports found for this information. Always stay cautious.',
-    'results.safe.description': 'No community warnings for this information.',
-    'results.safe.action': 'I want to report',
-    'results.suspicious.title': 'SUSPICIOUS WARNING',
-    'results.suspicious.message': 'Some reports exist for this information. Be careful.',
-    'results.suspicious.description': 'Community has sent some warnings about this information.',
-    'results.suspicious.action': 'I experienced this too',
-    'results.dangerous.title': 'DANGER WARNING',
-    'results.dangerous.message': 'Multiple scam reports for this information. ABSOLUTELY DO NOT trust!',
-    'results.dangerous.description': 'Many users have reported scam activities from this information.',
-    'results.dangerous.action': 'I was scammed too',
-    'results.reports.received': 'Reports Received',
-    'results.verified': 'Verified',
-    'results.reliability': 'Reliability',
-    'results.related.reports': 'Related Reports',
-    'results.reported.at': 'reported',
-    'results.verified.by': 'people confirmed',
-    'results.safety.tip': 'Safety Tip:',
-    'results.safety.message': 'Regardless of the results, always verify thoroughly before providing personal information or transferring money. When in doubt, contact the official organization directly.',
-    'results.back': 'Back',
-    'results.share.warning': 'Share Warning',
-    
-    // Report Form
-    'report.title': 'Report Scam',
-    'report.subtitle': 'Help the community by sharing scam information',
-    'report.step1.title': 'Type of information to report',
-    'report.step1.question': 'What type of information do you want to report?',
-    'report.step1.phone': 'Phone Number',
-    'report.step1.phone.desc': 'Scam phone number',
-    'report.step1.bank': 'Bank Account',
-    'report.step1.bank.desc': 'Bank account or banking information',
-    'report.step1.url': 'Website/Link',
-    'report.step1.url.desc': 'Scam website or link',
-    'report.step1.other': 'Other',
-    'report.step1.other.desc': 'Other types of scams',
-    'report.step2.title': 'Detailed Information',
-    'report.step2.phone.label': 'Enter phone number',
-    'report.step2.bank.label': 'Enter bank account number',
-    'report.step2.url.label': 'Enter website or link',
-    'report.step2.other.label': 'Describe the information to report',
-    'report.step2.phone.placeholder': 'e.g. 0123456789',
-    'report.step2.bank.placeholder': 'e.g. 1234567890',
-    'report.step2.url.placeholder': 'e.g. https://example.com',
-    'report.step2.other.placeholder': 'e.g. Company name, email address...',
-    'report.step2.privacy': 'This information will be kept confidential and only used to warn the community',
-    'report.step3.title': 'Describe the incident',
-    'report.step3.category.label': 'Type of scam',
-    'report.step3.description.label': 'Detailed description of the incident',
-    'report.step3.description.placeholder': 'Please describe what happened: what they said, what they requested, when it occurred...',
-    'report.step3.description.tip': 'The more detailed, the more effective the warning',
-    'report.step4.title': 'Evidence (optional)',
-    'report.step4.upload.label': 'Upload evidence',
-    'report.step4.upload.description': 'Screenshots of messages, calls, or any other evidence (not required)',
-    'report.step4.upload.instruction': 'Drag and drop files here or click to select',
-    'report.step4.upload.button': 'Choose files',
-    'report.step4.files.selected': 'Selected files:',
-    'report.step4.remove': 'Remove',
-    'report.step4.privacy.title': 'Privacy Commitment',
-    'report.step4.privacy.message': 'All information and evidence you provide will be strictly confidential. We only use it to verify and warn the community without revealing your identity.',
-    'report.categories.fake.police': 'Fake Police',
-    'report.categories.bank.fraud': 'Bank Fraud',
-    'report.categories.job.scam': 'Online Job Scam',
-    'report.categories.investment': 'Investment Fraud',
-    'report.categories.online.shopping': 'Online Shopping',
-    'report.categories.telecom.fraud': 'Fake Telecom Staff',
-    'report.categories.fake.promotion': 'Fake Promotion',
-    'report.categories.other': 'Other',
-    'report.navigation.back': 'Back',
-    'report.navigation.continue': 'Continue',
-    'report.navigation.submit': 'Submit Report',
-    'report.navigation.submitting': 'Submitting...',
-    'report.success.title': 'Report Submitted!',
-    'report.success.message': 'Thank you for helping protect the community. Your report will be reviewed and verified as soon as possible.',
-    'report.success.home': 'Go to Home',
-    'report.success.report.another': 'Report Another',
-    
-    // Language names
-    'language.english': 'English',
-    'language.vietnamese': 'Tiếng Việt',
-    'language.chinese': '中文',
-    'language.spanish': 'Español'
-  },
-  vi: {
-    // Header
-    'app.name': 'Vệ Binh Mạng',
-    'app.tagline': 'Tra cứu trước khi tin',
-    'header.login': 'Đăng nhập',
-    
-    // Hero Section
-    'hero.title.line1': 'Nhận tin nhắn lạ?',
-    'hero.title.line2': 'Tra cứu trước khi tin.',
-    'hero.subtitle': 'Vệ Binh Mạng là lá chắn cộng đồng miễn phí, giúp bạn kiểm tra và báo cáo lừa đảo trực tuyến chỉ trong vài giây.',
-    'hero.search.placeholder': 'Nhập SĐT, tài khoản ngân hàng, website để kiểm tra...',
-    'hero.search.button': 'Kiểm tra',
-    'hero.report.button': 'Báo cáo Lừa đảo',
-    'hero.examples': 'Thử ngay với các ví dụ:',
-    'hero.examples.dangerous': '(Nguy hiểm)',
-    'hero.examples.suspicious': '(Nghi ngờ)',
-    'hero.examples.safe': '(An toàn)',
-    
-    // Stats
-    'stats.reports.processed': 'Báo cáo đã xử lý',
-    'stats.users.joined': 'Người dùng đã tham gia',
-    'stats.situations.prevented': 'Tình huống đã ngăn chặn',
-    
-    // Recent Warnings
-    'warnings.title': 'Bảng tin Cảnh báo',
-    'warnings.subtitle': 'Những cảnh báo mới nhất từ cộng đồng',
-    'warnings.reports': 'báo cáo',
-    'warnings.view.details': 'Xem chi tiết →',
-    'warnings.categories.fake.police': 'Giả danh công an',
-    'warnings.categories.bank.fraud': 'Lừa đảo ngân hàng',
-    'warnings.categories.job.scam': 'Việc làm online',
-    
-    // How it works
-    'how.title': 'Vệ Binh Mạng hoạt động như thế nào?',
-    'how.step1.title': '1. Tra cứu tức thì',
-    'how.step1.desc': 'Nhập thông tin nghi ngờ vào thanh tìm kiếm',
-    'how.step2.title': '2. Nhận cảnh báo',
-    'how.step2.desc': 'Xem kết quả từ cơ sở dữ liệu cộng đồng',
-    'how.step3.title': '3. Chung tay bảo vệ',
-    'how.step3.desc': 'Báo cáo để giúp đỡ người khác',
-    
-    // Footer
-    'footer.description': 'Tham gia cùng hàng ngàn người dùng xây dựng một không gian mạng an toàn hơn. Mỗi báo cáo của bạn đều góp phần bảo vệ cộng đồng.',
-    'footer.links': 'Liên kết',
-    'footer.user.guide': 'Hướng dẫn sử dụng',
-    'footer.faq': 'Câu hỏi thường gặp',
-    'footer.privacy': 'Chính sách bảo mật',
-    'footer.terms': 'Điều khoản sử dụng',
-    'footer.contact': 'Liên hệ',
-    'footer.email': 'Email: support@vebinhmang.vn',
-    'footer.hotline': 'Hotline: 1900-xxx-xxx',
-    'footer.copyright': '© 2024 Vệ Binh Mạng. Tất cả quyền được bảo lưu.',
-    
-    // Search Results
-    'results.title': 'Kết quả tra cứu',
-    'results.searched.for': 'Thông tin tìm kiếm: ',
-    'results.safe.title': 'THÔNG TIN AN TOÀN',
-    'results.safe.message': 'Thông tin này chưa có báo cáo nào. Hãy luôn cẩn trọng.',
-    'results.safe.description': 'Không có cảnh báo nào từ cộng đồng cho thông tin này.',
-    'results.safe.action': 'Tôi muốn báo cáo',
-    'results.suspicious.title': 'CẢNH BÁO NGHI NGỜ',
-    'results.suspicious.message': 'Có một số báo cáo về thông tin này. Hãy thận trọng.',
-    'results.suspicious.description': 'Cộng đồng đã gửi một số cảnh báo về thông tin này.',
-    'results.suspicious.action': 'Tôi cũng gặp phải',
-    'results.dangerous.title': 'CẢNH BÁO NGUY HIỂM',
-    'results.dangerous.message': 'Thông tin này có nhiều báo cáo lừa đảo. TUYỆT ĐỐI KHÔNG tin tưởng!',
-    'results.dangerous.description': 'Nhiều người dùng đã báo cáo về hoạt động lừa đảo từ thông tin này.',
-    'results.dangerous.action': 'Tôi cũng bị lừa',
-    'results.reports.received': 'Báo cáo đã nhận',
-    'results.verified': 'Đã xác minh',
-    'results.reliability': 'Độ tin cậy',
-    'results.related.reports': 'Các báo cáo liên quan',
-    'results.reported.at': 'báo cáo',
-    'results.verified.by': 'người xác nhận',
-    'results.safety.tip': 'Lời khuyên an toàn:',
-    'results.safety.message': 'Dù kết quả như thế nào, hãy luôn kiểm tra kỹ lưỡng trước khi cung cấp thông tin cá nhân hoặc chuyển tiền. Khi có nghi ngờ, hãy liên hệ trực tiếp với tổ chức/cơ quan chính thức.',
-    'results.back': 'Quay lại',
-    'results.share.warning': 'Chia sẻ cảnh báo',
-    
-    // Report Form
-    'report.title': 'Báo cáo Lừa đảo',
-    'report.subtitle': 'Giúp cộng đồng bằng cách chia sẻ thông tin về lừa đảo',
-    'report.step1.title': 'Loại thông tin muốn báo cáo',
-    'report.step1.question': 'Bạn muốn báo cáo về loại thông tin nào?',
-    'report.step1.phone': 'Số điện thoại',
-    'report.step1.phone.desc': 'Số điện thoại lừa đảo',
-    'report.step1.bank': 'Tài khoản ngân hàng',
-    'report.step1.bank.desc': 'STK hoặc thông tin ngân hàng',
-    'report.step1.url': 'Website/Link',
-    'report.step1.url.desc': 'Trang web hoặc đường link lừa đảo',
-    'report.step1.other': 'Khác',
-    'report.step1.other.desc': 'Hình thức lừa đảo khác',
-    'report.step2.title': 'Thông tin chi tiết',
-    'report.step2.phone.label': 'Nhập số điện thoại',
-    'report.step2.bank.label': 'Nhập số tài khoản ngân hàng',
-    'report.step2.url.label': 'Nhập website hoặc link',
-    'report.step2.other.label': 'Mô tả thông tin cần báo cáo',
-    'report.step2.phone.placeholder': 'VD: 0123456789',
-    'report.step2.bank.placeholder': 'VD: 1234567890',
-    'report.step2.url.placeholder': 'VD: https://example.com',
-    'report.step2.other.placeholder': 'VD: Tên công ty, địa chỉ email...',
-    'report.step2.privacy': 'Thông tin này sẽ được bảo mật và chỉ sử dụng để cảnh báo cộng đồng',
-    'report.step3.title': 'Mô tả sự việc',
-    'report.step3.category.label': 'Loại lừa đảo',
-    'report.step3.description.label': 'Mô tả chi tiết sự việc',
-    'report.step3.description.placeholder': 'Hãy mô tả những gì đã xảy ra: họ nói gì, yêu cầu gì, thời gian diễn ra...',
-    'report.step3.description.tip': 'Càng chi tiết càng giúp cảnh báo hiệu quả hơn',
-    'report.step4.title': 'Bằng chứng (tùy chọn)',
-    'report.step4.upload.label': 'Tải lên bằng chứng',
-    'report.step4.upload.description': 'Ảnh chụp màn hình tin nhắn, cuộc gọi, hoặc bất kỳ bằng chứng nào khác (không bắt buộc)',
-    'report.step4.upload.instruction': 'Kéo thả file vào đây hoặc click để chọn',
-    'report.step4.upload.button': 'Chọn file',
-    'report.step4.files.selected': 'File đã chọn:',
-    'report.step4.remove': 'Xóa',
-    'report.step4.privacy.title': 'Cam kết bảo mật',
-    'report.step4.privacy.message': 'Mọi thông tin và bằng chứng bạn cung cấp sẽ được bảo mật tuyệt đối. Chúng tôi chỉ sử dụng để xác minh và cảnh báo cộng đồng mà không tiết lộ danh tính của bạn.',
-    'report.categories.fake.police': 'Giả danh công an',
-    'report.categories.bank.fraud': 'Lừa đảo ngân hàng',
-    'report.categories.job.scam': 'Việc làm online',
-    'report.categories.investment': 'Đầu tư tài chính',
-    'report.categories.online.shopping': 'Mua bán online',
-    'report.categories.telecom.fraud': 'Giả danh nhân viên viễn thông',
-    'report.categories.fake.promotion': 'Khuyến mãi giả',
-    'report.categories.other': 'Khác',
-    'report.navigation.back': 'Quay lại',
-    'report.navigation.continue': 'Tiếp tục',
-    'report.navigation.submit': 'Gửi báo cáo',
-    'report.navigation.submitting': 'Đang gửi...',
-    'report.success.title': 'Báo cáo đã được gửi!',
-    'report.success.message': 'Cảm ơn bạn đã góp phần bảo vệ cộng đồng. Báo cáo của bạn sẽ được xem xét và xác minh trong thời gian sớm nhất.',
-    'report.success.home': 'Về trang chủ',
-    'report.success.report.another': 'Báo cáo khác',
-    
-    // Language names
-    'language.english': 'English',
-    'language.vietnamese': 'Tiếng Việt',
-    'language.chinese': '中文',
-    'language.spanish': 'Español'
-  },
-  zh: {
-    // Header
-    'app.name': '网络卫士',
-    'app.tagline': '先查询再信任',
-    'header.login': '登录',
-    
-    // Hero Section
-    'hero.title.line1': '收到可疑消息？',
-    'hero.title.line2': '先查询再信任。',
-    'hero.subtitle': '网络卫士是免费的社区防护盾，帮您在几秒内检查和举报网络诈骗。',
-    'hero.search.placeholder': '输入电话号码、银行账户、网站进行查询...',
-    'hero.search.button': '查询',
-    'hero.report.button': '举报诈骗',
-    'hero.examples': '试试这些例子：',
-    'hero.examples.dangerous': '（危险）',
-    'hero.examples.suspicious': '（可疑）',
-    'hero.examples.safe': '（安全）',
-    
-    // Stats
-    'stats.reports.processed': '已处理举报',
-    'stats.users.joined': '用户加入',
-    'stats.situations.prevented': '阻止的情况',
-    
-    // Recent Warnings
-    'warnings.title': '警告板',
-    'warnings.subtitle': '来自社区的最新警告',
-    'warnings.reports': '举报',
-    'warnings.view.details': '查看详情 →',
-    'warnings.categories.fake.police': '冒充警察',
-    'warnings.categories.bank.fraud': '银行诈骗',
-    'warnings.categories.job.scam': '网络招聘诈骗',
-    
-    // How it works
-    'how.title': '网络卫士如何工作？',
-    'how.step1.title': '1. 即时搜索',
-    'how.step1.desc': '在搜索栏输入可疑信息',
-    'how.step2.title': '2. 获取警报',
-    'how.step2.desc': '查看来自社区数据库的结果',
-    'how.step3.title': '3. 共同保护',
-    'how.step3.desc': '举报以帮助他人',
-    
-    // Footer
-    'footer.description': '与成千上万的用户一起构建更安全的数字空间。您的每一份举报都有助于保护社区。',
-    'footer.links': '链接',
-    'footer.user.guide': '用户指南',
-    'footer.faq': '常见问题',
-    'footer.privacy': '隐私政策',
-    'footer.terms': '服务条款',
-    'footer.contact': '联系我们',
-    'footer.email': '邮箱：support@cyberguard.com',
-    'footer.hotline': '热线：1900-xxx-xxx',
-    'footer.copyright': '© 2024 网络卫士。保留所有权利。',
-    
-    // Search Results
-    'results.title': '搜索结果',
-    'results.searched.for': '搜索内容：',
-    'results.safe.title': '信息安全',
-    'results.safe.message': '此信息未发现举报。请始终保持谨慎。',
-    'results.safe.description': '社区对此信息没有警告。',
-    'results.safe.action': '我要举报',
-    'results.suspicious.title': '可疑警告',
-    'results.suspicious.message': '此信息存在一些举报。请小心。',
-    'results.suspicious.description': '社区对此信息发出了一些警告。',
-    'results.suspicious.action': '我也遇到了',
-    'results.dangerous.title': '危险警告',
-    'results.dangerous.message': '此信息有多个诈骗举报。绝对不要信任！',
-    'results.dangerous.description': '许多用户举报了来自此信息的诈骗活动。',
-    'results.dangerous.action': '我也被骗了',
-    'results.reports.received': '收到举报',
-    'results.verified': '已验证',
-    'results.reliability': '可靠性',
-    'results.related.reports': '相关举报',
-    'results.reported.at': '举报于',
-    'results.verified.by': '人确认',
-    'results.safety.tip': '安全提示：',
-    'results.safety.message': '无论结果如何，在提供个人信息或转账前请始终仔细验证。有疑问时，请直接联系官方机构。',
-    'results.back': '返回',
-    'results.share.warning': '分享警告',
-    
-    // Report Form
-    'report.title': '举报诈骗',
-    'report.subtitle': '通过分享诈骗信息帮助社区',
-    'report.step1.title': '要举报的信息类型',
-    'report.step1.question': '您要举报什么类型的信息？',
-    'report.step1.phone': '电话号码',
-    'report.step1.phone.desc': '诈骗电话号码',
-    'report.step1.bank': '银行账户',
-    'report.step1.bank.desc': '银行账户或银行信息',
-    'report.step1.url': '网站/链接',
-    'report.step1.url.desc': '诈骗网站或链接',
-    'report.step1.other': '其他',
-    'report.step1.other.desc': '其他类型的诈骗',
-    'report.step2.title': '详细信息',
-    'report.step2.phone.label': '输入电话号码',
-    'report.step2.bank.label': '输入银行账号',
-    'report.step2.url.label': '输入网站或链接',
-    'report.step2.other.label': '描述要举报的信息',
-    'report.step2.phone.placeholder': '例如：0123456789',
-    'report.step2.bank.placeholder': '例如：1234567890',
-    'report.step2.url.placeholder': '例如：https://example.com',
-    'report.step2.other.placeholder': '例如：公司名称、电子邮箱...',
-    'report.step2.privacy': '此信息将被保密，仅用于警告社区',
-    'report.step3.title': '描述事件',
-    'report.step3.category.label': '诈骗类型',
-    'report.step3.description.label': '详细描述事件',
-    'report.step3.description.placeholder': '请描述发生了什么：他们说了什么，要求什么，发生时间...',
-    'report.step3.description.tip': '越详细，警告效果越好',
-    'report.step4.title': '证据（可选）',
-    'report.step4.upload.label': '上传证据',
-    'report.step4.upload.description': '消息截图、通话记录或任何其他证据（非必需）',
-    'report.step4.upload.instruction': '拖拽文件到这里或点击选择',
-    'report.step4.upload.button': '选择文件',
-    'report.step4.files.selected': '已选择文件：',
-    'report.step4.remove': '删除',
-    'report.step4.privacy.title': '隐私承诺',
-    'report.step4.privacy.message': '您提供的所有信息和证据将严格保密。我们仅用于验证和警告社区，不会泄露您的身份。',
-    'report.categories.fake.police': '冒充警察',
-    'report.categories.bank.fraud': '银行诈骗',
-    'report.categories.job.scam': '网络招聘诈骗',
-    'report.categories.investment': '投资诈骗',
-    'report.categories.online.shopping': '网购诈骗',
-    'report.categories.telecom.fraud': '冒充电信工作人员',
-    'report.categories.fake.promotion': '虚假促销',
-    'report.categories.other': '其他',
-    'report.navigation.back': '返回',
-    'report.navigation.continue': '继续',
-    'report.navigation.submit': '提交举报',
-    'report.navigation.submitting': '提交中...',
-    'report.success.title': '举报已提交！',
-    'report.success.message': '感谢您帮助保护社区。您的举报将尽快得到审核和验证。',
-    'report.success.home': '回到首页',
-    'report.success.report.another': '举报其他',
-    
-    // Language names
-    'language.english': 'English',
-    'language.vietnamese': 'Tiếng Việt',
-    'language.chinese': '中文',
-    'language.spanish': 'Español'
-  },
-  es: {
-    // Header
-    'app.name': 'CiberGuardián',
-    'app.tagline': 'Verifica antes de confiar',
-    'header.login': 'Iniciar Sesión',
-    
-    // Hero Section
-    'hero.title.line1': '¿Recibiste un mensaje sospechoso?',
-    'hero.title.line2': 'Verifica antes de confiar.',
-    'hero.subtitle': 'CiberGuardián es un escudo comunitario gratuito que te ayuda a verificar y reportar estafas en línea en segundos.',
-    'hero.search.placeholder': 'Ingresa número de teléfono, cuenta bancaria, sitio web para verificar...',
-    'hero.search.button': 'Verificar',
-    'hero.report.button': 'Reportar Estafa',
-    'hero.examples': 'Prueba con ejemplos:',
-    'hero.examples.dangerous': '(Peligroso)',
-    'hero.examples.suspicious': '(Sospechoso)',
-    'hero.examples.safe': '(Seguro)',
-    
-    // Stats
-    'stats.reports.processed': 'Reportes Procesados',
-    'stats.users.joined': 'Usuarios Unidos',
-    'stats.situations.prevented': 'Situaciones Prevenidas',
-    
-    // Recent Warnings
-    'warnings.title': 'Tablero de Alertas',
-    'warnings.subtitle': 'Últimas alertas de la comunidad',
-    'warnings.reports': 'reportes',
-    'warnings.view.details': 'Ver detalles →',
-    'warnings.categories.fake.police': 'Falsa Policía',
-    'warnings.categories.bank.fraud': 'Fraude Bancario',
-    'warnings.categories.job.scam': 'Estafa de Trabajo Online',
-    
-    // How it works
-    'how.title': '¿Cómo funciona CiberGuardián?',
-    'how.step1.title': '1. Búsqueda Instantánea',
-    'how.step1.desc': 'Ingresa información sospechosa en la barra de búsqueda',
-    'how.step2.title': '2. Recibe Alertas',
-    'how.step2.desc': 'Ve resultados de la base de datos comunitaria',
-    'how.step3.title': '3. Protege Juntos',
-    'how.step3.desc': 'Reporta para ayudar a otros',
-    
-    // Footer
-    'footer.description': 'Únete a miles de usuarios construyendo un espacio digital más seguro. Cada reporte que haces ayuda a proteger la comunidad.',
-    'footer.links': 'Enlaces',
-    'footer.user.guide': 'Guía del Usuario',
-    'footer.faq': 'Preguntas Frecuentes',
-    'footer.privacy': 'Política de Privacidad',
-    'footer.terms': 'Términos de Servicio',
-    'footer.contact': 'Contacto',
-    'footer.email': 'Email: support@ciberguardian.com',
-    'footer.hotline': 'Línea directa: 1900-xxx-xxx',
-    'footer.copyright': '© 2024 CiberGuardián. Todos los derechos reservados.',
-    
-    // Search Results
-    'results.title': 'Resultados de Búsqueda',
-    'results.searched.for': 'Búsqueda realizada: ',
-    'results.safe.title': 'INFORMACIÓN SEGURA',
-    'results.safe.message': 'No se encontraron reportes para esta información. Mantente siempre cauteloso.',
-    'results.safe.description': 'No hay advertencias de la comunidad para esta información.',
-    'results.safe.action': 'Quiero reportar',
-    'results.suspicious.title': 'ADVERTENCIA SOSPECHOSA',
-    'results.suspicious.message': 'Existen algunos reportes para esta información. Ten cuidado.',
-    'results.suspicious.description': 'La comunidad ha enviado algunas advertencias sobre esta información.',
-    'results.suspicious.action': 'Yo también lo experimenté',
-    'results.dangerous.title': 'ADVERTENCIA DE PELIGRO',
-    'results.dangerous.message': 'Múltiples reportes de estafa para esta información. ¡ABSOLUTAMENTE NO confíes!',
-    'results.dangerous.description': 'Muchos usuarios han reportado actividades fraudulentas de esta información.',
-    'results.dangerous.action': 'Yo también fui estafado',
-    'results.reports.received': 'Reportes Recibidos',
-    'results.verified': 'Verificado',
-    'results.reliability': 'Confiabilidad',
-    'results.related.reports': 'Reportes Relacionados',
-    'results.reported.at': 'reportado',
-    'results.verified.by': 'personas confirmaron',
-    'results.safety.tip': 'Consejo de Seguridad:',
-    'results.safety.message': 'Independientemente de los resultados, siempre verifica cuidadosamente antes de proporcionar información personal o transferir dinero. Cuando tengas dudas, contacta directamente a la organización oficial.',
-    'results.back': 'Volver',
-    'results.share.warning': 'Compartir Advertencia',
-    
-    // Report Form
-    'report.title': 'Reportar Estafa',
-    'report.subtitle': 'Ayuda a la comunidad compartiendo información sobre estafas',
-    'report.step1.title': 'Tipo de información a reportar',
-    'report.step1.question': '¿Qué tipo de información quieres reportar?',
-    'report.step1.phone': 'Número de Teléfono',
-    'report.step1.phone.desc': 'Número telefónico de estafa',
-    'report.step1.bank': 'Cuenta Bancaria',
-    'report.step1.bank.desc': 'Cuenta bancaria o información bancaria',
-    'report.step1.url': 'Sitio Web/Enlace',
-    'report.step1.url.desc': 'Sitio web o enlace de estafa',
-    'report.step1.other': 'Otro',
-    'report.step1.other.desc': 'Otros tipos de estafas',
-    'report.step2.title': 'Información Detallada',
-    'report.step2.phone.label': 'Ingresa número de teléfono',
-    'report.step2.bank.label': 'Ingresa número de cuenta bancaria',
-    'report.step2.url.label': 'Ingresa sitio web o enlace',
-    'report.step2.other.label': 'Describe la información a reportar',
-    'report.step2.phone.placeholder': 'ej. 0123456789',
-    'report.step2.bank.placeholder': 'ej. 1234567890',
-    'report.step2.url.placeholder': 'ej. https://example.com',
-    'report.step2.other.placeholder': 'ej. Nombre de empresa, dirección de email...',
-    'report.step2.privacy': 'Esta información será confidencial y solo se usará para advertir a la comunidad',
-    'report.step3.title': 'Describir el incidente',
-    'report.step3.category.label': 'Tipo de estafa',
-    'report.step3.description.label': 'Descripción detallada del incidente',
-    'report.step3.description.placeholder': 'Por favor describe lo que pasó: qué dijeron, qué pidieron, cuándo ocurrió...',
-    'report.step3.description.tip': 'Mientras más detallado, más efectiva la advertencia',
-    'report.step4.title': 'Evidencia (opcional)',
-    'report.step4.upload.label': 'Subir evidencia',
-    'report.step4.upload.description': 'Capturas de pantalla de mensajes, llamadas, o cualquier otra evidencia (no requerido)',
-    'report.step4.upload.instruction': 'Arrastra y suelta archivos aquí o haz clic para seleccionar',
-    'report.step4.upload.button': 'Elegir archivos',
-    'report.step4.files.selected': 'Archivos seleccionados:',
-    'report.step4.remove': 'Eliminar',
-    'report.step4.privacy.title': 'Compromiso de Privacidad',
-    'report.step4.privacy.message': 'Toda la información y evidencia que proporciones será estrictamente confidencial. Solo la usamos para verificar y advertir a la comunidad sin revelar tu identidad.',
-    'report.categories.fake.police': 'Falsa Policía',
-    'report.categories.bank.fraud': 'Fraude Bancario',
-    'report.categories.job.scam': 'Estafa de Trabajo Online',
-    'report.categories.investment': 'Fraude de Inversión',
-    'report.categories.online.shopping': 'Compras en Línea',
-    'report.categories.telecom.fraud': 'Personal Falso de Telecomunicaciones',
-    'report.categories.fake.promotion': 'Promoción Falsa',
-    'report.categories.other': 'Otro',
-    'report.navigation.back': 'Volver',
-    'report.navigation.continue': 'Continuar',
-    'report.navigation.submit': 'Enviar Reporte',
-    'report.navigation.submitting': 'Enviando...',
-    'report.success.title': '¡Reporte Enviado!',
-    'report.success.message': 'Gracias por ayudar a proteger la comunidad. Tu reporte será revisado y verificado lo antes posible.',
-    'report.success.home': 'Ir al Inicio',
-    'report.success.report.another': 'Reportar Otro',
-    
-    // Language names
-    'language.english': 'English',
-    'language.vietnamese': 'Tiếng Việt',
-    'language.chinese': '中文',
-    'language.spanish': 'Español'
-  }
-};
-
-interface LanguageProviderProps {
-  children: React.ReactNode;
+interface Translation {
+  [key: string]: string | Translation;
 }
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('en');
+const translations: { [key: string]: Translation } = {
+  en: {
+    home: {
+      title: 'Protecting the Vietnamese Community from Online Scams',
+      subtitle: 'AI-powered scam detection and community reporting platform',
+      search: 'Search for phone numbers, URLs, or keywords...',
+      report: 'Report a Scam',
+      features: 'Key Features',
+      recentAlerts: 'Recent Scam Alerts',
+      trust: 'Join the Fight Against Scams',
+      trustSubtitle: 'Together, we can make the internet a safer place for everyone.',
+      searchButton: 'Search',
+    },
+    report: {
+      title: 'Report a Scam',
+      subtitle: 'Help protect others by reporting scams you encounter.',
+      step1: {
+        title: 'Target Type',
+        question: 'What are you reporting?',
+        phone: 'Phone Number',
+        phoneDesc: 'Report a suspicious phone number',
+        bank: 'Bank Account',
+        bankDesc: 'Report a fraudulent bank account',
+        url: 'Website / URL',
+        urlDesc: 'Report a phishing or scam website',
+        other: 'Other',
+        otherDesc: 'Report other types of scams'
+      },
+      step2: {
+        title: 'Target Details',
+        phone: {
+          label: 'Enter Phone Number',
+          placeholder: 'e.g., 0901234567'
+        },
+        bank: {
+          label: 'Enter Bank Account Number',
+          placeholder: 'e.g., 19038828811011'
+        },
+        url: {
+          label: 'Enter Website URL',
+          placeholder: 'e.g., scamwebsite.com'
+        },
+        other: {
+          label: 'Describe the Target',
+          placeholder: 'Describe what you are reporting'
+        },
+        privacy: 'We will not share your personal information with the reported target.'
+      },
+      step3: {
+        title: 'Scam Details',
+        category: {
+          label: 'Select Scam Category'
+        },
+        description: {
+          label: 'Describe the Scam',
+          placeholder: 'Provide details about the scam, how it works, and what happened.',
+          tip: 'The more details you provide, the better we can understand and prevent similar scams.'
+        }
+      },
+      step4: {
+        title: 'Evidence (Optional)',
+        upload: {
+          label: 'Upload Evidence',
+          description: 'Upload screenshots, documents, or other evidence to support your report.',
+          instruction: 'Drag and drop files here or click to upload',
+          button: 'Upload Files'
+        },
+        files: {
+          selected: 'Selected Files'
+        },
+        remove: 'Remove',
+        privacy: {
+          title: 'Privacy Notice',
+          message: 'Your uploaded files will be securely stored and used only for scam analysis. We will not share your personal information.'
+        }
+      },
+      categories: {
+        fake: {
+          police: 'Fake Police/Gov Official',
+        },
+        bank: {
+          fraud: 'Bank Fraud/Phishing',
+        },
+        job: {
+          scam: 'Job Scam',
+        },
+        investment: 'Investment Scam',
+        online: {
+          shopping: 'Online Shopping Scam',
+        },
+        telecom: {
+          fraud: 'Telecom Fraud',
+        },
+        fake: {
+          promotion: 'Fake Promotion',
+        },
+        other: 'Other'
+      },
+      navigation: {
+        back: 'Back',
+        continue: 'Continue',
+        submit: 'Submit Report',
+        submitting: 'Submitting...'
+      },
+      success: {
+        title: 'Report Submitted!',
+        message: 'Thank you for helping protect the community. Your report will be reviewed by our team.',
+        home: 'Back to Home',
+        report: {
+          another: 'Report Another Scam'
+        }
+      },
+      titleAI: 'AI Analysis'
+    },
+    results: {
+      title: 'Search Results',
+      back: 'Back to Home',
+      risk: {
+        safe: 'No significant risk detected',
+        suspicious: 'Potentially suspicious',
+        dangerous: 'High risk of scam'
+      },
+      confidence: 'Confidence Level',
+      reportCount: 'Community Reports',
+      aiAnalysis: 'AI Analysis',
+      reasons: 'Reasons',
+      relatedReports: 'Related Reports',
+      report: 'Report',
+      summary: 'Summary'
+    },
+    aiKey: {
+      title: 'AI Enhancement Setup',
+      description: 'To enable advanced AI scam detection, please enter your Google Gemini API key. This will be stored locally and used to analyze content for scam patterns.',
+      inputPlaceholder: 'Enter your Gemini API key',
+      getKey: 'Get your free API key at: ',
+      saveEnable: 'Save & Enable AI',
+      cancel: 'Cancel',
+      remove: 'Remove AI Key',
+      aiEnhanced: 'AI Enhanced',
+      configure: 'Configure',
+      enableAI: 'Enable AI Analysis'
+    },
+    image: {
+      analysis: {
+        title: "Image Analysis",
+        details: "AI Analysis Details"
+      },
+      upload: {
+        instruction: "Upload a screenshot or image to analyze for scam patterns",
+        button: "Select Image"
+      },
+      analyze: {
+        button: "Analyze Image"
+      },
+      analyzing: "Analyzing...",
+      clear: "Clear",
+      extracted: {
+        info: "Extracted Information"
+      }
+    }
+  },
+  vi: {
+    home: {
+      title: 'Bảo Vệ Cộng Đồng Việt Nam Khỏi Lừa Đảo Trực Tuyến',
+      subtitle: 'Nền tảng phát hiện lừa đảo bằng AI và báo cáo cộng đồng',
+      search: 'Tìm kiếm số điện thoại, URL hoặc từ khóa...',
+      report: 'Báo Cáo Lừa Đảo',
+      features: 'Tính Năng Chính',
+      recentAlerts: 'Cảnh Báo Lừa Đảo Gần Đây',
+      trust: 'Tham Gia Chống Lại Lừa Đảo',
+      trustSubtitle: 'Cùng nhau, chúng ta có thể làm cho internet trở nên an toàn hơn cho mọi người.',
+      searchButton: 'Tìm kiếm'
+    },
+    report: {
+      title: 'Báo Cáo Lừa Đảo',
+      subtitle: 'Giúp bảo vệ người khác bằng cách báo cáo các hành vi lừa đảo bạn gặp phải.',
+      step1: {
+        title: 'Loại Đối Tượng',
+        question: 'Bạn đang báo cáo về cái gì?',
+        phone: 'Số Điện Thoại',
+        phoneDesc: 'Báo cáo một số điện thoại đáng ngờ',
+        bank: 'Tài Khoản Ngân Hàng',
+        bankDesc: 'Báo cáo một tài khoản ngân hàng gian lận',
+        url: 'Trang Web / URL',
+        urlDesc: 'Báo cáo một trang web lừa đảo hoặc giả mạo',
+        other: 'Khác',
+        otherDesc: 'Báo cáo các loại lừa đảo khác'
+      },
+      step2: {
+        title: 'Chi Tiết Đối Tượng',
+        phone: {
+          label: 'Nhập Số Điện Thoại',
+          placeholder: 'ví dụ: 0901234567'
+        },
+        bank: {
+          label: 'Nhập Số Tài Khoản Ngân Hàng',
+          placeholder: 'ví dụ: 19038828811011'
+        },
+        url: {
+          label: 'Nhập URL Trang Web',
+          placeholder: 'ví dụ: trangwebgiandao.com'
+        },
+        other: {
+          label: 'Mô Tả Đối Tượng',
+          placeholder: 'Mô tả những gì bạn đang báo cáo'
+        },
+        privacy: 'Chúng tôi sẽ không chia sẻ thông tin cá nhân của bạn với đối tượng bị báo cáo.'
+      },
+      step3: {
+        title: 'Chi Tiết Lừa Đảo',
+        category: {
+          label: 'Chọn Danh Mục Lừa Đảo'
+        },
+        description: {
+          label: 'Mô Tả Vụ Lừa Đảo',
+          placeholder: 'Cung cấp chi tiết về vụ lừa đảo, cách thức hoạt động và những gì đã xảy ra.',
+          tip: 'Bạn cung cấp càng nhiều chi tiết, chúng tôi càng hiểu rõ hơn và ngăn chặn các vụ lừa đảo tương tự.'
+        }
+      },
+      step4: {
+        title: 'Bằng Chứng (Tùy Chọn)',
+        upload: {
+          label: 'Tải Lên Bằng Chứng',
+          description: 'Tải lên ảnh chụp màn hình, tài liệu hoặc bằng chứng khác để hỗ trợ báo cáo của bạn.',
+          instruction: 'Kéo và thả tệp vào đây hoặc nhấp để tải lên',
+          button: 'Tải Lên Tệp'
+        },
+        files: {
+          selected: 'Các Tệp Đã Chọn'
+        },
+        remove: 'Xóa',
+        privacy: {
+          title: 'Thông Báo Về Quyền Riêng Tư',
+          message: 'Các tệp bạn tải lên sẽ được lưu trữ an toàn và chỉ được sử dụng cho mục đích phân tích lừa đảo. Chúng tôi sẽ không chia sẻ thông tin cá nhân của bạn.'
+        }
+      },
+      categories: {
+        fake: {
+          police: 'Giả Danh Công An/Quan Chức',
+        },
+        bank: {
+          fraud: 'Gian Lận/Lừa Đảo Ngân Hàng',
+        },
+        job: {
+          scam: 'Lừa Đảo Việc Làm',
+        },
+        investment: 'Lừa Đảo Đầu Tư',
+        online: {
+          shopping: 'Lừa Đảo Mua Sắm Trực Tuyến',
+        },
+        telecom: {
+          fraud: 'Lừa Đảo Viễn Thông',
+        },
+        fake: {
+          promotion: 'Khuyến Mãi Giả Mạo',
+        },
+        other: 'Khác'
+      },
+      navigation: {
+        back: 'Quay Lại',
+        continue: 'Tiếp Tục',
+        submit: 'Gửi Báo Cáo',
+        submitting: 'Đang Gửi...'
+      },
+      success: {
+        title: 'Đã Gửi Báo Cáo!',
+        message: 'Cảm ơn bạn đã giúp bảo vệ cộng đồng. Báo cáo của bạn sẽ được xem xét bởi đội ngũ của chúng tôi.',
+        home: 'Về Trang Chủ',
+        report: {
+          another: 'Báo Cáo Vụ Lừa Đảo Khác'
+        }
+      },
+      titleAI: 'Phân tích AI'
+    },
+    results: {
+      title: 'Kết Quả Tìm Kiếm',
+      back: 'Về Trang Chủ',
+      risk: {
+        safe: 'Không phát hiện rủi ro đáng kể',
+        suspicious: 'Có khả năng đáng ngờ',
+        dangerous: 'Nguy cơ lừa đảo cao'
+      },
+      confidence: 'Mức Độ Tin Cậy',
+      reportCount: 'Báo Cáo Từ Cộng Đồng',
+      aiAnalysis: 'Phân Tích AI',
+      reasons: 'Lý Do',
+      relatedReports: 'Báo Cáo Liên Quan',
+      report: 'Báo cáo',
+      summary: 'Tóm tắt'
+    },
+    aiKey: {
+      title: 'Thiết Lập Nâng Cao AI',
+      description: 'Để kích hoạt tính năng phát hiện lừa đảo nâng cao bằng AI, vui lòng nhập khóa API Google Gemini của bạn. Khóa này sẽ được lưu trữ cục bộ và sử dụng để phân tích nội dung nhằm tìm các mẫu lừa đảo.',
+      inputPlaceholder: 'Nhập khóa API Gemini của bạn',
+      getKey: 'Nhận khóa API miễn phí của bạn tại: ',
+      saveEnable: 'Lưu & Kích Hoạt AI',
+      cancel: 'Hủy',
+      remove: 'Xóa Khóa AI',
+      aiEnhanced: 'Tăng Cường AI',
+      configure: 'Cấu Hình',
+      enableAI: 'Kích Hoạt Phân Tích AI'
+    },
+    image: {
+      analysis: {
+        title: "Phân Tích Hình Ảnh",
+        details: "Chi Tiết Phân Tích AI"
+      },
+      upload: {
+        instruction: "Tải lên ảnh chụp màn hình để phân tích các dấu hiệu lừa đảo",
+        button: "Chọn Hình Ảnh"
+      },
+      analyze: {
+        button: "Phân Tích Hình Ảnh"
+      },
+      analyzing: "Đang phân tích...",
+      clear: "Xóa",
+      extracted: {
+        info: "Thông Tin Trích Xuất"
+      }
+    }
+  },
+  zh: {
+    home: {
+      title: '保护越南社区免受网络诈骗',
+      subtitle: 'AI驱动的诈骗检测和社区报告平台',
+      search: '搜索电话号码、网址或关键词...',
+      report: '报告诈骗',
+      features: '主要功能',
+      recentAlerts: '最近的诈骗警报',
+      trust: '加入打击诈骗的行列',
+      trustSubtitle: '齐心协力，我们可以让互联网对每个人都更安全。',
+      searchButton: '搜索'
+    },
+    report: {
+      title: '报告诈骗',
+      subtitle: '通过报告您遇到的诈骗行为，帮助保护他人。',
+      step1: {
+        title: '目标类型',
+        question: '您要报告什么？',
+        phone: '电话号码',
+        phoneDesc: '报告可疑电话号码',
+        bank: '银行账户',
+        bankDesc: '报告欺诈性银行账户',
+        url: '网站/网址',
+        urlDesc: '报告网络钓鱼或诈骗网站',
+        other: '其他',
+        otherDesc: '报告其他类型的诈骗'
+      },
+      step2: {
+        title: '目标详情',
+        phone: {
+          label: '输入电话号码',
+          placeholder: '例如，0901234567'
+        },
+        bank: {
+          label: '输入银行账号',
+          placeholder: '例如，19038828811011'
+        },
+        url: {
+          label: '输入网站网址',
+          placeholder: '例如，scamwebsite.com'
+        },
+        other: {
+          label: '描述目标',
+          placeholder: '描述您要报告的内容'
+        },
+        privacy: '我们不会与被报告的目标分享您的个人信息。'
+      },
+      step3: {
+        title: '诈骗详情',
+        category: {
+          label: '选择诈骗类别'
+        },
+        description: {
+          label: '描述诈骗',
+          placeholder: '提供有关诈骗的详细信息、其运作方式以及发生的情况。',
+          tip: '您提供的详细信息越多，我们就越能理解和预防类似的诈骗。'
+        }
+      },
+      step4: {
+        title: '证据（可选）',
+        upload: {
+          label: '上传证据',
+          description: '上传屏幕截图、文档或其他证据以支持您的报告。',
+          instruction: '将文件拖放到此处或单击以上传',
+          button: '上传文件'
+        },
+        files: {
+          selected: '选定的文件'
+        },
+        remove: '移除',
+        privacy: {
+          title: '隐私声明',
+          message: '您上传的文件将被安全存储，仅用于诈骗分析。我们不会分享您的个人信息。'
+        }
+      },
+      categories: {
+        fake: {
+          police: '假冒警察/政府官员',
+        },
+        bank: {
+          fraud: '银行欺诈/网络钓鱼',
+        },
+        job: {
+          scam: '求职诈骗',
+        },
+        investment: '投资诈骗',
+        online: {
+          shopping: '网上购物诈骗',
+        },
+        telecom: {
+          fraud: '电信诈骗',
+        },
+        fake: {
+          promotion: '虚假促销',
+        },
+        other: '其他'
+      },
+      navigation: {
+        back: '返回',
+        continue: '继续',
+        submit: '提交报告',
+        submitting: '提交中...'
+      },
+      success: {
+        title: '报告已提交！',
+        message: '感谢您帮助保护社区。您的报告将由我们的团队审核。',
+        home: '返回主页',
+        report: {
+          another: '报告另一起诈骗'
+        }
+      },
+      titleAI: 'AI分析'
+    },
+    results: {
+      title: '搜索结果',
+      back: '返回主页',
+      risk: {
+        safe: '未检测到重大风险',
+        suspicious: '可能可疑',
+        dangerous: '高诈骗风险'
+      },
+      confidence: '信心水平',
+      reportCount: '社区报告',
+      aiAnalysis: 'AI分析',
+      reasons: '理由',
+      relatedReports: '相关报告',
+      report: '报告',
+      summary: '概要'
+    },
+    aiKey: {
+      title: 'AI增强设置',
+      description: '要启用高级AI诈骗检测，请输入您的Google Gemini API密钥。该密钥将存储在本地，并用于分析内容以查找诈骗模式。',
+      inputPlaceholder: '输入您的Gemini API密钥',
+      getKey: '在以下位置获取您的免费API密钥：',
+      saveEnable: '保存并启用AI',
+      cancel: '取消',
+      remove: '删除AI密钥',
+      aiEnhanced: 'AI增强',
+      configure: '配置',
+      enableAI: '启用AI分析'
+    },
+    image: {
+      analysis: {
+        title: "图像分析",
+        details: "AI分析详情"
+      },
+      upload: {
+        instruction: "上传截图或图片以分析诈骗模式",
+        button: "选择图片"
+      },
+      analyze: {
+        button: "分析图片"
+      },
+      analyzing: "分析中...",
+      clear: "清除",
+      extracted: {
+        info: "提取信息"
+      }
+    }
+  },
+  es: {
+    home: {
+      title: 'Protegiendo a la Comunidad Vietnamita de las Estafas en Línea',
+      subtitle: 'Plataforma de detección de estafas impulsada por IA y reporte comunitario',
+      search: 'Buscar números de teléfono, URLs o palabras clave...',
+      report: 'Reportar una Estafa',
+      features: 'Características Clave',
+      recentAlerts: 'Alertas de Estafas Recientes',
+      trust: 'Únete a la Lucha Contra las Estafas',
+      trustSubtitle: 'Juntos, podemos hacer de Internet un lugar más seguro para todos.',
+      searchButton: 'Buscar'
+    },
+    report: {
+      title: 'Reportar una Estafa',
+      subtitle: 'Ayuda a proteger a otros reportando las estafas que encuentres.',
+      step1: {
+        title: 'Tipo de Objetivo',
+        question: '¿Qué estás reportando?',
+        phone: 'Número de Teléfono',
+        phoneDesc: 'Reportar un número de teléfono sospechoso',
+        bank: 'Cuenta Bancaria',
+        bankDesc: 'Reportar una cuenta bancaria fraudulenta',
+        url: 'Sitio Web / URL',
+        urlDesc: 'Reportar un sitio web de phishing o estafa',
+        other: 'Otro',
+        otherDesc: 'Reportar otros tipos de estafas'
+      },
+      step2: {
+        title: 'Detalles del Objetivo',
+        phone: {
+          label: 'Ingresar Número de Teléfono',
+          placeholder: 'ej., 0901234567'
+        },
+        bank: {
+          label: 'Ingresar Número de Cuenta Bancaria',
+          placeholder: 'ej., 19038828811011'
+        },
+        url: {
+          label: 'Ingresar URL del Sitio Web',
+          placeholder: 'ej., sitioestafa.com'
+        },
+        other: {
+          label: 'Describir el Objetivo',
+          placeholder: 'Describir qué estás reportando'
+        },
+        privacy: 'No compartiremos tu información personal con el objetivo reportado.'
+      },
+      step3: {
+        title: 'Detalles de la Estafa',
+        category: {
+          label: 'Seleccionar Categoría de Estafa'
+        },
+        description: {
+          label: 'Describir la Estafa',
+          placeholder: 'Proporcionar detalles sobre la estafa, cómo funciona y qué sucedió.',
+          tip: 'Cuantos más detalles proporciones, mejor podremos entender y prevenir estafas similares.'
+        }
+      },
+      step4: {
+        title: 'Evidencia (Opcional)',
+        upload: {
+          label: 'Subir Evidencia',
+          description: 'Subir capturas de pantalla, documentos u otra evidencia para apoyar tu reporte.',
+          instruction: 'Arrastra y suelta archivos aquí o haz clic para subir',
+          button: 'Subir Archivos'
+        },
+        files: {
+          selected: 'Archivos Seleccionados'
+        },
+        remove: 'Eliminar',
+        privacy: {
+          title: 'Aviso de Privacidad',
+          message: 'Tus archivos subidos se almacenarán de forma segura y solo se utilizarán para análisis de estafas. No compartiremos tu información personal.'
+        }
+      },
+      categories: {
+        fake: {
+          police: 'Policía/Funcionario del Gobierno Falso',
+        },
+        bank: {
+          fraud: 'Fraude Bancario/Phishing',
+        },
+        job: {
+          scam: 'Estafa de Empleo',
+        },
+        investment: 'Estafa de Inversión',
+        online: {
+          shopping: 'Estafa de Compras en Línea',
+        },
+        telecom: {
+          fraud: 'Fraude de Telecomunicaciones',
+        },
+        fake: {
+          promotion: 'Promoción Falsa',
+        },
+        other: 'Otro'
+      },
+      navigation: {
+        back: 'Volver',
+        continue: 'Continuar',
+        submit: 'Enviar Reporte',
+        submitting: 'Enviando...'
+      },
+      success: {
+        title: '¡Reporte Enviado!',
+        message: 'Gracias por ayudar a proteger a la comunidad. Tu reporte será revisado por nuestro equipo.',
+        home: 'Volver al Inicio',
+        report: {
+          another: 'Reportar Otra Estafa'
+        }
+      },
+      titleAI: 'Análisis de IA'
+    },
+    results: {
+      title: 'Resultados de la Búsqueda',
+      back: 'Volver al Inicio',
+      risk: {
+        safe: 'No se detectó riesgo significativo',
+        suspicious: 'Potencialmente sospechoso',
+        dangerous: 'Alto riesgo de estafa'
+      },
+      confidence: 'Nivel de Confianza',
+      reportCount: 'Reportes de la Comunidad',
+      aiAnalysis: 'Análisis de IA',
+      reasons: 'Razones',
+      relatedReports: 'Reportes Relacionados',
+      report: 'Reporte',
+      summary: 'Resumen'
+    },
+    aiKey: {
+      title: 'Configuración de Mejora de IA',
+      description: 'Para habilitar la detección avanzada de estafas con IA, ingresa tu clave API de Google Gemini. Esta clave se almacenará localmente y se utilizará para analizar el contenido en busca de patrones de estafa.',
+      inputPlaceholder: 'Ingresa tu clave API de Gemini',
+      getKey: 'Obtén tu clave API gratuita en: ',
+      saveEnable: 'Guardar y Habilitar IA',
+      cancel: 'Cancelar',
+      remove: 'Eliminar Clave de IA',
+      aiEnhanced: 'IA Mejorada',
+      configure: 'Configurar',
+      enableAI: 'Habilitar Análisis de IA'
+    },
+    image: {
+      analysis: {
+        title: "Análisis de Imagen",
+        details: "Detalles del Análisis AI"
+      },
+      upload: {
+        instruction: "Sube una captura de pantalla o imagen para analizar patrones de estafa",
+        button: "Seleccionar Imagen"
+      },
+      analyze: {
+        button: "Analizar Imagen"
+      },
+      analyzing: "Analizando...",
+      clear: "Limpiar",
+      extracted: {
+        info: "Información Extraída"
+      }
+    }
+  }
+};
+
+const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'vi');
 
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('language') as Language;
-    if (savedLanguage && ['en', 'vi', 'zh', 'es'].includes(savedLanguage)) {
-      setLanguage(savedLanguage);
-    }
-  }, []);
-
-  const changeLanguage = (lang: Language) => {
-    setLanguage(lang);
-    localStorage.setItem('language', lang);
-  };
+    localStorage.setItem('language', language);
+  }, [language]);
 
   const t = (key: string): string => {
-    return translations[language][key] || key;
+    const keys = key.split('.');
+    let value: any = translations[language];
+    for (const k of keys) {
+      if (value && typeof value === 'object' && k in value) {
+        value = value[k];
+      } else {
+        return key;
+      }
+    }
+    return typeof value === 'string' ? value : key;
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage: changeLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );
 };
+
+const useLanguage = () => {
+  return useContext(LanguageContext);
+};
+
+export { LanguageProvider, useLanguage };
