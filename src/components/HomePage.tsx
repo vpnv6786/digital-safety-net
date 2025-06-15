@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { Search, ShieldAlert, Lightbulb, Users, CheckCheck, PlusCircle } from 'lucide-react';
+import { Search, ShieldAlert, Lightbulb, Users, CheckCheck, PlusCircle, Info, Phone, Lock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -58,6 +59,28 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
           </div>
           
           <div className="flex items-center space-x-4">
+            {/* Navigation Menu */}
+            <nav className="hidden md:flex items-center space-x-6">
+              <Link to="/about" className="text-gray-600 hover:text-trust-blue transition-colors">
+                <div className="flex items-center space-x-1">
+                  <Info className="w-4 h-4" />
+                  <span>Giới thiệu</span>
+                </div>
+              </Link>
+              <Link to="/contact" className="text-gray-600 hover:text-trust-blue transition-colors">
+                <div className="flex items-center space-x-1">
+                  <Phone className="w-4 h-4" />
+                  <span>Liên hệ</span>
+                </div>
+              </Link>
+              <Link to="/privacy" className="text-gray-600 hover:text-trust-blue transition-colors">
+                <div className="flex items-center space-x-1">
+                  <Lock className="w-4 h-4" />
+                  <span>Bảo mật</span>
+                </div>
+              </Link>
+            </nav>
+            
             <AIKeyInput />
             <LanguageSelector />
           </div>
@@ -198,9 +221,66 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-100 py-6 text-center text-gray-500 text-sm">
-        {t('footer.copyright')}
+      {/* Enhanced Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid md:grid-cols-4 gap-8">
+            {/* Brand Section */}
+            <div className="col-span-1">
+              <div className="flex items-center space-x-2 mb-4">
+                <ShieldAlert className="w-6 h-6 text-trust-blue" />
+                <span className="text-lg font-semibold">Vệ Binh Mạng</span>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Bảo vệ cộng đồng khỏi lừa đảo trực tuyến với công nghệ AI tiên tiến và sức mạnh cộng đồng.
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div className="col-span-1">
+              <h3 className="font-semibold mb-4">Liên kết nhanh</h3>
+              <div className="space-y-2">
+                <Link to="/about" className="block text-gray-400 hover:text-white transition-colors text-sm">
+                  Giới thiệu
+                </Link>
+                <Link to="/contact" className="block text-gray-400 hover:text-white transition-colors text-sm">
+                  Liên hệ
+                </Link>
+                <Link to="/privacy" className="block text-gray-400 hover:text-white transition-colors text-sm">
+                  Chính sách bảo mật
+                </Link>
+              </div>
+            </div>
+
+            {/* Support */}
+            <div className="col-span-1">
+              <h3 className="font-semibold mb-4">Hỗ trợ</h3>
+              <div className="space-y-2 text-sm text-gray-400">
+                <p>Email: support@vebinh.com</p>
+                <p>Hotline: 1900-888-999</p>
+                <p>Khẩn cấp: 113</p>
+              </div>
+            </div>
+
+            {/* Legal */}
+            <div className="col-span-1">
+              <h3 className="font-semibold mb-4">Pháp lý</h3>
+              <div className="space-y-2 text-sm text-gray-400">
+                <p>© 2024 Vệ Binh Mạng</p>
+                <p>Bảo lưu mọi quyền</p>
+                <p>Phiên bản 1.0</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-gray-800 mt-8 pt-6 text-center text-sm text-gray-400">
+            <p>
+              Vệ Binh Mạng - Nền tảng bảo vệ cộng đồng khỏi lừa đảo trực tuyến. 
+              Được phát triển với ❤️ tại Việt Nam.
+            </p>
+          </div>
+        </div>
       </footer>
     </div>
   );
