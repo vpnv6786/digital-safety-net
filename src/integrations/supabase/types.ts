@@ -60,6 +60,81 @@ export type Database = {
           },
         ]
       }
+      community_alerts: {
+        Row: {
+          affected_areas: string[] | null
+          alert_type: string
+          contact_info: string | null
+          created_at: string
+          description: string
+          downvotes: number | null
+          evidence_urls: string[] | null
+          expires_at: string | null
+          id: string
+          is_verified: boolean | null
+          latitude: number | null
+          location_name: string | null
+          longitude: number | null
+          reporter_user_id: string | null
+          severity: string
+          source_type: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          upvotes: number | null
+          verified_by: string | null
+          view_count: number | null
+        }
+        Insert: {
+          affected_areas?: string[] | null
+          alert_type: string
+          contact_info?: string | null
+          created_at?: string
+          description: string
+          downvotes?: number | null
+          evidence_urls?: string[] | null
+          expires_at?: string | null
+          id?: string
+          is_verified?: boolean | null
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          reporter_user_id?: string | null
+          severity: string
+          source_type?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          upvotes?: number | null
+          verified_by?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          affected_areas?: string[] | null
+          alert_type?: string
+          contact_info?: string | null
+          created_at?: string
+          description?: string
+          downvotes?: number | null
+          evidence_urls?: string[] | null
+          expires_at?: string | null
+          id?: string
+          is_verified?: boolean | null
+          latitude?: number | null
+          location_name?: string | null
+          longitude?: number | null
+          reporter_user_id?: string | null
+          severity?: string
+          source_type?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          upvotes?: number | null
+          verified_by?: string | null
+          view_count?: number | null
+        }
+        Relationships: []
+      }
       danger_zones: {
         Row: {
           active_from: string | null
@@ -250,6 +325,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      scam_statistics: {
+        Row: {
+          created_at: string
+          damage_score: number | null
+          danger_level: string
+          description: string
+          frequency_score: number | null
+          id: string
+          prevention_tips: string[] | null
+          recent_trend: string | null
+          scam_type: string
+          title: string
+          total_reports: number | null
+          updated_at: string
+          warning_signs: string[] | null
+        }
+        Insert: {
+          created_at?: string
+          damage_score?: number | null
+          danger_level: string
+          description: string
+          frequency_score?: number | null
+          id?: string
+          prevention_tips?: string[] | null
+          recent_trend?: string | null
+          scam_type: string
+          title: string
+          total_reports?: number | null
+          updated_at?: string
+          warning_signs?: string[] | null
+        }
+        Update: {
+          created_at?: string
+          damage_score?: number | null
+          danger_level?: string
+          description?: string
+          frequency_score?: number | null
+          id?: string
+          prevention_tips?: string[] | null
+          recent_trend?: string | null
+          scam_type?: string
+          title?: string
+          total_reports?: number | null
+          updated_at?: string
+          warning_signs?: string[] | null
+        }
+        Relationships: []
       }
       user_locations: {
         Row: {
