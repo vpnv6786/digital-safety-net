@@ -7,13 +7,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { aiManager } from '@/services/aiManager';
 import { AI_PROVIDERS } from '@/types/aiProviders';
 import { useLanguage } from '@/contexts/LanguageContext';
+import TranslatedText from './TranslatedText';
 import AIProviderSetup from './AIProviderSetup';
 
 const AIKeyInput: React.FC = () => {
   const [isConfigured, setIsConfigured] = useState(false);
   const [activeProvider, setActiveProvider] = useState<string>('');
   const [showSetup, setShowSetup] = useState(false);
-  const { t } = useLanguage();
+  const { language } = useLanguage();
 
   useEffect(() => {
     // Initialize and check configuration
@@ -43,17 +44,19 @@ const AIKeyInput: React.FC = () => {
           <DialogTrigger asChild>
             <Button variant="ghost" size="sm" className="text-xs">
               <Settings className="w-3 h-3 mr-1" />
-              {t('aiKey.configure')}
+              <TranslatedText>{language === 'en' ? 'Configure' : 'Cấu hình'}</TranslatedText>
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{t('aiKey.title')}</DialogTitle>
+              <DialogTitle>
+                <TranslatedText>{language === 'en' ? 'AI Configuration' : 'Cấu hình AI'}</TranslatedText>
+              </DialogTitle>
             </DialogHeader>
             <AIProviderSetup />
             <div className="flex justify-end pt-4">
               <Button onClick={handleSetupComplete}>
-                {t('report.success.home')}
+                <TranslatedText>{language === 'en' ? 'Close' : 'Đóng'}</TranslatedText>
               </Button>
             </div>
           </DialogContent>
@@ -72,17 +75,19 @@ const AIKeyInput: React.FC = () => {
           className="border-blue-500 text-blue-500 hover:bg-blue-50"
         >
           <Brain className="w-4 h-4 mr-2" />
-          {t('aiKey.enableAI')}
+          <TranslatedText>{language === 'en' ? 'Enable AI' : 'Kích hoạt AI'}</TranslatedText>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t('aiKey.title')}</DialogTitle>
+          <DialogTitle>
+            <TranslatedText>{language === 'en' ? 'AI Configuration' : 'Cấu hình AI'}</TranslatedText>
+          </DialogTitle>
         </DialogHeader>
         <AIProviderSetup />
         <div className="flex justify-end pt-4">
           <Button onClick={handleSetupComplete}>
-            {t('report.success.home')}
+            <TranslatedText>{language === 'en' ? 'Close' : 'Đóng'}</TranslatedText>
           </Button>
         </div>
       </DialogContent>

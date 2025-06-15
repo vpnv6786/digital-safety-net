@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Upload, Image, AlertTriangle, CheckCircle, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { analyzeScamImage } from '@/services/aiService';
 import { useLanguage } from '@/contexts/LanguageContext';
+import TranslatedText from './TranslatedText';
 
 interface ImageAnalysisResult {
   riskLevel: 'safe' | 'suspicious' | 'dangerous';
@@ -21,7 +21,7 @@ const ImageAnalysis: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<ImageAnalysisResult | null>(null);
-  const { t } = useLanguage();
+  const { language } = useLanguage();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -84,14 +84,21 @@ const ImageAnalysis: React.FC = () => {
       <CardHeader>
         <CardTitle className="flex items-center">
           <Image className="w-6 h-6 mr-2 text-blue-500" />
-          {t('image.analysis.title')}
+          <TranslatedText>{language === 'en' ? 'Image Analysis' : 'Phân tích hình ảnh'}</TranslatedText>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {!selectedFile ? (
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
             <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 mb-4">{t('image.upload.instruction')}</p>
+            <p className="text-gray-600 mb-4">
+              <TranslatedText>
+                {language === 'en' 
+                  ? 'Upload an image to analyze for scam content'
+                  : 'Tải lên hình ảnh để phân tích nội dung lừa đảo'
+                }
+              </TranslatedText>
+            </p>
             <input
               type="file"
               accept="image/*"
@@ -102,7 +109,7 @@ const ImageAnalysis: React.FC = () => {
             <label htmlFor="imageUpload">
               <Button variant="outline" className="cursor-pointer">
                 <Upload className="w-4 h-4 mr-2" />
-                {t('image.upload.button')}
+                <TranslatedText>{language === 'en' ? 'Upload Image' : 'Tải lên hình ảnh'}</TranslatedText>
               </Button>
             </label>
           </div>
@@ -133,17 +140,17 @@ const ImageAnalysis: React.FC = () => {
                 {isAnalyzing ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {t('image.analyzing')}
+                    <TranslatedText>{language === 'en' ? 'Analyzing...' : 'Đang phân tích...'}</TranslatedText>
                   </>
                 ) : (
                   <>
                     <AlertTriangle className="w-4 h-4 mr-2" />
-                    {t('image.analyze.button')}
+                    <TranslatedText>{language === 'en' ? 'Analyze Image' : 'Phân tích hình ảnh'}</TranslatedText>
                   </>
                 )}
               </Button>
               <Button variant="outline" onClick={clearImage}>
-                {t('image.clear')}
+                <TranslatedText>{language === 'en' ? 'Clear' : 'Xóa'}</TranslatedText>
               </Button>
             </div>
           </div>
@@ -156,12 +163,16 @@ const ImageAnalysis: React.FC = () => {
                 {getRiskIcon(analysisResult.riskLevel)}
                 <div className="flex-1">
                   <div className="font-semibold text-lg">
-                    {analysisResult.riskLevel === 'dangerous' && t('results.risk.dangerous')}
-                    {analysisResult.riskLevel === 'suspicious' && t('results.risk.suspicious')}
-                    {analysisResult.riskLevel === 'safe' && t('results.risk.safe')}
+                    <TranslatedText>
+                      {analysisResult.riskLevel === 'dangerous' && (language === 'en' ? 'High Risk - Dangerous' : 'Rủi ro cao - Nguy hiểm')}
+                      {analysisResult.riskLevel === 'suspicious' && (language === 'en' ? 'Medium Risk - Suspicious' : 'Rủi ro trung bình - Đáng nghi')}
+                      {analysisResult.riskLevel === 'safe' && (language === 'en' ? 'Low Risk - Safe' : 'Rủi ro thấp - An toàn')}
+                    </TranslatedText>
                   </div>
                   <div className="text-sm opacity-75">
-                    {t('results.confidence')}: {analysisResult.confidence}%
+                    <TranslatedText>
+                      {language === 'en' ? `Confidence: ${analysisResult.confidence}%` : `Độ tin cậy: ${analysisResult.confidence}%`}
+                    </TranslatedText>
                   </div>
                 </div>
               </div>
@@ -169,13 +180,17 @@ const ImageAnalysis: React.FC = () => {
 
             <div className="grid gap-4">
               <div>
-                <h4 className="font-semibold mb-2">{t('image.analysis.details')}</h4>
+                <h4 className="font-semibold mb-2">
+                  <TranslatedText>{language === 'en' ? 'Analysis Details' : 'Chi tiết phân tích'}</TranslatedText>
+                </h4>
                 <p className="text-gray-700 text-sm">{analysisResult.aiAnalysis}</p>
               </div>
 
               {analysisResult.reasons.length > 0 && (
                 <div>
-                  <h4 className="font-semibold mb-2">{t('results.reasons')}</h4>
+                  <h4 className="font-semibold mb-2">
+                    <TranslatedText>{language === 'en' ? 'Risk Factors' : 'Yếu tố rủi ro'}</TranslatedText>
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {analysisResult.reasons.map((reason, index) => (
                       <Badge key={index} variant="outline" className="text-xs">
@@ -188,7 +203,9 @@ const ImageAnalysis: React.FC = () => {
 
               {analysisResult.extractedInfo.length > 0 && (
                 <div>
-                  <h4 className="font-semibold mb-2">{t('image.extracted.info')}</h4>
+                  <h4 className="font-semibold mb-2">
+                    <TranslatedText>{language === 'en' ? 'Extracted Information' : 'Thông tin trích xuất'}</TranslatedText>
+                  </h4>
                   <div className="bg-gray-50 rounded-lg p-3">
                     {analysisResult.extractedInfo.map((info, index) => (
                       <div key={index} className="text-sm font-mono bg-white px-2 py-1 rounded mb-1">
