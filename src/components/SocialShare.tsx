@@ -60,59 +60,61 @@ const SocialShare: React.FC<SocialShareProps> = ({
   };
 
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
-      <span className="text-sm text-gray-600 mr-2">
+    <div className={`flex flex-wrap items-center gap-2 ${className}`}>
+      <span className="text-xs sm:text-sm text-gray-600 mr-1 w-full sm:w-auto mb-1 sm:mb-0">
         {language === 'en' ? 'Share:' : 'Chia sẻ:'}
       </span>
       
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => handleShare('facebook')}
-        className="flex items-center space-x-1"
-      >
-        <Facebook className="w-4 h-4" />
-        <span className="hidden sm:inline">Facebook</span>
-      </Button>
-      
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => handleShare('twitter')}
-        className="flex items-center space-x-1"
-      >
-        <Twitter className="w-4 h-4" />
-        <span className="hidden sm:inline">Twitter</span>
-      </Button>
-      
-      {navigator.share ? (
+      <div className="flex items-center space-x-2">
         <Button
           variant="outline"
           size="sm"
-          onClick={handleNativeShare}
-          className="flex items-center space-x-1"
+          onClick={() => handleShare('facebook')}
+          className="flex items-center space-x-1 h-8 px-2 sm:px-3"
         >
-          <Share className="w-4 h-4" />
-          <span className="hidden sm:inline">
-            {language === 'en' ? 'Share' : 'Chia sẻ'}
-          </span>
+          <Facebook className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span className="hidden xs:inline text-xs sm:text-sm">Facebook</span>
         </Button>
-      ) : (
+        
         <Button
           variant="outline"
           size="sm"
-          onClick={handleCopyLink}
-          className="flex items-center space-x-1"
+          onClick={() => handleShare('twitter')}
+          className="flex items-center space-x-1 h-8 px-2 sm:px-3"
         >
-          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-          <span className="hidden sm:inline">
-            {copied 
-              ? (language === 'en' ? 'Copied!' : 'Đã sao chép!')
-              : (language === 'en' ? 'Copy Link' : 'Sao chép')
-            }
-          </span>
+          <Twitter className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span className="hidden xs:inline text-xs sm:text-sm">Twitter</span>
         </Button>
-      )}
+        
+        {navigator.share ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleNativeShare}
+            className="flex items-center space-x-1 h-8 px-2 sm:px-3"
+          >
+            <Share className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden xs:inline text-xs sm:text-sm">
+              {language === 'en' ? 'Share' : 'Chia sẻ'}
+            </span>
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCopyLink}
+            className="flex items-center space-x-1 h-8 px-2 sm:px-3"
+          >
+            {copied ? <Check className="w-3 h-3 sm:w-4 sm:h-4" /> : <Copy className="w-3 h-3 sm:w-4 sm:h-4" />}
+            <span className="hidden xs:inline text-xs sm:text-sm">
+              {copied 
+                ? (language === 'en' ? 'Copied!' : 'Đã sao chép!')
+                : (language === 'en' ? 'Copy Link' : 'Sao chép')
+              }
+            </span>
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

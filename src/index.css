@@ -162,6 +162,54 @@
   }
 }
 
+/* Mobile-first responsive utilities */
+@layer utilities {
+  /* Extra small screens - phones */
+  .xs\:inline {
+    @media (min-width: 475px) {
+      display: inline;
+    }
+  }
+  
+  .xs\:block {
+    @media (min-width: 475px) {
+      display: block;
+    }
+  }
+  
+  .xs\:flex {
+    @media (min-width: 475px) {
+      display: flex;
+    }
+  }
+
+  /* Touch-friendly tap targets */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Safe area for notched devices */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Text scaling for better mobile readability */
+  .mobile-text {
+    @apply text-base leading-relaxed;
+  }
+
+  @media (max-width: 640px) {
+    .mobile-text {
+      @apply text-sm leading-normal;
+    }
+  }
+}
+
 /* Custom animations */
 @keyframes pulse-trust {
   0%, 100% {
