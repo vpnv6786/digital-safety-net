@@ -205,7 +205,7 @@ const ScamRankings = () => {
                   <div className="text-center p-3 bg-blue-50 rounded-lg">
                     <div className="text-2xl font-bold text-blue-600">{stat.total_reports.toLocaleString()}</div>
                     <div className="text-sm text-gray-600">
-                      {language === 'en' ? 'Reports' : 'Số Báo Cáo'}
+                      {language === 'en' ? 'Total Reports' : 'Tổng Báo Cáo'}
                     </div>
                   </div>
                 </div>
