@@ -73,10 +73,10 @@ const ScamRankings = () => {
 
   const getDangerLevelText = (level: string) => {
     switch (level) {
-      case 'critical': return language === 'en' ? 'Extremely dangerous' : 'Cực kỳ nguy hiểm';
-      case 'high': return language === 'en' ? 'High risk' : 'Nguy hiểm cao';
-      case 'medium': return language === 'en' ? 'Medium risk' : 'Nguy hiểm trung bình';
-      case 'low': return language === 'en' ? 'Low risk' : 'Nguy hiểm thấp';
+      case 'critical': return language === 'en' ? 'Extremely Dangerous' : 'Cực Kỳ Nguy Hiểm';
+      case 'high': return language === 'en' ? 'High Risk' : 'Nguy Hiểm Cao';
+      case 'medium': return language === 'en' ? 'Medium Risk' : 'Nguy Hiểm Trung Bình';
+      case 'low': return language === 'en' ? 'Low Risk' : 'Nguy Hiểm Thấp';
       default: return level;
     }
   };
@@ -104,13 +104,13 @@ const ScamRankings = () => {
           <Link to="/">
             <Button variant="ghost" className="text-trust-blue hover:bg-trust-blue/10">
               <ArrowLeft className="w-5 h-5 mr-2" />
-              {language === 'en' ? 'Back to home' : 'Về trang chủ'}
+              {language === 'en' ? 'Back to Home' : 'Về Trang Chủ'}
             </Button>
           </Link>
           <div className="flex items-center space-x-2">
             <AlertTriangle className="w-6 h-6 text-trust-blue" />
             <span className="text-lg font-semibold text-gray-800">
-              {language === 'en' ? 'Scam Rankings' : 'Bảng xếp hạng lừa đảo'}
+              {language === 'en' ? 'Scam Rankings' : 'Bảng Xếp Hạng Lừa Đảo'}
             </span>
           </div>
         </div>
@@ -119,7 +119,7 @@ const ScamRankings = () => {
       <div className="max-w-6xl mx-auto p-4 space-y-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            📊 {language === 'en' ? 'Dangerous scam types ranking' : 'Bảng xếp hạng các dạng lừa đảo nguy hiểm'}
+            📊 {language === 'en' ? 'Dangerous Scam Types Ranking' : 'Bảng Xếp Hạng Các Dạng Lừa Đảo Nguy Hiểm'}
           </h1>
           <p className="text-gray-600">
             {language === 'en' 
@@ -131,7 +131,7 @@ const ScamRankings = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>{language === 'en' ? 'Sort by' : 'Sắp xếp theo'}</CardTitle>
+            <CardTitle>{language === 'en' ? 'Sort By' : 'Sắp Xếp Theo'}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
@@ -141,7 +141,7 @@ const ScamRankings = () => {
                 className="flex items-center space-x-2"
               >
                 <Eye className="w-4 h-4" />
-                <span>{language === 'en' ? 'Frequency' : 'Tần suất xuất hiện'}</span>
+                <span>{language === 'en' ? 'Frequency' : 'Tần Suất Xuất Hiện'}</span>
               </Button>
               <Button
                 variant={sortBy === 'damage' ? 'default' : 'outline'}
@@ -149,7 +149,7 @@ const ScamRankings = () => {
                 className="flex items-center space-x-2"
               >
                 <DollarSign className="w-4 h-4" />
-                <span>{language === 'en' ? 'Damage level' : 'Mức độ thiệt hại'}</span>
+                <span>{language === 'en' ? 'Damage Level' : 'Mức Độ Thiệt Hại'}</span>
               </Button>
               <Button
                 variant={sortBy === 'reports' ? 'default' : 'outline'}
@@ -157,7 +157,7 @@ const ScamRankings = () => {
                 className="flex items-center space-x-2"
               >
                 <Shield className="w-4 h-4" />
-                <span>{language === 'en' ? 'Number of reports' : 'Số báo cáo'}</span>
+                <span>{language === 'en' ? 'Number of Reports' : 'Số Báo Cáo'}</span>
               </Button>
             </div>
           </CardContent>
@@ -193,19 +193,19 @@ const ScamRankings = () => {
                   <div className="text-center p-3 bg-red-50 rounded-lg">
                     <div className="text-2xl font-bold text-red-600">{stat.frequency_score}</div>
                     <div className="text-sm text-gray-600">
-                      {language === 'en' ? 'Frequency score' : 'Điểm tần suất'}
+                      {language === 'en' ? 'Frequency Score' : 'Điểm Tần Suất'}
                     </div>
                   </div>
                   <div className="text-center p-3 bg-orange-50 rounded-lg">
                     <div className="text-2xl font-bold text-orange-600">{stat.damage_score}</div>
                     <div className="text-sm text-gray-600">
-                      {language === 'en' ? 'Damage score' : 'Điểm thiệt hại'}
+                      {language === 'en' ? 'Damage Score' : 'Điểm Thiệt Hại'}
                     </div>
                   </div>
                   <div className="text-center p-3 bg-blue-50 rounded-lg">
                     <div className="text-2xl font-bold text-blue-600">{stat.total_reports.toLocaleString()}</div>
                     <div className="text-sm text-gray-600">
-                      {language === 'en' ? 'Reports' : 'Số báo cáo'}
+                      {language === 'en' ? 'Reports' : 'Số Báo Cáo'}
                     </div>
                   </div>
                 </div>
@@ -213,7 +213,7 @@ const ScamRankings = () => {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <h4 className="font-medium text-gray-900 mb-2">
-                      🚨 {language === 'en' ? 'Warning signs:' : 'Dấu hiệu cảnh báo:'}
+                      🚨 {language === 'en' ? 'Warning Signs:' : 'Dấu Hiệu Cảnh Báo:'}
                     </h4>
                     <ul className="text-sm text-gray-600 space-y-1">
                       {stat.warning_signs.map((sign, idx) => (
@@ -226,7 +226,7 @@ const ScamRankings = () => {
                   </div>
                   <div>
                     <h4 className="font-medium text-gray-900 mb-2">
-                      🛡️ {language === 'en' ? 'Prevention tips:' : 'Cách phòng chống:'}
+                      🛡️ {language === 'en' ? 'Prevention Tips:' : 'Cách Phòng Chống:'}
                     </h4>
                     <ul className="text-sm text-gray-600 space-y-1">
                       {stat.prevention_tips.map((tip, idx) => (
@@ -249,7 +249,7 @@ const ScamRankings = () => {
               <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
               <div>
                 <h4 className="font-medium text-yellow-800 mb-1">
-                  {language === 'en' ? 'Important note' : 'Lưu ý quan trọng'}
+                  {language === 'en' ? 'Important Note' : 'Lưu Ý Quan Trọng'}
                 </h4>
                 <p className="text-sm text-yellow-700">
                   {language === 'en' 

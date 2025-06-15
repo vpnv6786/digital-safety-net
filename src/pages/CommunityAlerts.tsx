@@ -24,7 +24,7 @@ const CommunityAlerts = () => {
       console.log('New alert received:', newAlert);
       setAlerts(prev => [newAlert, ...prev]);
       toast({
-        title: language === 'en' ? "🚨 New Alert" : "🚨 Cảnh báo mới",
+        title: language === 'en' ? "🚨 New Alert" : "🚨 Cảnh Báo Mới",
         description: language === 'en' ? "New alert from community" : "Có cảnh báo mới từ cộng đồng",
       });
     });
@@ -80,30 +80,30 @@ const CommunityAlerts = () => {
 
   const getAlertTypeName = (type: string) => {
     const types = {
-      'urgent_alert': language === 'en' ? 'Urgent Alert' : 'Cảnh báo khẩn cấp',
-      'scam_warning': language === 'en' ? 'Scam Warning' : 'Cảnh báo lừa đảo',
-      'danger_zone': language === 'en' ? 'Danger Zone' : 'Khu vực nguy hiểm',
-      'safety_tip': language === 'en' ? 'Safety Tip' : 'Mẹo an toàn'
+      'urgent_alert': language === 'en' ? 'Urgent Alert' : 'Cảnh Báo Khẩn Cấp',
+      'scam_warning': language === 'en' ? 'Scam Warning' : 'Cảnh Báo Lừa Đảo',
+      'danger_zone': language === 'en' ? 'Danger Zone' : 'Khu Vực Nguy Hiểm',
+      'safety_tip': language === 'en' ? 'Safety Tip' : 'Mẹo An Toàn'
     };
-    return types[type as keyof typeof types] || (language === 'en' ? 'Notification' : 'Thông báo');
+    return types[type as keyof typeof types] || (language === 'en' ? 'Notification' : 'Thông Báo');
   };
 
   const getSourceTypeName = (type: string) => {
     const sources = {
-      'authority': language === 'en' ? 'Authority' : 'Cơ quan chức năng',
-      'community': language === 'en' ? 'Community' : 'Cộng đồng',
-      'user_report': language === 'en' ? 'User Report' : 'Báo cáo người dùng',
-      'auto_detected': language === 'en' ? 'Auto Detected' : 'Tự động phát hiện'
+      'authority': language === 'en' ? 'Authority' : 'Cơ Quan Chức Năng',
+      'community': language === 'en' ? 'Community' : 'Cộng Đồng',
+      'user_report': language === 'en' ? 'User Report' : 'Báo Cáo Người Dùng',
+      'auto_detected': language === 'en' ? 'Auto Detected' : 'Tự Động Phát Hiện'
     };
-    return sources[type as keyof typeof sources] || (language === 'en' ? 'Unknown' : 'Không rõ');
+    return sources[type as keyof typeof sources] || (language === 'en' ? 'Unknown' : 'Không Rõ');
   };
 
   const getSeverityText = (severity: string) => {
     const severities = {
-      'critical': language === 'en' ? 'Extremely dangerous' : 'Cực kỳ nguy hiểm',
-      'high': language === 'en' ? 'High risk' : 'Nguy hiểm cao',
-      'medium': language === 'en' ? 'Medium risk' : 'Nguy hiểm trung bình',
-      'low': language === 'en' ? 'Low risk' : 'Nguy hiểm thấp'
+      'critical': language === 'en' ? 'Extremely Dangerous' : 'Cực Kỳ Nguy Hiểm',
+      'high': language === 'en' ? 'High Risk' : 'Nguy Hiểm Cao',
+      'medium': language === 'en' ? 'Medium Risk' : 'Nguy Hiểm Trung Bình',
+      'low': language === 'en' ? 'Low Risk' : 'Nguy Hiểm Thấp'
     };
     return severities[severity as keyof typeof severities] || severity;
   };
@@ -149,13 +149,13 @@ const CommunityAlerts = () => {
           <Link to="/">
             <Button variant="ghost" className="text-trust-blue hover:bg-trust-blue/10">
               <ArrowLeft className="w-5 h-5 mr-2" />
-              {language === 'en' ? 'Back to home' : 'Về trang chủ'}
+              {language === 'en' ? 'Back to Home' : 'Về Trang Chủ'}
             </Button>
           </Link>
           <div className="flex items-center space-x-2">
             <AlertTriangle className="w-6 h-6 text-trust-blue" />
             <span className="text-lg font-semibold text-gray-800">
-              {language === 'en' ? 'Community Alerts' : 'Cảnh báo cộng đồng'}
+              {language === 'en' ? 'Community Alerts' : 'Cảnh Báo Cộng Đồng'}
             </span>
           </div>
         </div>
@@ -164,7 +164,7 @@ const CommunityAlerts = () => {
       <div className="max-w-6xl mx-auto p-4 space-y-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            🚨 {language === 'en' ? 'Real-time community alerts' : 'Cảnh báo cộng đồng realtime'}
+            🚨 {language === 'en' ? 'Real-time Community Alerts' : 'Cảnh Báo Cộng Đồng Realtime'}
           </h1>
           <p className="text-gray-600">
             {language === 'en' 
@@ -177,7 +177,7 @@ const CommunityAlerts = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>{language === 'en' ? 'Filter alerts' : 'Lọc cảnh báo'}</span>
+              <span>{language === 'en' ? 'Filter Alerts' : 'Lọc Cảnh Báo'}</span>
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <Eye className="w-4 h-4" />
                 <span>{getFilteredAlerts().length} {language === 'en' ? 'alerts' : 'cảnh báo'}</span>
@@ -191,28 +191,28 @@ const CommunityAlerts = () => {
                 onClick={() => setFilter('all')}
                 className="flex items-center space-x-2"
               >
-                <span>{language === 'en' ? 'All' : 'Tất cả'}</span>
+                <span>{language === 'en' ? 'All' : 'Tất Cả'}</span>
               </Button>
               <Button
                 variant={filter === 'urgent' ? 'default' : 'outline'}
                 onClick={() => setFilter('urgent')}
                 className="flex items-center space-x-2"
               >
-                <span>🚨 {language === 'en' ? 'Urgent' : 'Khẩn cấp'}</span>
+                <span>🚨 {language === 'en' ? 'Urgent' : 'Khẩn Cấp'}</span>
               </Button>
               <Button
                 variant={filter === 'scam' ? 'default' : 'outline'}
                 onClick={() => setFilter('scam')}
                 className="flex items-center space-x-2"
               >
-                <span>⚠️ {language === 'en' ? 'Scam' : 'Lừa đảo'}</span>
+                <span>⚠️ {language === 'en' ? 'Scam' : 'Lừa Đảo'}</span>
               </Button>
               <Button
                 variant={filter === 'danger' ? 'default' : 'outline'}
                 onClick={() => setFilter('danger')}
                 className="flex items-center space-x-2"
               >
-                <span>⛔ {language === 'en' ? 'Danger Zone' : 'Khu vực nguy hiểm'}</span>
+                <span>⛔ {language === 'en' ? 'Danger Zone' : 'Khu Vực Nguy Hiểm'}</span>
               </Button>
             </div>
           </CardContent>
@@ -230,7 +230,7 @@ const CommunityAlerts = () => {
                         <h3 className="text-lg font-semibold text-gray-900">{alert.title}</h3>
                         {alert.is_verified && (
                           <Badge variant="outline" className="text-green-600 border-green-600">
-                            ✓ {language === 'en' ? 'Verified' : 'Đã xác minh'}
+                            ✓ {language === 'en' ? 'Verified' : 'Đã Xác Minh'}
                           </Badge>
                         )}
                       </div>
@@ -273,7 +273,7 @@ const CommunityAlerts = () => {
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-1">
                       <Clock className="w-4 h-4" />
-                      <span>{alert.created_at ? formatTimeAgo(alert.created_at) : (language === 'en' ? 'Unknown' : 'Không rõ')}</span>
+                      <span>{alert.created_at ? formatTimeAgo(alert.created_at) : (language === 'en' ? 'Unknown' : 'Không Rõ')}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <Eye className="w-4 h-4" />
@@ -302,7 +302,7 @@ const CommunityAlerts = () => {
             <CardContent className="text-center py-8">
               <AlertTriangle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {language === 'en' ? 'No alerts' : 'Không có cảnh báo nào'}
+                {language === 'en' ? 'No Alerts' : 'Không Có Cảnh Báo Nào'}
               </h3>
               <p className="text-gray-600">
                 {language === 'en' 
@@ -320,7 +320,7 @@ const CommunityAlerts = () => {
               <AlertTriangle className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
                 <h4 className="font-medium text-blue-800 mb-1">
-                  {language === 'en' ? 'Real-time information' : 'Thông tin realtime'}
+                  {language === 'en' ? 'Real-time Information' : 'Thông Tin Realtime'}
                 </h4>
                 <p className="text-sm text-blue-700">
                   {language === 'en' 
