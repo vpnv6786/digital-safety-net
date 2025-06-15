@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, TrendingUp, TrendingDown, Minus, AlertTriangle, Shield, Eye, DollarSign } from 'lucide-react';
@@ -7,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { communityService, ScamStatistic } from '@/services/communityService';
 import { useLanguage } from '@/contexts/LanguageContext';
+import SocialShare from '@/components/SocialShare';
 
 const ScamRankings = () => {
   const [scamStats, setScamStats] = useState<ScamStatistic[]>([]);
@@ -121,12 +121,24 @@ const ScamRankings = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {language === 'en' ? '📊 Dangerous Scam Types Ranking' : '📊 Bảng Xếp Hạng Các Dạng Lừa Đảo Nguy Hiểm'}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mb-4">
             {language === 'en' 
               ? 'Statistics and analysis of the most common scam types today'
               : 'Thống kê và phân tích các hình thức lừa đảo phổ biến nhất hiện nay'
             }
           </p>
+          
+          {/* Social Share Component */}
+          <div className="flex justify-center">
+            <SocialShare
+              title={language === 'en' ? 'Dangerous Scam Types Ranking - ScamGuard' : 'Bảng Xếp Hạng Lừa Đảo Nguy Hiểm - ScamGuard'}
+              description={language === 'en' 
+                ? 'Check out the latest scam statistics and protect yourself from online fraud'
+                : 'Xem thống kê lừa đảo mới nhất và bảo vệ bản thân khỏi gian lận trực tuyến'
+              }
+              hashtags={['ScamGuard', 'OnlineSafety', 'ScamPrevention', 'CyberSecurity']}
+            />
+          </div>
         </div>
 
         <Card>
