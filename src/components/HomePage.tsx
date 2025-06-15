@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Shield, Search, AlertTriangle, Users, TrendingUp, MapPin, Phone, Globe, CreditCard } from 'lucide-react';
+import { Shield, Search, AlertTriangle, Users, TrendingUp, MapPin, Phone, Globe, CreditCard, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import SearchResults from './SearchResults';
 import ReportForm from './ReportForm';
 import ImageAnalysis from './ImageAnalysis';
 import AIProviderSetup from './AIProviderSetup';
+import SocialShare from './SocialShare';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -70,6 +71,37 @@ const HomePage = () => {
               : 'Kiểm tra số điện thoại, website và thông tin đáng ngờ. Nhận cảnh báo thời gian thực và chia sẻ kinh nghiệm với cộng đồng.'
             }
           </p>
+
+          {/* Social Share Section */}
+          <div className="mb-6 sm:mb-8">
+            <Card className="bg-white/80 backdrop-blur shadow-lg max-w-2xl mx-auto">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex items-center justify-center space-x-2 mb-3">
+                  <Share className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900">
+                    {language === 'en' ? 'Help protect the community' : 'Giúp bảo vệ cộng đồng'}
+                  </h3>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-600 mb-3 text-center">
+                  {language === 'en' 
+                    ? 'Share ScamGuard with your friends and family to keep them safe'
+                    : 'Chia sẻ ScamGuard với bạn bè và gia đình để bảo vệ họ'
+                  }
+                </p>
+                <div className="flex justify-center">
+                  <SocialShare
+                    title={language === 'en' ? 'ScamGuard - Protect Yourself from Online Scams' : 'ScamGuard - Bảo vệ bản thân khỏi lừa đảo trực tuyến'}
+                    description={language === 'en' 
+                      ? 'AI-powered protection against online scams for Vietnamese community'
+                      : 'Công nghệ AI bảo vệ cộng đồng Việt Nam khỏi lừa đảo trực tuyến'
+                    }
+                    hashtags={['ScamGuard', 'OnlineSafety', 'Vietnam', 'CyberSecurity']}
+                    className="justify-center"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 sm:mb-8">

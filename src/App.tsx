@@ -27,7 +27,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={
-                <Layout showHeader={false} showFooter={false} showBottomNav={false}>
+                <Layout showHeader={false} showFooter={true} showBottomNav={true}>
                   <Index />
                 </Layout>
               } />
