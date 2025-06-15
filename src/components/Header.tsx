@@ -12,7 +12,6 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from './LanguageSelector';
-import TranslatedText from './TranslatedText';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Header = () => {
@@ -54,9 +53,9 @@ const Header = () => {
                 <Link key={item.to} to={item.to}>
                   <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-blue-600">
                     <item.icon className="w-4 h-4" />
-                    <TranslatedText>
+                    <span>
                       {language === 'en' ? item.labelEn : item.labelKey}
-                    </TranslatedText>
+                    </span>
                   </Button>
                 </Link>
               ))}
@@ -77,7 +76,7 @@ const Header = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={handleSignOut}>
-                    <TranslatedText>{language === 'en' ? 'Logout' : 'Đăng xuất'}</TranslatedText>
+                    {language === 'en' ? 'Logout' : 'Đăng xuất'}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -85,7 +84,7 @@ const Header = () => {
               <Link to="/auth" onClick={closeMobileMenu}>
                 <Button className="flex items-center space-x-1 sm:space-x-2 bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm px-2 sm:px-4">
                   <LogIn className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <TranslatedText>{language === 'en' ? 'Login' : 'Đăng nhập'}</TranslatedText>
+                  {language === 'en' ? 'Login' : 'Đăng nhập'}
                 </Button>
               </Link>
             )}
@@ -112,9 +111,9 @@ const Header = () => {
                 <Link key={item.to} to={item.to} onClick={closeMobileMenu}>
                   <Button variant="ghost" className="w-full justify-start flex items-center space-x-2 text-gray-600 hover:text-blue-600">
                     <item.icon className="w-4 h-4" />
-                    <TranslatedText>
+                    <span>
                       {language === 'en' ? item.labelEn : item.labelKey}
-                    </TranslatedText>
+                    </span>
                   </Button>
                 </Link>
               ))}
