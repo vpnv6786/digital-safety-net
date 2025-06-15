@@ -11,7 +11,9 @@ export abstract class BaseAIProvider {
 
   abstract initialize(): boolean;
   abstract analyzeScamRisk(request: ScamAnalysisRequest): Promise<ScamAnalysisResponse>;
-  abstract analyzeImage?(imageFile: File): Promise<ScamAnalysisResponse>;
+
+  // Optional method for image analysis - only some providers support this
+  analyzeImage?(imageFile: File): Promise<ScamAnalysisResponse>;
 
   isAvailable(): boolean {
     return this.isInitialized && !!this.apiKey;

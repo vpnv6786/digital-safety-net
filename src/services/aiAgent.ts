@@ -111,6 +111,3 @@ class ScamAnalysisAgent {
 
 // Export singleton instance
 export const scamAnalysisAgent = new ScamAnalysisAgent();
-
-// Export types for use in other components
-export type { ScamAnalysisRequest, ScamAnalysisResponse };
