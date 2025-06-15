@@ -14,10 +14,10 @@ const LanguageSelector: React.FC = () => {
   const { language, setLanguage, t } = useLanguage();
 
   const languages: { code: Language; name: string; flag: string }[] = [
-    { code: 'en', name: t('language.english'), flag: '🇺🇸' },
-    { code: 'vi', name: t('language.vietnamese'), flag: '🇻🇳' },
-    { code: 'zh', name: t('language.chinese'), flag: '🇨🇳' },
-    { code: 'es', name: t('language.spanish'), flag: '🇪🇸' },
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+    { code: 'zh', name: '中文', flag: '🇨🇳' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
   ];
 
   const currentLanguage = languages.find(lang => lang.code === language);
@@ -25,7 +25,7 @@ const LanguageSelector: React.FC = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="border-trust-blue text-trust-blue hover:bg-trust-blue hover:text-white">
+        <Button variant="outline" size="sm" className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
           <Globe className="w-4 h-4 mr-2" />
           {currentLanguage?.flag} {currentLanguage?.name}
         </Button>
@@ -35,7 +35,7 @@ const LanguageSelector: React.FC = () => {
           <DropdownMenuItem
             key={lang.code}
             onClick={() => setLanguage(lang.code)}
-            className={`cursor-pointer ${language === lang.code ? 'bg-trust-blue/10' : ''}`}
+            className={`cursor-pointer ${language === lang.code ? 'bg-blue-600/10' : ''}`}
           >
             <span className="mr-2">{lang.flag}</span>
             {lang.name}

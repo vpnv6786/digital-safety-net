@@ -12,6 +12,7 @@ import Safety from "./pages/Safety";
 import ScamRankings from "./pages/ScamRankings";
 import CommunityAlerts from "./pages/CommunityAlerts";
 import Authorities from "./pages/Authorities";
+import AuthPage from "./components/AuthPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<AuthPage onBack={() => window.history.back()} />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy" element={<Privacy />} />
