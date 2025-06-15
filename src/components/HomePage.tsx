@@ -8,23 +8,42 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import AIKeyInput from '@/components/AIKeyInput';
 import ImageAnalysis from '@/components/ImageAnalysis';
+import { searchEntity } from '@/services/searchService';
 
 interface HomePageProps {
-  onSearch: (query: string) => void;
+  onSearch: (query: string, result?: any) => void;
   onReport: () => void;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const { t } = useLanguage();
 
   const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
 
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = async () => {
     if (searchQuery.trim() !== '') {
-      onSearch(searchQuery);
+      setIsSearching(true);
+      try {
+        // Use AI Agent enhanced search
+        const result = await searchEntity(searchQuery.trim());
+        onSearch(searchQuery, result);
+      } catch (error) {
+        console.error('Search failed:', error);
+        // Fallback to basic search
+        onSearch(searchQuery);
+      } finally {
+        setIsSearching(false);
+      }
+    }
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handleSearchSubmit();
     }
   };
 
@@ -62,10 +81,16 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
               className="w-full max-w-md rounded-full shadow-sm"
               value={searchQuery}
               onChange={handleSearchInput}
+              onKeyPress={handleKeyPress}
+              disabled={isSearching}
             />
-            <Button onClick={handleSearchSubmit} className="rounded-full">
-              <Search className="w-5 h-5 mr-2" />
-              {t('home.search.button')}
+            <Button 
+              onClick={handleSearchSubmit} 
+              className="rounded-full"
+              disabled={isSearching || !searchQuery.trim()}
+            >
+              <Search className={`w-5 h-5 mr-2 ${isSearching ? 'animate-spin' : ''}`} />
+              {isSearching ? 'Đang phân tích...' : t('home.search.button')}
             </Button>
           </div>
           <Button variant="link" onClick={onReport} className="mt-4">
@@ -74,28 +99,15 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
           </Button>
         </section>
 
-        {/* New Image Analysis Section */}
-        <section className="mb-16">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              {t('image.analysis.title')}
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              {t('image.upload.instruction')}
-            </p>
-          </div>
-          <ImageAnalysis />
-        </section>
-
-        {/* Features Section */}
+        {/* Enhanced Features Section */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <Card className="shadow-md">
+          <Card className="shadow-md border-2 border-blue-100 hover:border-blue-300 transition-colors">
             <CardContent className="p-6">
               <div className="flex items-center space-x-4 mb-4">
-                <Lightbulb className="w-6 h-6 text-warning-orange" />
-                <h3 className="text-lg font-semibold text-gray-900">{t('home.features.ai.title')}</h3>
+                <Lightbulb className="w-8 h-8 text-blue-500" />
+                <h3 className="text-lg font-semibold text-gray-900">AI Agent Thông Minh</h3>
               </div>
-              <p className="text-gray-600">{t('home.features.ai.description')}</p>
+              <p className="text-gray-600">Phân tích chuyên sâu với AI Agent chuyên dụng, đưa ra cảnh báo chính xác và khuyến nghị phòng tránh.</p>
             </CardContent>
           </Card>
 
@@ -118,6 +130,19 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
               <p className="text-gray-600">{t('home.features.verified.description')}</p>
             </CardContent>
           </Card>
+        </section>
+
+        {/* Image Analysis Section */}
+        <section className="mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {t('image.analysis.title')}
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              {t('image.upload.instruction')}
+            </p>
+          </div>
+          <ImageAnalysis />
         </section>
 
         {/* Recent Alerts Section */}

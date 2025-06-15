@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { ArrowLeft, Shield, AlertTriangle, XCircle, CheckCircle, Share2, Flag, Brain } from 'lucide-react';
+import { ArrowLeft, Shield, AlertTriangle, XCircle, CheckCircle, Share2, Flag, Brain, Clock, Target, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -57,33 +58,28 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
     }
   };
 
+  const getUrgencyColor = (urgency: string) => {
+    switch (urgency) {
+      case 'critical': return 'bg-red-500';
+      case 'high': return 'bg-orange-500';
+      case 'medium': return 'bg-yellow-500';
+      default: return 'bg-green-500';
+    }
+  };
+
   const config = getResultConfig(riskLevel);
   const IconComponent = config.icon;
 
-  // Use AI-enhanced data if available
-  const reportCount = searchResult?.reportCount || (riskLevel !== 'safe' ? 8 : 0);
+  // Enhanced data from AI Agent
+  const reportCount = searchResult?.reportCount || 0;
   const confidence = searchResult?.confidence || 70;
   const aiAnalysis = searchResult?.aiAnalysis;
   const reasons = searchResult?.reasons || [];
+  const recommendations = searchResult?.recommendations || [];
+  const urgencyLevel = searchResult?.urgencyLevel || 'low';
+  const similarPatterns = searchResult?.similarPatterns || [];
+  const preventionTips = searchResult?.preventionTips || [];
   const relatedReports = searchResult?.relatedReports || [];
-
-  // Fallback to mock data if no AI results
-  const mockReports = relatedReports.length > 0 ? relatedReports : (riskLevel !== 'safe' ? [
-    {
-      id: 1,
-      category: t('warnings.categories.fake.police'),
-      description: 'Gọi điện tự xưng là công an, yêu cầu chuyển tiền để giải quyết vụ án',
-      reportedAt: '2 ngày trước',
-      verifiedBy: 3
-    },
-    {
-      id: 2,
-      category: t('report.categories.investment'),
-      description: 'Mời tham gia đầu tư online với lợi nhuận cao',
-      reportedAt: '1 tuần trước',
-      verifiedBy: 7
-    }
-  ] : []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-light to-white font-be-vietnam">
@@ -119,6 +115,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
               <IconComponent className={`w-12 h-12 ${config.iconColor}`} />
             </div>
             
+            {/* Urgency Indicator */}
+            <div className="flex justify-center mb-4">
+              <Badge className={`${getUrgencyColor(urgencyLevel)} text-white`}>
+                <Clock className="w-3 h-3 mr-1" />
+                Mức độ: {urgencyLevel.toUpperCase()}
+              </Badge>
+            </div>
+            
             <h2 className={`text-2xl font-bold mb-4 ${config.iconColor}`}>
               {config.title}
             </h2>
@@ -128,28 +132,26 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
             </p>
             
             {/* AI Confidence Score */}
-            {confidence && (
-              <div className="mb-4">
-                <div className="text-sm text-gray-600 mb-2">AI Confidence Score</div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full ${
-                      confidence >= 80 ? 'bg-red-500' : 
-                      confidence >= 60 ? 'bg-yellow-500' : 'bg-green-500'
-                    }`}
-                    style={{ width: `${confidence}%` }}
-                  ></div>
-                </div>
-                <div className="text-xs text-gray-500 mt-1">{confidence}% confident</div>
+            <div className="mb-6">
+              <div className="text-sm text-gray-600 mb-2">AI Confidence Score</div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className={`h-3 rounded-full ${
+                    confidence >= 80 ? 'bg-red-500' : 
+                    confidence >= 60 ? 'bg-yellow-500' : 'bg-green-500'
+                  }`}
+                  style={{ width: `${confidence}%` }}
+                ></div>
               </div>
-            )}
+              <div className="text-xs text-gray-500 mt-1">{confidence}% confident</div>
+            </div>
 
             {/* AI Analysis */}
             {aiAnalysis && (
               <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <div className="flex items-center mb-2">
                   <Brain className="w-5 h-5 text-blue-500 mr-2" />
-                  <span className="text-sm font-semibold text-blue-700">AI Analysis</span>
+                  <span className="text-sm font-semibold text-blue-700">AI Agent Analysis</span>
                 </div>
                 <p className="text-sm text-gray-700 text-left">{aiAnalysis}</p>
               </div>
@@ -158,7 +160,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
             {/* Detection Reasons */}
             {reasons.length > 0 && (
               <div className="mb-6 text-left">
-                <h4 className="font-semibold text-gray-800 mb-2">Detection Factors:</h4>
+                <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
+                  <Target className="w-4 h-4 mr-2" />
+                  Yếu tố phát hiện:
+                </h4>
                 <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
                   {reasons.map((reason, index) => (
                     <li key={index}>{reason}</li>
@@ -166,11 +171,24 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
                 </ul>
               </div>
             )}
-            
-            <p className="text-gray-600 mb-8">
-              {config.description}
-            </p>
 
+            {/* AI Recommendations */}
+            {recommendations.length > 0 && (
+              <div className="mb-6 text-left">
+                <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  Khuyến nghị của AI:
+                </h4>
+                <div className="space-y-2">
+                  {recommendations.map((rec, index) => (
+                    <div key={index} className="bg-yellow-50 border border-yellow-200 rounded p-2 text-sm text-gray-700">
+                      {rec}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 className={riskLevel === 'dangerous' ? 'bg-danger-red hover:bg-red-700' : 'bg-trust-blue hover:bg-trust-blue-dark'} 
@@ -187,6 +205,46 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
             </div>
           </CardContent>
         </Card>
+
+        {/* Similar Patterns */}
+        {similarPatterns.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg">Mẫu lừa đảo tương tự</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-2">
+                {similarPatterns.map((pattern, index) => (
+                  <div key={index} className="bg-orange-50 border border-orange-200 rounded p-3 text-sm">
+                    {pattern}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Prevention Tips */}
+        {preventionTips.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center">
+                <Shield className="w-5 h-5 mr-2 text-green-500" />
+                Mẹo phòng tránh
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {preventionTips.map((tip, index) => (
+                  <div key={index} className="flex items-start space-x-2">
+                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">{tip}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Statistics */}
         {riskLevel !== 'safe' && (
@@ -221,12 +279,12 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
         )}
 
         {/* Related Reports */}
-        {mockReports.length > 0 && (
+        {relatedReports.length > 0 && (
           <div className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             <h3 className="text-xl font-bold text-gray-900 mb-6">{t('results.related.reports')}</h3>
             
             <div className="space-y-4">
-              {mockReports.map((report, index) => (
+              {relatedReports.map((report, index) => (
                 <Card key={report.id} className="hover:shadow-md transition-shadow animate-fade-in-up" style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
@@ -249,11 +307,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
           </div>
         )}
 
-        {/* Safety Tips */}
+        {/* Enhanced Safety Tips */}
         <Alert className="mt-8 border-trust-blue bg-trust-blue/5">
           <Shield className="h-4 w-4 text-trust-blue" />
           <AlertDescription className="text-trust-blue font-medium">
-            <strong>{t('results.safety.tip')}</strong> {t('results.safety.message')}
+            <strong>AI Agent khuyến nghị:</strong> {preventionTips[0] || 'Luôn xác minh thông tin từ nguồn chính thức trước khi hành động.'}
           </AlertDescription>
         </Alert>
       </div>

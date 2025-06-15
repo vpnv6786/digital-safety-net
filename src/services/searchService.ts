@@ -1,5 +1,5 @@
 
-import { analyzeScamContent, generateReportSummary } from './aiService';
+import { scamAnalysisAgent, ScamAnalysisRequest, ScamAnalysisResponse } from './aiAgent';
 
 export interface SearchResult {
   riskLevel: 'safe' | 'suspicious' | 'dangerous';
@@ -9,6 +9,10 @@ export interface SearchResult {
   aiAnalysis: string;
   relatedReports: ReportSummary[];
   summary: string;
+  recommendations: string[];
+  urgencyLevel: 'low' | 'medium' | 'high' | 'critical';
+  similarPatterns: string[];
+  preventionTips: string[];
 }
 
 export interface ReportSummary {
@@ -57,9 +61,20 @@ const mockReports: { [key: string]: ReportSummary[] } = {
   ]
 };
 
-// Enhanced search with AI analysis
+// Initialize AI Agent with stored API key
+const initializeAIAgent = () => {
+  const apiKey = localStorage.getItem('gemini-api-key');
+  if (apiKey) {
+    scamAnalysisAgent.initialize(apiKey);
+  }
+};
+
+// Enhanced search with AI Agent
 export const searchEntity = async (query: string): Promise<SearchResult> => {
   console.log('Searching for:', query);
+  
+  // Initialize AI Agent if needed
+  initializeAIAgent();
   
   // Get existing reports from mock database
   const reports = mockReports[query] || [];
@@ -67,38 +82,29 @@ export const searchEntity = async (query: string): Promise<SearchResult> => {
   // Determine entity type
   const type = detectEntityType(query);
   
-  // Get AI analysis
-  const aiAnalysis = await analyzeScamContent(query, type);
+  // Prepare AI Agent request
+  const aiRequest: ScamAnalysisRequest = {
+    query,
+    type,
+    existingReports: reports,
+    userContext: `Tìm kiếm từ ứng dụng Vệ Binh Mạng`
+  };
   
-  // Combine database and AI results
-  let finalRiskLevel = aiAnalysis.riskLevel;
-  let confidence = aiAnalysis.confidence;
-  
-  // If we have reports, adjust risk level
-  if (reports.length > 0) {
-    if (reports.length >= 5) {
-      finalRiskLevel = 'dangerous';
-      confidence = Math.max(confidence, 85);
-    } else if (reports.length >= 2) {
-      finalRiskLevel = finalRiskLevel === 'safe' ? 'suspicious' : finalRiskLevel;
-      confidence = Math.max(confidence, 70);
-    }
-  }
-  
-  // Generate summary using AI
-  const summary = await generateReportSummary(reports);
+  // Get AI Agent analysis
+  const aiAnalysis: ScamAnalysisResponse = await scamAnalysisAgent.analyzeScamRisk(aiRequest);
   
   return {
-    riskLevel: finalRiskLevel,
+    riskLevel: aiAnalysis.riskLevel,
     reportCount: reports.length,
-    confidence,
-    reasons: [
-      ...aiAnalysis.reasons,
-      ...(reports.length > 0 ? [`${reports.length} báo cáo từ cộng đồng`] : [])
-    ],
+    confidence: aiAnalysis.confidence,
+    reasons: aiAnalysis.reasons,
     aiAnalysis: aiAnalysis.aiAnalysis,
     relatedReports: reports,
-    summary
+    summary: generateSummary(reports, aiAnalysis),
+    recommendations: aiAnalysis.recommendations,
+    urgencyLevel: aiAnalysis.urgencyLevel,
+    similarPatterns: aiAnalysis.similarPatterns,
+    preventionTips: aiAnalysis.preventionTips
   };
 };
 
@@ -116,6 +122,16 @@ const detectEntityType = (input: string): 'phone' | 'url' | 'text' | 'email' => 
   return 'text';
 };
 
+// Generate summary combining reports and AI analysis
+const generateSummary = (reports: ReportSummary[], aiAnalysis: ScamAnalysisResponse): string => {
+  if (reports.length === 0) {
+    return aiAnalysis.aiAnalysis;
+  }
+  
+  const reportSummary = `Có ${reports.length} báo cáo từ cộng đồng. `;
+  return reportSummary + aiAnalysis.aiAnalysis;
+};
+
 // Enhanced report submission with AI pre-analysis
 export const submitReport = async (reportData: {
   targetType: string;
@@ -125,18 +141,27 @@ export const submitReport = async (reportData: {
   evidenceFiles: File[];
 }): Promise<{ success: boolean; reportId: string; aiInsights?: string }> => {
   try {
+    // Initialize AI Agent if needed
+    initializeAIAgent();
+    
     // AI analysis of the report description
-    const aiAnalysis = await analyzeScamContent(reportData.description, 'text');
+    const aiRequest: ScamAnalysisRequest = {
+      query: reportData.description,
+      type: 'text',
+      userContext: 'Báo cáo từ người dùng'
+    };
+    
+    const aiAnalysis = await scamAnalysisAgent.analyzeScamRisk(aiRequest);
     
     // Generate unique report ID
     const reportId = 'RPT_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     
-    // In production, this would save to a real database
-    console.log('Report submitted:', {
+    console.log('Report submitted with AI insights:', {
       ...reportData,
       reportId,
       aiConfidence: aiAnalysis.confidence,
-      aiRiskLevel: aiAnalysis.riskLevel
+      aiRiskLevel: aiAnalysis.riskLevel,
+      aiRecommendations: aiAnalysis.recommendations
     });
     
     // Add to mock database
