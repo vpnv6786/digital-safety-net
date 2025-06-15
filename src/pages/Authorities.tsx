@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { Phone, Shield, AlertTriangle, MapPin, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const Authorities = () => {
@@ -261,20 +263,44 @@ const Authorities = () => {
         </div>
 
         <Tabs defaultValue="emergency" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="emergency">
-              {language === 'en' ? 'Emergency' : 'Khẩn cấp'}
-            </TabsTrigger>
-            <TabsTrigger value="provincial">
-              {language === 'en' ? 'Provincial Police' : 'Công an tỉnh thành'}
-            </TabsTrigger>
-            <TabsTrigger value="national">
-              {language === 'en' ? 'National Agencies' : 'Cơ quan quốc gia'}
-            </TabsTrigger>
-            <TabsTrigger value="international">
-              {language === 'en' ? 'International' : 'Quốc tế'}
-            </TabsTrigger>
-          </TabsList>
+          <div className="w-full overflow-hidden">
+            <ScrollArea className="w-full">
+              <TabsList className="w-max grid grid-cols-4 min-w-full lg:w-full">
+                <TabsTrigger value="emergency" className="text-xs sm:text-sm px-2 sm:px-4">
+                  <span className="hidden sm:inline">
+                    {language === 'en' ? 'Emergency' : 'Khẩn cấp'}
+                  </span>
+                  <span className="sm:hidden">
+                    {language === 'en' ? 'SOS' : 'SOS'}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger value="provincial" className="text-xs sm:text-sm px-2 sm:px-4">
+                  <span className="hidden sm:inline">
+                    {language === 'en' ? 'Provincial Police' : 'Công an tỉnh thành'}
+                  </span>
+                  <span className="sm:hidden">
+                    {language === 'en' ? 'Police' : 'Công an'}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger value="national" className="text-xs sm:text-sm px-2 sm:px-4">
+                  <span className="hidden sm:inline">
+                    {language === 'en' ? 'National Agencies' : 'Cơ quan quốc gia'}
+                  </span>
+                  <span className="sm:hidden">
+                    {language === 'en' ? 'National' : 'Quốc gia'}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger value="international" className="text-xs sm:text-sm px-2 sm:px-4">
+                  <span className="hidden sm:inline">
+                    {language === 'en' ? 'International' : 'Quốc tế'}
+                  </span>
+                  <span className="sm:hidden">
+                    {language === 'en' ? 'Intl' : 'QT'}
+                  </span>
+                </TabsTrigger>
+              </TabsList>
+            </ScrollArea>
+          </div>
 
           <TabsContent value="emergency" className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-900 flex items-center">
