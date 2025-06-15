@@ -1,16 +1,15 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+export type Language = 'en' | 'vi' | 'zh' | 'es';
+
 interface LanguageContextProps {
-  language: string;
-  setLanguage: (language: string) => void;
+  language: Language;
+  setLanguage: (language: Language) => void;
   t: (key: string) => string;
 }
 
-const LanguageContext = createContext<LanguageContextProps>({
-  language: 'vi',
-  setLanguage: () => {},
-  t: (key: string) => key,
-});
+const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
 interface Translation {
   [key: string]: string | Translation;
@@ -19,15 +18,41 @@ interface Translation {
 const translations: { [key: string]: Translation } = {
   en: {
     home: {
-      title: 'Protecting the Vietnamese Community from Online Scams',
-      subtitle: 'AI-powered scam detection and community reporting platform',
-      search: 'Search for phone numbers, URLs, or keywords...',
-      report: 'Report a Scam',
-      features: 'Key Features',
-      recentAlerts: 'Recent Scam Alerts',
-      trust: 'Join the Fight Against Scams',
-      trustSubtitle: 'Together, we can make the internet a safer place for everyone.',
-      searchButton: 'Search',
+      hero: {
+        title: 'Protecting the Vietnamese Community from Online Scams',
+        subtitle: 'AI-powered scam detection and community reporting platform'
+      },
+      search: {
+        placeholder: 'Search for phone numbers, URLs, or keywords...',
+        button: 'Search'
+      },
+      report: {
+        button: 'Report a Scam'
+      },
+      features: {
+        ai: {
+          title: 'AI-Powered Detection',
+          description: 'Advanced AI analyzes patterns to identify potential scams'
+        },
+        community: {
+          title: 'Community Reports',
+          description: 'Real reports from Vietnamese community members'
+        },
+        verified: {
+          title: 'Verified Information',
+          description: 'Cross-referenced data for accurate results'
+        }
+      },
+      alerts: {
+        title: 'Recent Scam Alerts',
+        recent: 'Recently reported',
+        reported: 'Reported',
+        times: 'times'
+      },
+      trust: {
+        title: 'Join the Fight Against Scams',
+        description: 'Together, we can make the internet a safer place for everyone.'
+      }
     },
     report: {
       title: 'Report a Scam',
@@ -93,25 +118,13 @@ const translations: { [key: string]: Translation } = {
         }
       },
       categories: {
-        fake: {
-          police: 'Fake Police/Gov Official',
-        },
-        bank: {
-          fraud: 'Bank Fraud/Phishing',
-        },
-        job: {
-          scam: 'Job Scam',
-        },
+        fakePolice: 'Fake Police/Gov Official',
+        bankFraud: 'Bank Fraud/Phishing',
+        jobScam: 'Job Scam',
         investment: 'Investment Scam',
-        online: {
-          shopping: 'Online Shopping Scam',
-        },
-        telecom: {
-          fraud: 'Telecom Fraud',
-        },
-        fake: {
-          promotion: 'Fake Promotion',
-        },
+        onlineShopping: 'Online Shopping Scam',
+        telecomFraud: 'Telecom Fraud',
+        fakePromotion: 'Fake Promotion',
         other: 'Other'
       },
       navigation: {
@@ -124,9 +137,7 @@ const translations: { [key: string]: Translation } = {
         title: 'Report Submitted!',
         message: 'Thank you for helping protect the community. Your report will be reviewed by our team.',
         home: 'Back to Home',
-        report: {
-          another: 'Report Another Scam'
-        }
+        reportAnother: 'Report Another Scam'
       },
       titleAI: 'AI Analysis'
     },
@@ -175,19 +186,54 @@ const translations: { [key: string]: Translation } = {
       extracted: {
         info: "Extracted Information"
       }
+    },
+    language: {
+      english: 'English',
+      vietnamese: 'Vietnamese',
+      chinese: 'Chinese',
+      spanish: 'Spanish'
+    },
+    footer: {
+      copyright: '© 2024 Vệ Binh Mạng. All rights reserved.'
     }
   },
   vi: {
     home: {
-      title: 'Bảo Vệ Cộng Đồng Việt Nam Khỏi Lừa Đảo Trực Tuyến',
-      subtitle: 'Nền tảng phát hiện lừa đảo bằng AI và báo cáo cộng đồng',
-      search: 'Tìm kiếm số điện thoại, URL hoặc từ khóa...',
-      report: 'Báo Cáo Lừa Đảo',
-      features: 'Tính Năng Chính',
-      recentAlerts: 'Cảnh Báo Lừa Đảo Gần Đây',
-      trust: 'Tham Gia Chống Lại Lừa Đảo',
-      trustSubtitle: 'Cùng nhau, chúng ta có thể làm cho internet trở nên an toàn hơn cho mọi người.',
-      searchButton: 'Tìm kiếm'
+      hero: {
+        title: 'Bảo Vệ Cộng Đồng Việt Nam Khỏi Lừa Đảo Trực Tuyến',
+        subtitle: 'Nền tảng phát hiện lừa đảo bằng AI và báo cáo cộng đồng'
+      },
+      search: {
+        placeholder: 'Tìm kiếm số điện thoại, URL hoặc từ khóa...',
+        button: 'Tìm kiếm'
+      },
+      report: {
+        button: 'Báo Cáo Lừa Đảo'
+      },
+      features: {
+        ai: {
+          title: 'Phát Hiện Bằng AI',
+          description: 'AI tiên tiến phân tích các mẫu để xác định lừa đảo tiềm ẩn'
+        },
+        community: {
+          title: 'Báo Cáo Cộng Đồng',
+          description: 'Báo cáo thực từ các thành viên cộng đồng Việt Nam'
+        },
+        verified: {
+          title: 'Thông Tin Xác Minh',
+          description: 'Dữ liệu được tham chiếu chéo để có kết quả chính xác'
+        }
+      },
+      alerts: {
+        title: 'Cảnh Báo Lừa Đảo Gần Đây',
+        recent: 'Vừa được báo cáo',
+        reported: 'Đã báo cáo',
+        times: 'lần'
+      },
+      trust: {
+        title: 'Tham Gia Chống Lại Lừa Đảo',
+        description: 'Cùng nhau, chúng ta có thể làm cho internet trở nên an toàn hơn cho mọi người.'
+      }
     },
     report: {
       title: 'Báo Cáo Lừa Đảo',
@@ -253,25 +299,13 @@ const translations: { [key: string]: Translation } = {
         }
       },
       categories: {
-        fake: {
-          police: 'Giả Danh Công An/Quan Chức',
-        },
-        bank: {
-          fraud: 'Gian Lận/Lừa Đảo Ngân Hàng',
-        },
-        job: {
-          scam: 'Lừa Đảo Việc Làm',
-        },
+        fakePolice: 'Giả Danh Công An/Quan Chức',
+        bankFraud: 'Gian Lận/Lừa Đảo Ngân Hàng',
+        jobScam: 'Lừa Đảo Việc Làm',
         investment: 'Lừa Đảo Đầu Tư',
-        online: {
-          shopping: 'Lừa Đảo Mua Sắm Trực Tuyến',
-        },
-        telecom: {
-          fraud: 'Lừa Đảo Viễn Thông',
-        },
-        fake: {
-          promotion: 'Khuyến Mãi Giả Mạo',
-        },
+        onlineShopping: 'Lừa Đảo Mua Sắm Trực Tuyến',
+        telecomFraud: 'Lừa Đảo Viễn Thông',
+        fakePromotion: 'Khuyến Mãi Giả Mạo',
         other: 'Khác'
       },
       navigation: {
@@ -284,9 +318,7 @@ const translations: { [key: string]: Translation } = {
         title: 'Đã Gửi Báo Cáo!',
         message: 'Cảm ơn bạn đã giúp bảo vệ cộng đồng. Báo cáo của bạn sẽ được xem xét bởi đội ngũ của chúng tôi.',
         home: 'Về Trang Chủ',
-        report: {
-          another: 'Báo Cáo Vụ Lừa Đảo Khác'
-        }
+        reportAnother: 'Báo Cáo Vụ Lừa Đảo Khác'
       },
       titleAI: 'Phân tích AI'
     },
@@ -335,19 +367,54 @@ const translations: { [key: string]: Translation } = {
       extracted: {
         info: "Thông Tin Trích Xuất"
       }
+    },
+    language: {
+      english: 'Tiếng Anh',
+      vietnamese: 'Tiếng Việt',
+      chinese: 'Tiếng Trung',
+      spanish: 'Tiếng Tây Ban Nha'
+    },
+    footer: {
+      copyright: '© 2024 Vệ Binh Mạng. Bảo lưu mọi quyền.'
     }
   },
   zh: {
     home: {
-      title: '保护越南社区免受网络诈骗',
-      subtitle: 'AI驱动的诈骗检测和社区报告平台',
-      search: '搜索电话号码、网址或关键词...',
-      report: '报告诈骗',
-      features: '主要功能',
-      recentAlerts: '最近的诈骗警报',
-      trust: '加入打击诈骗的行列',
-      trustSubtitle: '齐心协力，我们可以让互联网对每个人都更安全。',
-      searchButton: '搜索'
+      hero: {
+        title: '保护越南社区免受网络诈骗',
+        subtitle: 'AI驱动的诈骗检测和社区报告平台'
+      },
+      search: {
+        placeholder: '搜索电话号码、网址或关键词...',
+        button: '搜索'
+      },
+      report: {
+        button: '报告诈骗'
+      },
+      features: {
+        ai: {
+          title: 'AI驱动检测',
+          description: '先进的AI分析模式以识别潜在诈骗'
+        },
+        community: {
+          title: '社区报告',
+          description: '来自越南社区成员的真实报告'
+        },
+        verified: {
+          title: '验证信息',
+          description: '交叉引用数据以获得准确结果'
+        }
+      },
+      alerts: {
+        title: '最近的诈骗警报',
+        recent: '最近报告',
+        reported: '已报告',
+        times: '次'
+      },
+      trust: {
+        title: '加入打击诈骗的行列',
+        description: '齐心协力，我们可以让互联网对每个人都更安全。'
+      }
     },
     report: {
       title: '报告诈骗',
@@ -413,25 +480,13 @@ const translations: { [key: string]: Translation } = {
         }
       },
       categories: {
-        fake: {
-          police: '假冒警察/政府官员',
-        },
-        bank: {
-          fraud: '银行欺诈/网络钓鱼',
-        },
-        job: {
-          scam: '求职诈骗',
-        },
+        fakePolice: '假冒警察/政府官员',
+        bankFraud: '银行欺诈/网络钓鱼',
+        jobScam: '求职诈骗',
         investment: '投资诈骗',
-        online: {
-          shopping: '网上购物诈骗',
-        },
-        telecom: {
-          fraud: '电信诈骗',
-        },
-        fake: {
-          promotion: '虚假促销',
-        },
+        onlineShopping: '网上购物诈骗',
+        telecomFraud: '电信诈骗',
+        fakePromotion: '虚假促销',
         other: '其他'
       },
       navigation: {
@@ -444,9 +499,7 @@ const translations: { [key: string]: Translation } = {
         title: '报告已提交！',
         message: '感谢您帮助保护社区。您的报告将由我们的团队审核。',
         home: '返回主页',
-        report: {
-          another: '报告另一起诈骗'
-        }
+        reportAnother: '报告另一起诈骗'
       },
       titleAI: 'AI分析'
     },
@@ -495,19 +548,54 @@ const translations: { [key: string]: Translation } = {
       extracted: {
         info: "提取信息"
       }
+    },
+    language: {
+      english: '英语',
+      vietnamese: '越南语',
+      chinese: '中文',
+      spanish: '西班牙语'
+    },
+    footer: {
+      copyright: '© 2024 Vệ Binh Mạng. 版权所有。'
     }
   },
   es: {
     home: {
-      title: 'Protegiendo a la Comunidad Vietnamita de las Estafas en Línea',
-      subtitle: 'Plataforma de detección de estafas impulsada por IA y reporte comunitario',
-      search: 'Buscar números de teléfono, URLs o palabras clave...',
-      report: 'Reportar una Estafa',
-      features: 'Características Clave',
-      recentAlerts: 'Alertas de Estafas Recientes',
-      trust: 'Únete a la Lucha Contra las Estafas',
-      trustSubtitle: 'Juntos, podemos hacer de Internet un lugar más seguro para todos.',
-      searchButton: 'Buscar'
+      hero: {
+        title: 'Protegiendo a la Comunidad Vietnamita de las Estafas en Línea',
+        subtitle: 'Plataforma de detección de estafas impulsada por IA y reporte comunitario'
+      },
+      search: {
+        placeholder: 'Buscar números de teléfono, URLs o palabras clave...',
+        button: 'Buscar'
+      },
+      report: {
+        button: 'Reportar una Estafa'
+      },
+      features: {
+        ai: {
+          title: 'Detección Impulsada por IA',
+          description: 'IA avanzada analiza patrones para identificar posibles estafas'
+        },
+        community: {
+          title: 'Reportes de la Comunidad',
+          description: 'Reportes reales de miembros de la comunidad vietnamita'
+        },
+        verified: {
+          title: 'Información Verificada',
+          description: 'Datos referenciados cruzadamente para resultados precisos'
+        }
+      },
+      alerts: {
+        title: 'Alertas de Estafas Recientes',
+        recent: 'Recientemente reportado',
+        reported: 'Reportado',
+        times: 'veces'
+      },
+      trust: {
+        title: 'Únete a la Lucha Contra las Estafas',
+        description: 'Juntos, podemos hacer de Internet un lugar más seguro para todos.'
+      }
     },
     report: {
       title: 'Reportar una Estafa',
@@ -573,25 +661,13 @@ const translations: { [key: string]: Translation } = {
         }
       },
       categories: {
-        fake: {
-          police: 'Policía/Funcionario del Gobierno Falso',
-        },
-        bank: {
-          fraud: 'Fraude Bancario/Phishing',
-        },
-        job: {
-          scam: 'Estafa de Empleo',
-        },
+        fakePolice: 'Policía/Funcionario del Gobierno Falso',
+        bankFraud: 'Fraude Bancario/Phishing',
+        jobScam: 'Estafa de Empleo',
         investment: 'Estafa de Inversión',
-        online: {
-          shopping: 'Estafa de Compras en Línea',
-        },
-        telecom: {
-          fraud: 'Fraude de Telecomunicaciones',
-        },
-        fake: {
-          promotion: 'Promoción Falsa',
-        },
+        onlineShopping: 'Estafa de Compras en Línea',
+        telecomFraud: 'Fraude de Telecomunicaciones',
+        fakePromotion: 'Promoción Falsa',
         other: 'Otro'
       },
       navigation: {
@@ -604,9 +680,7 @@ const translations: { [key: string]: Translation } = {
         title: '¡Reporte Enviado!',
         message: 'Gracias por ayudar a proteger a la comunidad. Tu reporte será revisado por nuestro equipo.',
         home: 'Volver al Inicio',
-        report: {
-          another: 'Reportar Otra Estafa'
-        }
+        reportAnother: 'Reportar Otra Estafa'
       },
       titleAI: 'Análisis de IA'
     },
@@ -655,12 +729,24 @@ const translations: { [key: string]: Translation } = {
       extracted: {
         info: "Información Extraída"
       }
+    },
+    language: {
+      english: 'Inglés',
+      vietnamese: 'Vietnamita',
+      chinese: 'Chino',
+      spanish: 'Español'
+    },
+    footer: {
+      copyright: '© 2024 Vệ Binh Mạng. Todos los derechos reservados.'
     }
   }
 };
 
 const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState(localStorage.getItem('language') || 'vi');
+  const [language, setLanguage] = useState<Language>(() => {
+    const saved = localStorage.getItem('language');
+    return (saved as Language) || 'vi';
+  });
 
   useEffect(() => {
     localStorage.setItem('language', language);
@@ -687,7 +773,11 @@ const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children })
 };
 
 const useLanguage = () => {
-  return useContext(LanguageContext);
+  const context = useContext(LanguageContext);
+  if (context === undefined) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
 };
 
 export { LanguageProvider, useLanguage };

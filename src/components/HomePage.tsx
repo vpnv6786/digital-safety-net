@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { MagnifyingGlass, ShieldAlert, Lightbulb, Users, CheckCheck, PlusCircle } from 'lucide-react';
+import { Search, ShieldAlert, Lightbulb, Users, CheckCheck, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -63,7 +64,7 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
               onChange={handleSearchInput}
             />
             <Button onClick={handleSearchSubmit} className="rounded-full">
-              <MagnifyingGlass className="w-5 h-5 mr-2" />
+              <Search className="w-5 h-5 mr-2" />
               {t('home.search.button')}
             </Button>
           </div>
