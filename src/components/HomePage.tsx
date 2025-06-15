@@ -55,7 +55,9 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
         <div className="max-w-6xl mx-auto px-4 py-6 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <ShieldAlert className="w-6 h-6 text-trust-blue" />
-            <span className="text-lg font-semibold text-gray-800">Vệ Binh Mạng</span>
+            <span className="text-lg font-semibold text-gray-800">
+              {language === 'en' ? 'Scam Guard' : 'Vệ Binh Mạng'}
+            </span>
           </div>
           
           <div className="flex items-center space-x-4">
@@ -236,7 +238,9 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
             <div className="col-span-1">
               <div className="flex items-center space-x-2 mb-4">
                 <ShieldAlert className="w-6 h-6 text-trust-blue" />
-                <span className="text-lg font-semibold">Vệ Binh Mạng</span>
+                <span className="text-lg font-semibold">
+                  {language === 'en' ? 'Scam Guard' : 'Vệ Binh Mạng'}
+                </span>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
                 {language === 'en' 
@@ -293,7 +297,7 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
           <div className="border-t border-gray-800 mt-8 pt-6 text-center text-sm text-gray-400">
             <p>
               {language === 'en' 
-                ? 'Vệ Binh Mạng - Platform protecting community from online scams. Developed with ❤️ in Vietnam.'
+                ? 'Scam Guard - Platform protecting community from online scams. Developed with ❤️ in Vietnam.'
                 : 'Vệ Binh Mạng - Nền tảng bảo vệ cộng đồng khỏi lừa đảo trực tuyến. Được phát triển với ❤️ tại Việt Nam.'
               }
             </p>

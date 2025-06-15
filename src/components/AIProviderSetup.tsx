@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AIProvider, AI_PROVIDERS } from '@/types/aiProviders';
 import { aiManager } from '@/services/aiManager';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const AIProviderSetup: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AIProvider>('gemini');
@@ -27,6 +28,7 @@ const AIProviderSetup: React.FC = () => {
   const [configuredProviders, setConfiguredProviders] = useState<
     { provider: AIProvider; name: string; isActive: boolean }[]
   >([]);
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     // Initialize AI Manager and load configured providers
@@ -86,7 +88,10 @@ const AIProviderSetup: React.FC = () => {
             </div>
             {isConfigured && (
               <Badge variant={isActive ? "default" : "secondary"}>
-                {isActive ? 'Đang sử dụng' : 'Đã cấu hình'}
+                {isActive 
+                  ? (language === 'en' ? 'Active' : 'Đang sử dụng')
+                  : (language === 'en' ? 'Configured' : 'Đã cấu hình')
+                }
               </Badge>
             )}
           </CardTitle>
@@ -106,7 +111,7 @@ const AIProviderSetup: React.FC = () => {
                 />
                 {config.setupUrl && (
                   <div className="text-xs text-gray-500">
-                    Lấy API key tại:{' '}
+                    {language === 'en' ? 'Get API key at:' : 'Lấy API key tại:'}{' '}
                     <a
                       href={config.setupUrl}
                       target="_blank"
@@ -126,14 +131,17 @@ const AIProviderSetup: React.FC = () => {
                 className="w-full"
               >
                 <Key className="w-4 h-4 mr-2" />
-                {loading[provider] ? 'Đang cấu hình...' : 'Lưu & Kích hoạt'}
+                {loading[provider] 
+                  ? (language === 'en' ? 'Configuring...' : 'Đang cấu hình...')
+                  : (language === 'en' ? 'Save & Enable' : 'Lưu & Kích hoạt')
+                }
               </Button>
             </>
           ) : (
             <div className="space-y-2">
               <div className="flex items-center text-green-600 text-sm">
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Đã cấu hình thành công
+                {language === 'en' ? 'Successfully configured' : 'Đã cấu hình thành công'}
               </div>
               
               <div className="flex space-x-2">
@@ -143,7 +151,7 @@ const AIProviderSetup: React.FC = () => {
                     onClick={() => handleSetActive(provider)}
                     className="flex-1"
                   >
-                    Đặt làm mặc định
+                    {language === 'en' ? 'Set as Default' : 'Đặt làm mặc định'}
                   </Button>
                 )}
                 <Button
@@ -152,7 +160,7 @@ const AIProviderSetup: React.FC = () => {
                   onClick={() => handleRemoveProvider(provider)}
                   className="flex-1"
                 >
-                  Xóa
+                  {language === 'en' ? 'Remove' : 'Xóa'}
                 </Button>
               </div>
             </div>
@@ -167,10 +175,13 @@ const AIProviderSetup: React.FC = () => {
       <div className="mb-6">
         <h2 className="text-2xl font-bold flex items-center mb-2">
           <Settings className="w-6 h-6 mr-2 text-blue-500" />
-          Cấu hình AI Providers
+          {language === 'en' ? 'Configure AI Providers' : 'Cấu hình AI Providers'}
         </h2>
         <p className="text-gray-600">
-          Cấu hình các nhà cung cấp AI để có được phân tích lừa đảo tốt nhất
+          {language === 'en' 
+            ? 'Configure AI providers to get the best scam analysis'
+            : 'Cấu hình các nhà cung cấp AI để có được phân tích lừa đảo tốt nhất'
+          }
         </p>
       </div>
 
@@ -178,9 +189,12 @@ const AIProviderSetup: React.FC = () => {
         <Alert className="mb-6 border-green-200 bg-green-50">
           <CheckCircle className="h-4 w-4 text-green-600" />
           <AlertDescription className="text-green-700">
-            Đã cấu hình {configuredProviders.length} AI provider(s). 
-            Provider đang sử dụng: <strong>
-              {configuredProviders.find(p => p.isActive)?.name || 'Không có'}
+            {language === 'en' 
+              ? `${configuredProviders.length} AI provider(s) configured. Active provider: `
+              : `Đã cấu hình ${configuredProviders.length} AI provider(s). Provider đang sử dụng: `
+            }
+            <strong>
+              {configuredProviders.find(p => p.isActive)?.name || (language === 'en' ? 'None' : 'Không có')}
             </strong>
           </AlertDescription>
         </Alert>
@@ -193,12 +207,26 @@ const AIProviderSetup: React.FC = () => {
       </div>
 
       <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-        <h3 className="font-semibold text-blue-900 mb-2">💡 Khuyến nghị:</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">
+          💡 {language === 'en' ? 'Recommendations:' : 'Khuyến nghị:'}
+        </h3>
         <ul className="text-sm text-blue-800 space-y-1">
-          <li>• <strong>Gemini:</strong> Tốt nhất cho phân tích hình ảnh và văn bản tiếng Việt</li>
-          <li>• <strong>OpenAI GPT-4:</strong> Mạnh về phân tích ngữ cảnh và reasoning</li>
-          <li>• <strong>Claude:</strong> Excellnt ở phân tích chi tiết và an toàn</li>
-          <li>• <strong>Perplexity:</strong> Có khả năng tìm kiếm thông tin real-time</li>
+          <li>• <strong>Gemini:</strong> {language === 'en' 
+            ? 'Best for image analysis and Vietnamese text'
+            : 'Tốt nhất cho phân tích hình ảnh và văn bản tiếng Việt'
+          }</li>
+          <li>• <strong>OpenAI GPT-4:</strong> {language === 'en'
+            ? 'Strong at context analysis and reasoning'
+            : 'Mạnh về phân tích ngữ cảnh và reasoning'
+          }</li>
+          <li>• <strong>Claude:</strong> {language === 'en'
+            ? 'Excellent at detailed analysis and safety'
+            : 'Excellnt ở phân tích chi tiết và an toàn'
+          }</li>
+          <li>• <strong>Perplexity:</strong> {language === 'en'
+            ? 'Real-time information search capability'
+            : 'Có khả năng tìm kiếm thông tin real-time'
+          }</li>
         </ul>
       </div>
     </div>
