@@ -7,7 +7,6 @@ export type Language = 'en' | 'vi';
 interface LanguageContextProps {
   language: Language;
   setLanguage: (language: Language) => void;
-  t: (text: string) => Promise<string>;
   hasTranslationSetup: boolean;
 }
 
@@ -27,28 +26,10 @@ const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children })
     setHasTranslationSetup(translationService.hasApiKey());
   }, [language]);
 
-  const t = async (text: string): Promise<string> => {
-    if (language === 'en') {
-      return text;
-    }
-
-    if (!translationService.hasApiKey()) {
-      return text;
-    }
-
-    try {
-      return await translationService.translateText(text, language);
-    } catch (error) {
-      console.error('Translation error:', error);
-      return text;
-    }
-  };
-
   return (
     <LanguageContext.Provider value={{ 
       language, 
       setLanguage, 
-      t,
       hasTranslationSetup
     }}>
       {children}

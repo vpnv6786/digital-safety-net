@@ -12,11 +12,12 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from './LanguageSelector';
+import TranslatedText from './TranslatedText';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Header = () => {
   const { user, signOut } = useAuth();
-  const { t } = useLanguage();
+  const { language } = useLanguage();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -26,12 +27,12 @@ const Header = () => {
   };
 
   const navigationItems = [
-    { to: '/', icon: Home, label: t('home.navigation.home') || 'Trang chủ' },
-    { to: '/safety', icon: Shield, label: t('home.navigation.safety') || 'An toàn' },
-    { to: '/scam-rankings', icon: BarChart3, label: t('home.navigation.scamRankings') || 'Bảng xếp hạng lừa đảo' },
-    { to: '/community-alerts', icon: AlertTriangle, label: t('home.navigation.communityAlerts') || 'Cảnh báo cộng đồng' },
-    { to: '/authorities', icon: Users, label: t('home.navigation.authorities') || 'Cơ quan chức năng' },
-    { to: '/about', icon: Users, label: t('home.navigation.about') || 'Giới thiệu' },
+    { to: '/', icon: Home, labelKey: 'Trang chủ', labelEn: 'Home' },
+    { to: '/safety', icon: Shield, labelKey: 'An toàn', labelEn: 'Safety' },
+    { to: '/scam-rankings', icon: BarChart3, labelKey: 'Bảng xếp hạng lừa đảo', labelEn: 'Scam Rankings' },
+    { to: '/community-alerts', icon: AlertTriangle, labelKey: 'Cảnh báo cộng đồng', labelEn: 'Community Alerts' },
+    { to: '/authorities', icon: Users, labelKey: 'Cơ quan chức năng', labelEn: 'Authorities' },
+    { to: '/about', icon: Users, labelKey: 'Giới thiệu', labelEn: 'About' },
   ];
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
@@ -53,7 +54,9 @@ const Header = () => {
                 <Link key={item.to} to={item.to}>
                   <Button variant="ghost" className="flex items-center space-x-2 text-gray-600 hover:text-blue-600">
                     <item.icon className="w-4 h-4" />
-                    <span>{item.label}</span>
+                    <TranslatedText>
+                      {language === 'en' ? item.labelEn : item.labelKey}
+                    </TranslatedText>
                   </Button>
                 </Link>
               ))}
@@ -74,7 +77,7 @@ const Header = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={handleSignOut}>
-                    {t('home.navigation.logout') || 'Đăng xuất'}
+                    <TranslatedText>{language === 'en' ? 'Logout' : 'Đăng xuất'}</TranslatedText>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -82,7 +85,7 @@ const Header = () => {
               <Link to="/auth" onClick={closeMobileMenu}>
                 <Button className="flex items-center space-x-1 sm:space-x-2 bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm px-2 sm:px-4">
                   <LogIn className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>{t('home.navigation.login') || 'Đăng nhập'}</span>
+                  <TranslatedText>{language === 'en' ? 'Login' : 'Đăng nhập'}</TranslatedText>
                 </Button>
               </Link>
             )}
@@ -109,7 +112,9 @@ const Header = () => {
                 <Link key={item.to} to={item.to} onClick={closeMobileMenu}>
                   <Button variant="ghost" className="w-full justify-start flex items-center space-x-2 text-gray-600 hover:text-blue-600">
                     <item.icon className="w-4 h-4" />
-                    <span>{item.label}</span>
+                    <TranslatedText>
+                      {language === 'en' ? item.labelEn : item.labelKey}
+                    </TranslatedText>
                   </Button>
                 </Link>
               ))}

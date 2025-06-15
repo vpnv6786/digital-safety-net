@@ -10,6 +10,7 @@ import SearchResults from './SearchResults';
 import ReportForm from './ReportForm';
 import ImageAnalysis from './ImageAnalysis';
 import AIProviderSetup from './AIProviderSetup';
+import TranslatedText from './TranslatedText';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -17,7 +18,7 @@ const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [activeTab, setActiveTab] = useState<'search' | 'report' | 'image'>('search');
-  const { t } = useLanguage();
+  const { language } = useLanguage();
   const isMobile = useIsMobile();
 
   const handleSearch = () => {
@@ -33,9 +34,9 @@ const HomePage = () => {
   };
 
   const exampleSearches = [
-    { icon: Phone, text: "0123456789", type: "Số điện thoại" },
+    { icon: Phone, text: "0123456789", type: language === 'en' ? 'Phone number' : 'Số điện thoại' },
     { icon: Globe, text: "scam-website.com", type: "Website" },
-    { icon: CreditCard, text: "1234567890123456", type: "Số tài khoản" }
+    { icon: CreditCard, text: "1234567890123456", type: language === 'en' ? 'Account number' : 'Số tài khoản' }
   ];
 
   return (
@@ -47,11 +48,22 @@ const HomePage = () => {
             <Shield className="w-12 h-12 sm:w-16 sm:h-16 text-blue-600" />
           </div>
           <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
-            {t('home.hero.title') || 'Bảo vệ bạn khỏi'}{' '}
-            <span className="text-blue-600">lừa đảo</span>
+            <TranslatedText>
+              {language === 'en' ? 'Protect yourself from' : 'Bảo vệ bạn khỏi'}
+            </TranslatedText>{' '}
+            <span className="text-blue-600">
+              <TranslatedText>
+                {language === 'en' ? 'scams' : 'lừa đảo'}
+              </TranslatedText>
+            </span>
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
-            {t('home.hero.subtitle') || 'Kiểm tra số điện thoại, website và thông tin đáng ngờ. Nhận cảnh báo realtime và chia sẻ kinh nghiệm với cộng đồng.'}
+            <TranslatedText>
+              {language === 'en' 
+                ? 'Check phone numbers, websites and suspicious information. Get real-time alerts and share experiences with the community.'
+                : 'Kiểm tra số điện thoại, website và thông tin đáng ngờ. Nhận cảnh báo realtime và chia sẻ kinh nghiệm với cộng đồng.'
+              }
+            </TranslatedText>
           </p>
 
           {/* Quick Actions */}
@@ -60,8 +72,19 @@ const HomePage = () => {
               <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/80 backdrop-blur h-full">
                 <CardContent className="p-4 sm:p-6 text-center">
                   <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 mx-auto mb-2 sm:mb-3" />
-                  <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base">An toàn cá nhân</h3>
-                  <p className="text-xs sm:text-sm text-gray-600">Theo dõi GPS và cảnh báo khu vực nguy hiểm</p>
+                  <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base">
+                    <TranslatedText>
+                      {language === 'en' ? 'Personal Safety' : 'An toàn cá nhân'}
+                    </TranslatedText>
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-600">
+                    <TranslatedText>
+                      {language === 'en' 
+                        ? 'GPS tracking and dangerous area alerts'
+                        : 'Theo dõi GPS và cảnh báo khu vực nguy hiểm'
+                      }
+                    </TranslatedText>
+                  </p>
                 </CardContent>
               </Card>
             </Link>
@@ -70,8 +93,19 @@ const HomePage = () => {
               <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/80 backdrop-blur h-full">
                 <CardContent className="p-4 sm:p-6 text-center">
                   <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 mx-auto mb-2 sm:mb-3" />
-                  <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base">Bảng xếp hạng lừa đảo</h3>
-                  <p className="text-xs sm:text-sm text-gray-600">Thống kê các hình thức lừa đảo nguy hiểm nhất</p>
+                  <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base">
+                    <TranslatedText>
+                      {language === 'en' ? 'Scam Rankings' : 'Bảng xếp hạng lừa đảo'}
+                    </TranslatedText>
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-600">
+                    <TranslatedText>
+                      {language === 'en'
+                        ? 'Statistics of the most dangerous scam types'
+                        : 'Thống kê các hình thức lừa đảo nguy hiểm nhất'
+                      }
+                    </TranslatedText>
+                  </p>
                 </CardContent>
               </Card>
             </Link>
@@ -80,8 +114,19 @@ const HomePage = () => {
               <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/80 backdrop-blur h-full">
                 <CardContent className="p-4 sm:p-6 text-center">
                   <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 mx-auto mb-2 sm:mb-3" />
-                  <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base">Cảnh báo cộng đồng</h3>
-                  <p className="text-xs sm:text-sm text-gray-600">Thông tin cảnh báo realtime từ cộng đồng</p>
+                  <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base">
+                    <TranslatedText>
+                      {language === 'en' ? 'Community Alerts' : 'Cảnh báo cộng đồng'}
+                    </TranslatedText>
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-600">
+                    <TranslatedText>
+                      {language === 'en'
+                        ? 'Real-time alert information from the community'
+                        : 'Thông tin cảnh báo realtime từ cộng đồng'
+                      }
+                    </TranslatedText>
+                  </p>
                 </CardContent>
               </Card>
             </Link>
@@ -102,7 +147,9 @@ const HomePage = () => {
                   size={isMobile ? 'sm' : 'default'}
                 >
                   <Search className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>Kiểm tra thông tin</span>
+                  <TranslatedText>
+                    {language === 'en' ? 'Check Information' : 'Kiểm tra thông tin'}
+                  </TranslatedText>
                 </Button>
                 <Button
                   variant={activeTab === 'report' ? 'default' : 'outline'}
@@ -111,7 +158,9 @@ const HomePage = () => {
                   size={isMobile ? 'sm' : 'default'}
                 >
                   <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>Báo cáo lừa đảo</span>
+                  <TranslatedText>
+                    {language === 'en' ? 'Report Scam' : 'Báo cáo lừa đảo'}
+                  </TranslatedText>
                 </Button>
                 <Button
                   variant={activeTab === 'image' ? 'default' : 'outline'}
@@ -120,7 +169,9 @@ const HomePage = () => {
                   size={isMobile ? 'sm' : 'default'}
                 >
                   <Shield className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>Phân tích hình ảnh</span>
+                  <TranslatedText>
+                    {language === 'en' ? 'Image Analysis' : 'Phân tích hình ảnh'}
+                  </TranslatedText>
                 </Button>
               </div>
             </CardHeader>
@@ -130,7 +181,11 @@ const HomePage = () => {
                   <div className="space-y-4">
                     <div className="flex flex-col sm:flex-row gap-2">
                       <Input
-                        placeholder={t('home.search.placeholder') || "Nhập số điện thoại, website, email hoặc thông tin cần kiểm tra..."}
+                        placeholder={
+                          language === 'en' 
+                            ? "Enter phone number, website, email or information to check..."
+                            : "Nhập số điện thoại, website, email hoặc thông tin cần kiểm tra..."
+                        }
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyPress={handleKeyPress}
@@ -138,12 +193,18 @@ const HomePage = () => {
                       />
                       <Button onClick={handleSearch} size={isMobile ? 'default' : 'lg'} className="px-4 sm:px-8">
                         <Search className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-                        {t('home.search.button') || 'Kiểm tra'}
+                        <TranslatedText>
+                          {language === 'en' ? 'Check' : 'Kiểm tra'}
+                        </TranslatedText>
                       </Button>
                     </div>
                     
                     <div className="flex flex-wrap gap-2 justify-center">
-                      <span className="text-xs sm:text-sm text-gray-600 mr-2">Ví dụ:</span>
+                      <span className="text-xs sm:text-sm text-gray-600 mr-2">
+                        <TranslatedText>
+                          {language === 'en' ? 'Examples:' : 'Ví dụ:'}
+                        </TranslatedText>
+                      </span>
                       {exampleSearches.map((example, index) => (
                         <Button
                           key={index}
@@ -175,24 +236,42 @@ const HomePage = () => {
       <section className="px-4 py-8 sm:py-16 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-8 sm:mb-12">
-            Thống kê bảo vệ cộng đồng
+            <TranslatedText>
+              {language === 'en' ? 'Community Protection Statistics' : 'Thống kê bảo vệ cộng đồng'}
+            </TranslatedText>
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
             <div className="text-center">
               <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">50,000+</div>
-              <div className="text-sm sm:text-base text-gray-600">Số điện thoại được kiểm tra</div>
+              <div className="text-sm sm:text-base text-gray-600">
+                <TranslatedText>
+                  {language === 'en' ? 'Phone numbers checked' : 'Số điện thoại được kiểm tra'}
+                </TranslatedText>
+              </div>
             </div>
             <div className="text-center">
               <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">15,000+</div>
-              <div className="text-sm sm:text-base text-gray-600">Báo cáo lừa đảo</div>
+              <div className="text-sm sm:text-base text-gray-600">
+                <TranslatedText>
+                  {language === 'en' ? 'Scam reports' : 'Báo cáo lừa đảo'}
+                </TranslatedText>
+              </div>
             </div>
             <div className="text-center">
               <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">98%</div>
-              <div className="text-sm sm:text-base text-gray-600">Độ chính xác phát hiện</div>
+              <div className="text-sm sm:text-base text-gray-600">
+                <TranslatedText>
+                  {language === 'en' ? 'Detection accuracy' : 'Độ chính xác phát hiện'}
+                </TranslatedText>
+              </div>
             </div>
             <div className="text-center">
               <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">24/7</div>
-              <div className="text-sm sm:text-base text-gray-600">Giám sát liên tục</div>
+              <div className="text-sm sm:text-base text-gray-600">
+                <TranslatedText>
+                  {language === 'en' ? 'Continuous monitoring' : 'Giám sát liên tục'}
+                </TranslatedText>
+              </div>
             </div>
           </div>
         </div>
@@ -215,40 +294,71 @@ const HomePage = () => {
                 <span className="text-lg sm:text-xl font-bold">ScamGuard</span>
               </div>
               <p className="text-sm sm:text-base text-gray-400">
-                Bảo vệ bạn khỏi lừa đảo với công nghệ AI tiên tiến và cộng đồng cảnh báo.
+                <TranslatedText>
+                  {language === 'en' 
+                    ? 'Protect yourself from scams with advanced AI technology and community alerts.'
+                    : 'Bảo vệ bạn khỏi lừa đảo với công nghệ AI tiên tiến và cộng đồng cảnh báo.'
+                  }
+                </TranslatedText>
               </p>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4 text-sm sm:text-base">Liên kết nhanh</h3>
+              <h3 className="font-semibold mb-4 text-sm sm:text-base">
+                <TranslatedText>
+                  {language === 'en' ? 'Quick Links' : 'Liên kết nhanh'}
+                </TranslatedText>
+              </h3>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link to="/safety" className="hover:text-white">An toàn cá nhân</Link></li>
-                <li><Link to="/scam-rankings" className="hover:text-white">Bảng xếp hạng</Link></li>
-                <li><Link to="/community-alerts" className="hover:text-white">Cảnh báo cộng đồng</Link></li>
+                <li><Link to="/safety" className="hover:text-white">
+                  <TranslatedText>{language === 'en' ? 'Personal Safety' : 'An toàn cá nhân'}</TranslatedText>
+                </Link></li>
+                <li><Link to="/scam-rankings" className="hover:text-white">
+                  <TranslatedText>{language === 'en' ? 'Rankings' : 'Bảng xếp hạng'}</TranslatedText>
+                </Link></li>
+                <li><Link to="/community-alerts" className="hover:text-white">
+                  <TranslatedText>{language === 'en' ? 'Community Alerts' : 'Cảnh báo cộng đồng'}</TranslatedText>
+                </Link></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4 text-sm sm:text-base">Hỗ trợ</h3>
+              <h3 className="font-semibold mb-4 text-sm sm:text-base">
+                <TranslatedText>
+                  {language === 'en' ? 'Support' : 'Hỗ trợ'}
+                </TranslatedText>
+              </h3>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link to="/about" className="hover:text-white">Giới thiệu</Link></li>
-                <li><Link to="/contact" className="hover:text-white">Liên hệ</Link></li>
-                <li><Link to="/privacy" className="hover:text-white">Chính sách bảo mật</Link></li>
+                <li><Link to="/about" className="hover:text-white">
+                  <TranslatedText>{language === 'en' ? 'About' : 'Giới thiệu'}</TranslatedText>
+                </Link></li>
+                <li><Link to="/contact" className="hover:text-white">
+                  <TranslatedText>{language === 'en' ? 'Contact' : 'Liên hệ'}</TranslatedText>
+                </Link></li>
+                <li><Link to="/privacy" className="hover:text-white">
+                  <TranslatedText>{language === 'en' ? 'Privacy Policy' : 'Chính sách bảo mật'}</TranslatedText>
+                </Link></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4 text-sm sm:text-base">Cơ quan chức năng</h3>
+              <h3 className="font-semibold mb-4 text-sm sm:text-base">
+                <TranslatedText>
+                  {language === 'en' ? 'Authorities' : 'Cơ quan chức năng'}
+                </TranslatedText>
+              </h3>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link to="/authorities" className="hover:text-white">Số điện thoại khẩn cấp</Link></li>
-                <li><a href="tel:113" className="hover:text-white">113 - Cảnh sát</a></li>
-                <li><a href="tel:1900545464" className="hover:text-white">1900 545464 - Ngân hàng</a></li>
+                <li><Link to="/authorities" className="hover:text-white">
+                  <TranslatedText>{language === 'en' ? 'Emergency Numbers' : 'Số điện thoại khẩn cấp'}</TranslatedText>
+                </Link></li>
+                <li><a href="tel:113" className="hover:text-white">113 - {language === 'en' ? 'Police' : 'Cảnh sát'}</a></li>
+                <li><a href="tel:1900545464" className="hover:text-white">1900 545464 - {language === 'en' ? 'Banking' : 'Ngân hàng'}</a></li>
               </ul>
             </div>
           </div>
           
           <div className="border-t border-gray-800 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-xs sm:text-sm text-gray-400">
-            <p>&copy; 2024 ScamGuard. Tất cả quyền được bảo lưu.</p>
+            <p>&copy; 2024 ScamGuard. <TranslatedText>{language === 'en' ? 'All rights reserved.' : 'Tất cả quyền được bảo lưu.'}</TranslatedText></p>
           </div>
         </div>
       </footer>
