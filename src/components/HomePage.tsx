@@ -10,13 +10,16 @@ import LanguageSelector from '@/components/LanguageSelector';
 import AIKeyInput from '@/components/AIKeyInput';
 import ImageAnalysis from '@/components/ImageAnalysis';
 import { searchEntity } from '@/services/searchService';
+import { User } from '@supabase/supabase-js';
 
 interface HomePageProps {
   onSearch: (query: string, result?: any) => void;
   onReport: () => void;
+  onAuth: () => void;
+  user: User | null;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
+const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport, onAuth, user }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const { t, language } = useLanguage();
@@ -82,6 +85,23 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
                 </div>
               </Link>
             </nav>
+            
+            {/* User Auth Section */}
+            {user ? (
+              <div className="flex items-center space-x-2 text-gray-600">
+                <span className="text-sm">
+                  {language === 'en' ? 'Welcome' : 'Xin chào'}: {user.phone}
+                </span>
+              </div>
+            ) : (
+              <Button 
+                variant="outline" 
+                onClick={onAuth}
+                className="text-trust-blue border-trust-blue hover:bg-trust-blue hover:text-white"
+              >
+                {language === 'en' ? 'Login' : 'Đăng nhập'}
+              </Button>
+            )}
             
             <AIKeyInput />
             <LanguageSelector />
