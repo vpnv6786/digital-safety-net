@@ -286,7 +286,7 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
                 {language === 'en' ? 'Legal' : 'Pháp lý'}
               </h3>
               <div className="space-y-2 text-sm text-gray-400">
-                <p>© 2024 Vệ Binh Mạng</p>
+                <p>© 2024 {language === 'en' ? 'Scam Guard' : 'Vệ Binh Mạng'}</p>
                 <p>{language === 'en' ? 'All rights reserved' : 'Bảo lưu mọi quyền'}</p>
                 <p>{language === 'en' ? 'Version 1.0' : 'Phiên bản 1.0'}</p>
               </div>
