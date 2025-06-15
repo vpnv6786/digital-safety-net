@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,7 +19,20 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'be-vietnam': ['Be Vietnam Pro', 'sans-serif'],
+			},
 			colors: {
+				// Vệ Binh Mạng Brand Colors
+				'trust-blue': '#0057B7',
+				'trust-blue-light': '#1E6FD4',
+				'trust-blue-dark': '#004294',
+				'safe-green': '#28A745',
+				'warning-orange': '#FFA500',
+				'danger-red': '#D7263D',
+				'attention-yellow': '#FFD700',
+				'neutral-light': '#F5F7FA',
+				
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
@@ -84,11 +98,48 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'radar-scan': {
+					'0%': {
+						transform: 'scaleX(0)',
+						opacity: '1'
+					},
+					'100%': {
+						transform: 'scaleX(1)',
+						opacity: '0'
+					}
+				},
+				'shield-build': {
+					'0%': {
+						transform: 'scale(0) rotate(-10deg)',
+						opacity: '0'
+					},
+					'50%': {
+						transform: 'scale(1.1) rotate(5deg)',
+						opacity: '1'
+					},
+					'100%': {
+						transform: 'scale(1) rotate(0deg)',
+						opacity: '1'
+					}
+				},
+				'fade-in-up': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(20px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'radar-scan': 'radar-scan 1.5s ease-out',
+				'shield-build': 'shield-build 0.6s ease-out',
+				'fade-in-up': 'fade-in-up 0.5s ease-out'
 			}
 		}
 	},
