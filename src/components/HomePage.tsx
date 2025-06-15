@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Shield, Search, AlertTriangle, Users, TrendingUp, MapPin, Phone, Globe, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -39,11 +40,11 @@ const HomePage = () => {
       <section className="px-4 py-16 text-center">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-center mb-6">
-            <Shield className="w-16 h-16 text-trust-blue" />
+            <Shield className="w-16 h-16 text-blue-600" />
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Bảo vệ bạn khỏi{' '}
-            <span className="text-trust-blue">lừa đảo</span>
+            <span className="text-blue-600">lừa đảo</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Kiểm tra số điện thoại, website và thông tin đáng ngờ. 
@@ -55,7 +56,7 @@ const HomePage = () => {
             <Link to="/safety" className="block">
               <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/80 backdrop-blur">
                 <CardContent className="p-6 text-center">
-                  <Shield className="w-8 h-8 text-trust-blue mx-auto mb-3" />
+                  <Shield className="w-8 h-8 text-blue-600 mx-auto mb-3" />
                   <h3 className="font-semibold text-gray-900 mb-2">An toàn cá nhân</h3>
                   <p className="text-sm text-gray-600">Theo dõi GPS và cảnh báo khu vực nguy hiểm</p>
                 </CardContent>
@@ -65,7 +66,7 @@ const HomePage = () => {
             <Link to="/scam-rankings" className="block">
               <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/80 backdrop-blur">
                 <CardContent className="p-6 text-center">
-                  <TrendingUp className="w-8 h-8 text-trust-blue mx-auto mb-3" />
+                  <TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-3" />
                   <h3 className="font-semibold text-gray-900 mb-2">Bảng xếp hạng lừa đảo</h3>
                   <p className="text-sm text-gray-600">Thống kê các hình thức lừa đảo nguy hiểm nhất</p>
                 </CardContent>
@@ -75,7 +76,7 @@ const HomePage = () => {
             <Link to="/community-alerts" className="block">
               <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/80 backdrop-blur">
                 <CardContent className="p-6 text-center">
-                  <AlertTriangle className="w-8 h-8 text-trust-blue mx-auto mb-3" />
+                  <AlertTriangle className="w-8 h-8 text-blue-600 mx-auto mb-3" />
                   <h3 className="font-semibold text-gray-900 mb-2">Cảnh báo cộng đồng</h3>
                   <p className="text-sm text-gray-600">Thông tin cảnh báo realtime từ cộng đồng</p>
                 </CardContent>
@@ -172,19 +173,19 @@ const HomePage = () => {
           </h2>
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-3xl font-bold text-trust-blue mb-2">50,000+</div>
+              <div className="text-3xl font-bold text-blue-600 mb-2">50,000+</div>
               <div className="text-gray-600">Số điện thoại được kiểm tra</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-trust-blue mb-2">15,000+</div>
+              <div className="text-3xl font-bold text-blue-600 mb-2">15,000+</div>
               <div className="text-gray-600">Báo cáo lừa đảo</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-trust-blue mb-2">98%</div>
+              <div className="text-3xl font-bold text-blue-600 mb-2">98%</div>
               <div className="text-gray-600">Độ chính xác phát hiện</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-trust-blue mb-2">24/7</div>
+              <div className="text-3xl font-bold text-blue-600 mb-2">24/7</div>
               <div className="text-gray-600">Giám sát liên tục</div>
             </div>
           </div>
@@ -197,6 +198,54 @@ const HomePage = () => {
           <AIProviderSetup />
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <Shield className="w-6 h-6 text-blue-400" />
+                <span className="text-xl font-bold">ScamGuard</span>
+              </div>
+              <p className="text-gray-400">
+                Bảo vệ bạn khỏi lừa đảo với công nghệ AI tiên tiến và cộng đồng cảnh báo.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold mb-4">Liên kết nhanh</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link to="/safety" className="hover:text-white">An toàn cá nhân</Link></li>
+                <li><Link to="/scam-rankings" className="hover:text-white">Bảng xếp hạng</Link></li>
+                <li><Link to="/community-alerts" className="hover:text-white">Cảnh báo cộng đồng</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold mb-4">Hỗ trợ</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link to="/about" className="hover:text-white">Giới thiệu</Link></li>
+                <li><Link to="/contact" className="hover:text-white">Liên hệ</Link></li>
+                <li><Link to="/privacy" className="hover:text-white">Chính sách bảo mật</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold mb-4">Cơ quan chức năng</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link to="/authorities" className="hover:text-white">Số điện thoại khẩn cấp</Link></li>
+                <li><a href="tel:113" className="hover:text-white">113 - Cảnh sát</a></li>
+                <li><a href="tel:1900545464" className="hover:text-white">1900 545464 - Ngân hàng</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 ScamGuard. Tất cả quyền được bảo lưu.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

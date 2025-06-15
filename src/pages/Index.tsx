@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import Header from '@/components/Header';
 import HomePage from '@/components/HomePage';
 import SearchResults from '@/components/SearchResults';
 import ReportForm from '@/components/ReportForm';
@@ -86,32 +87,32 @@ const Index = () => {
     );
   }
 
-  switch (currentView) {
-    case 'auth':
-      return <AuthPage onBack={goHome} />;
-    
-    case 'search-results':
-      return (
+  // Auth page doesn't need header
+  if (currentView === 'auth') {
+    return <AuthPage onBack={goHome} />;
+  }
+
+  // All other views include the header
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      {currentView === 'search-results' && (
         <SearchResults
           query={searchQuery}
           riskLevel={searchResult?.riskLevel || 'safe'}
           searchResult={searchResult}
           onBack={goHome}
         />
-      );
-    
-    case 'report-form':
-      return (
-        <ReportForm
-          onBack={goHome}
-        />
-      );
-    
-    default:
-      return (
-        <HomePage />
-      );
-  }
+      )}
+      
+      {currentView === 'report-form' && (
+        <ReportForm onBack={goHome} />
+      )}
+      
+      {currentView === 'home' && <HomePage />}
+    </div>
+  );
 };
 
 export default Index;
