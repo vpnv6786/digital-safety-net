@@ -24,6 +24,10 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport, onAuth, user })
   const [isSearching, setIsSearching] = useState(false);
   const { t, language } = useLanguage();
 
+  // Debug logging
+  console.log('HomePage user:', user);
+  console.log('HomePage onAuth function:', onAuth);
+
   const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
@@ -86,25 +90,31 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport, onAuth, user })
               </Link>
             </nav>
             
-            {/* User Auth Section */}
-            {user ? (
-              <div className="flex items-center space-x-2 text-gray-600">
-                <span className="text-sm">
-                  {language === 'en' ? 'Welcome' : 'Xin chào'}: {user.phone}
-                </span>
-              </div>
-            ) : (
-              <Button 
-                variant="outline" 
-                onClick={onAuth}
-                className="text-trust-blue border-trust-blue hover:bg-trust-blue hover:text-white"
-              >
-                {language === 'en' ? 'Login' : 'Đăng nhập'}
-              </Button>
-            )}
-            
-            <AIKeyInput />
-            <LanguageSelector />
+            {/* User Auth Section - Made more prominent */}
+            <div className="flex items-center space-x-3">
+              {user ? (
+                <div className="flex items-center space-x-2 text-gray-600 bg-green-50 px-3 py-2 rounded-lg">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm font-medium">
+                    {language === 'en' ? 'Welcome' : 'Xin chào'}: {user.phone}
+                  </span>
+                </div>
+              ) : (
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    console.log('Login button clicked!');
+                    onAuth();
+                  }}
+                  className="text-trust-blue border-trust-blue hover:bg-trust-blue hover:text-white font-medium px-4 py-2"
+                >
+                  {language === 'en' ? 'Login' : 'Đăng nhập'}
+                </Button>
+              )}
+              
+              <AIKeyInput />
+              <LanguageSelector />
+            </div>
           </div>
         </div>
       </header>
