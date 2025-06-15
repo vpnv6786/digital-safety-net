@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -25,16 +26,56 @@ function App() {
           <Toaster />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<AuthPage onBack={() => window.history.back()} />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/safety" element={<Safety />} />
-              <Route path="/scam-rankings" element={<ScamRankings />} />
-              <Route path="/community-alerts" element={<CommunityAlerts />} />
-              <Route path="/authorities" element={<Authorities />} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="/" element={
+                <Layout showHeader={false} showFooter={false}>
+                  <Index />
+                </Layout>
+              } />
+              <Route path="/auth" element={
+                <Layout showHeader={false} showFooter={false}>
+                  <AuthPage onBack={() => window.history.back()} />
+                </Layout>
+              } />
+              <Route path="/about" element={
+                <Layout>
+                  <About />
+                </Layout>
+              } />
+              <Route path="/contact" element={
+                <Layout>
+                  <Contact />
+                </Layout>
+              } />
+              <Route path="/privacy" element={
+                <Layout>
+                  <Privacy />
+                </Layout>
+              } />
+              <Route path="/safety" element={
+                <Layout>
+                  <Safety />
+                </Layout>
+              } />
+              <Route path="/scam-rankings" element={
+                <Layout>
+                  <ScamRankings />
+                </Layout>
+              } />
+              <Route path="/community-alerts" element={
+                <Layout>
+                  <CommunityAlerts />
+                </Layout>
+              } />
+              <Route path="/authorities" element={
+                <Layout>
+                  <Authorities />
+                </Layout>
+              } />
+              <Route path="*" element={
+                <Layout>
+                  <NotFound />
+                </Layout>
+              } />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>

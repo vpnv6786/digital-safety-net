@@ -87,7 +87,7 @@ const Index = () => {
     );
   }
 
-  // Auth page doesn't need header
+  // Auth page doesn't need header/footer (handled by Layout)
   if (currentView === 'auth') {
     return <AuthPage onBack={goHome} />;
   }
