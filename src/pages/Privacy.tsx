@@ -96,23 +96,21 @@ const Privacy = () => {
                 <h4 className="font-semibold mb-2">
                   {language === 'en' ? 'Search information:' : 'Thông tin tìm kiếm:'}
                 </h4>
-                <p className="text-gray-700">
-                  {language === 'en' 
-                    ? '- Phone numbers, websites, emails you search\n- Content descriptions in reports\n- Images uploaded for analysis'
-                    : '- Số điện thoại, website, email mà bạn tìm kiếm\n- Nội dung mô tả trong báo cáo\n- Hình ảnh được upload để phân tích'
-                  }
-                </p>
+                <ul className="list-disc list-inside text-gray-700 space-y-1">
+                  <li>{language === 'en' ? 'Phone numbers, websites, emails you search' : 'Số điện thoại, website, email mà bạn tìm kiếm'}</li>
+                  <li>{language === 'en' ? 'Content descriptions in reports' : 'Nội dung mô tả trong báo cáo'}</li>
+                  <li>{language === 'en' ? 'Images uploaded for analysis' : 'Hình ảnh được upload để phân tích'}</li>
+                </ul>
               </div>
               <div>
                 <h4 className="font-semibold mb-2">
                   {language === 'en' ? 'Technical information:' : 'Thông tin kỹ thuật:'}
                 </h4>
-                <p className="text-gray-700">
-                  {language === 'en' 
-                    ? '- IP address and browser information\n- Access time and service usage\n- System logs to improve service'
-                    : '- Địa chỉ IP và thông tin trình duyệt\n- Thời gian truy cập và sử dụng dịch vụ\n- Logs hệ thống để cải thiện dịch vụ'
-                  }
-                </p>
+                <ul className="list-disc list-inside text-gray-700 space-y-1">
+                  <li>{language === 'en' ? 'IP address and browser information' : 'Địa chỉ IP và thông tin trình duyệt'}</li>
+                  <li>{language === 'en' ? 'Access time and service usage' : 'Thời gian truy cập và sử dụng dịch vụ'}</li>
+                  <li>{language === 'en' ? 'System logs to improve service' : 'Logs hệ thống để cải thiện dịch vụ'}</li>
+                </ul>
               </div>
             </CardContent>
           </Card>
