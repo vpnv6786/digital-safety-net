@@ -73,7 +73,7 @@ const ScamRankings = () => {
 
   const getDangerLevelText = (level: string) => {
     switch (level) {
-      case 'critical': return language === 'en' ? 'Extremely Dangerous' : 'Cực Kỳ Nguy Hiểm';
+      case 'critical': return language === 'en' ? 'Critical Risk' : 'Cực Kỳ Nguy Hiểm';
       case 'high': return language === 'en' ? 'High Risk' : 'Nguy Hiểm Cao';
       case 'medium': return language === 'en' ? 'Medium Risk' : 'Nguy Hiểm Trung Bình';
       case 'low': return language === 'en' ? 'Low Risk' : 'Nguy Hiểm Thấp';
@@ -157,7 +157,7 @@ const ScamRankings = () => {
                 className="flex items-center space-x-2"
               >
                 <Shield className="w-4 h-4" />
-                <span>{language === 'en' ? 'Number of Reports' : 'Số Báo Cáo'}</span>
+                <span>{language === 'en' ? 'Reports' : 'Số Báo Cáo'}</span>
               </Button>
             </div>
           </CardContent>

@@ -100,7 +100,7 @@ const CommunityAlerts = () => {
 
   const getSeverityText = (severity: string) => {
     const severities = {
-      'critical': language === 'en' ? 'Extremely Dangerous' : 'Cực Kỳ Nguy Hiểm',
+      'critical': language === 'en' ? 'Critical Risk' : 'Cực Kỳ Nguy Hiểm',
       'high': language === 'en' ? 'High Risk' : 'Nguy Hiểm Cao',
       'medium': language === 'en' ? 'Medium Risk' : 'Nguy Hiểm Trung Bình',
       'low': language === 'en' ? 'Low Risk' : 'Nguy Hiểm Thấp'
