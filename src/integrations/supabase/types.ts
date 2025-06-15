@@ -9,6 +9,144 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      alert_history: {
+        Row: {
+          alert_type: string
+          contacts_notified: string[] | null
+          danger_zone_id: string | null
+          id: string
+          location_id: string | null
+          message: string | null
+          sent_at: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          contacts_notified?: string[] | null
+          danger_zone_id?: string | null
+          id?: string
+          location_id?: string | null
+          message?: string | null
+          sent_at?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          contacts_notified?: string[] | null
+          danger_zone_id?: string | null
+          id?: string
+          location_id?: string | null
+          message?: string | null
+          sent_at?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_history_danger_zone_id_fkey"
+            columns: ["danger_zone_id"]
+            isOneToOne: false
+            referencedRelation: "danger_zones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_history_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "user_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      danger_zones: {
+        Row: {
+          active_from: string | null
+          active_to: string | null
+          center_latitude: number
+          center_longitude: number
+          created_at: string
+          created_by: string | null
+          danger_level: string | null
+          days_of_week: number[] | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          radius_meters: number
+          updated_at: string
+        }
+        Insert: {
+          active_from?: string | null
+          active_to?: string | null
+          center_latitude: number
+          center_longitude: number
+          created_at?: string
+          created_by?: string | null
+          danger_level?: string | null
+          days_of_week?: number[] | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          radius_meters: number
+          updated_at?: string
+        }
+        Update: {
+          active_from?: string | null
+          active_to?: string | null
+          center_latitude?: number
+          center_longitude?: number
+          created_at?: string
+          created_by?: string | null
+          danger_level?: string | null
+          days_of_week?: number[] | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          radius_meters?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      emergency_contacts: {
+        Row: {
+          contact_email: string | null
+          contact_name: string
+          contact_phone: string | null
+          created_at: string
+          id: string
+          is_primary: boolean | null
+          relationship: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_name: string
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          relationship?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contact_email?: string | null
+          contact_name?: string
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          relationship?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       entities: {
         Row: {
           created_at: string
@@ -112,6 +250,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_locations: {
+        Row: {
+          accuracy: number | null
+          battery_level: number | null
+          created_at: string
+          id: string
+          is_emergency: boolean | null
+          latitude: number
+          longitude: number
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          accuracy?: number | null
+          battery_level?: number | null
+          created_at?: string
+          id?: string
+          is_emergency?: boolean | null
+          latitude: number
+          longitude: number
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          accuracy?: number | null
+          battery_level?: number | null
+          created_at?: string
+          id?: string
+          is_emergency?: boolean | null
+          latitude?: number
+          longitude?: number
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
