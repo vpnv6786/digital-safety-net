@@ -1,30 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, AlertTriangle, MapPin, Clock, Users, TrendingUp, Eye, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-interface CommunityAlert {
-  id: string;
-  title: string;
-  description: string;
-  alert_type: 'scam_warning' | 'danger_zone' | 'safety_tip' | 'urgent_alert';
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  location_name: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  source_type: 'user_report' | 'authority' | 'community' | 'auto_detected';
-  is_verified: boolean;
-  view_count: number;
-  upvotes: number;
-  downvotes: number;
-  tags: string[];
-  created_at: string;
-}
+import { communityService, CommunityAlert } from '@/services/communityService';
 
 const CommunityAlerts = () => {
   const [alerts, setAlerts] = useState<CommunityAlert[]>([]);
@@ -36,45 +17,24 @@ const CommunityAlerts = () => {
     loadCommunityAlerts();
     
     // Set up real-time subscription
-    const channel = supabase
-      .channel('community_alerts_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'community_alerts'
-        },
-        (payload) => {
-          console.log('New alert received:', payload);
-          setAlerts(prev => [payload.new as CommunityAlert, ...prev]);
-          toast({
-            title: "🚨 Cảnh báo mới",
-            description: "Có cảnh báo mới từ cộng đồng",
-          });
-        }
-      )
-      .subscribe();
+    const channel = communityService.subscribeToAlerts((newAlert: CommunityAlert) => {
+      console.log('New alert received:', newAlert);
+      setAlerts(prev => [newAlert, ...prev]);
+      toast({
+        title: "🚨 Cảnh báo mới",
+        description: "Có cảnh báo mới từ cộng đồng",
+      });
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      channel.unsubscribe();
     };
   }, [toast]);
 
   const loadCommunityAlerts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('community_alerts')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) {
-        console.error('Error loading community alerts:', error);
-        return;
-      }
-
-      setAlerts(data || []);
+      const data = await communityService.getCommunityAlerts();
+      setAlerts(data);
     } catch (error) {
       console.error('Error loading community alerts:', error);
     } finally {
@@ -163,7 +123,6 @@ const CommunityAlerts = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
-      {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/">
@@ -180,7 +139,6 @@ const CommunityAlerts = () => {
       </header>
 
       <div className="max-w-6xl mx-auto p-4 space-y-6">
-        {/* Page Title */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             🚨 Cảnh báo cộng đồng realtime
@@ -190,7 +148,6 @@ const CommunityAlerts = () => {
           </p>
         </div>
 
-        {/* Filter Controls */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -235,7 +192,6 @@ const CommunityAlerts = () => {
           </CardContent>
         </Card>
 
-        {/* Alerts List */}
         <div className="space-y-4">
           {getFilteredAlerts().map((alert) => (
             <Card key={alert.id} className={`overflow-hidden ${alert.severity === 'critical' ? 'border-red-300 bg-red-50' : ''}`}>
@@ -254,7 +210,6 @@ const CommunityAlerts = () => {
                       </div>
                       <p className="text-gray-600 text-sm mb-2">{alert.description}</p>
                       
-                      {/* Location Info */}
                       {alert.location_name && (
                         <div className="flex items-center space-x-1 text-sm text-gray-500 mb-2">
                           <MapPin className="w-4 h-4" />
@@ -262,8 +217,7 @@ const CommunityAlerts = () => {
                         </div>
                       )}
                       
-                      {/* Tags */}
-                      {alert.tags.length > 0 && (
+                      {alert.tags && alert.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-2">
                           {alert.tags.map((tag, idx) => (
                             <Badge key={idx} variant="outline" className="text-xs">
@@ -285,7 +239,7 @@ const CommunityAlerts = () => {
                     
                     <div className="text-xs text-gray-500 text-right">
                       <div>{getAlertTypeName(alert.alert_type)}</div>
-                      <div>{getSourceTypeName(alert.source_type)}</div>
+                      <div>{getSourceTypeName(alert.source_type || 'user_report')}</div>
                     </div>
                   </div>
                 </div>
@@ -296,22 +250,22 @@ const CommunityAlerts = () => {
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-1">
                       <Clock className="w-4 h-4" />
-                      <span>{formatTimeAgo(alert.created_at)}</span>
+                      <span>{alert.created_at ? formatTimeAgo(alert.created_at) : 'Không rõ'}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <Eye className="w-4 h-4" />
-                      <span>{alert.view_count} lượt xem</span>
+                      <span>{alert.view_count || 0} lượt xem</span>
                     </div>
                   </div>
                   
                   <div className="flex items-center space-x-3">
                     <div className="flex items-center space-x-1">
                       <TrendingUp className="w-4 h-4 text-green-600" />
-                      <span>{alert.upvotes}</span>
+                      <span>{alert.upvotes || 0}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <TrendingUp className="w-4 h-4 text-red-600 rotate-180" />
-                      <span>{alert.downvotes}</span>
+                      <span>{alert.downvotes || 0}</span>
                     </div>
                   </div>
                 </div>
@@ -330,7 +284,6 @@ const CommunityAlerts = () => {
           </Card>
         )}
 
-        {/* Info Note */}
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="p-4">
             <div className="flex items-start space-x-3">

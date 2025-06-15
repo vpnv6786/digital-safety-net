@@ -1,25 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, TrendingUp, TrendingDown, Minus, AlertTriangle, Shield, Eye, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
-
-interface ScamStatistic {
-  id: string;
-  scam_type: string;
-  title: string;
-  description: string;
-  danger_level: 'low' | 'medium' | 'high' | 'critical';
-  frequency_score: number;
-  damage_score: number;
-  total_reports: number;
-  recent_trend: 'increasing' | 'stable' | 'decreasing';
-  prevention_tips: string[];
-  warning_signs: string[];
-}
+import { communityService, ScamStatistic } from '@/services/communityService';
 
 const ScamRankings = () => {
   const [scamStats, setScamStats] = useState<ScamStatistic[]>([]);
@@ -32,17 +17,8 @@ const ScamRankings = () => {
 
   const loadScamStatistics = async () => {
     try {
-      const { data, error } = await supabase
-        .from('scam_statistics')
-        .select('*')
-        .order('frequency_score', { ascending: false });
-
-      if (error) {
-        console.error('Error loading scam statistics:', error);
-        return;
-      }
-
-      setScamStats(data || []);
+      const data = await communityService.getScamStatistics();
+      setScamStats(data);
     } catch (error) {
       console.error('Error loading scam statistics:', error);
     } finally {
@@ -124,7 +100,7 @@ const ScamRankings = () => {
       </header>
 
       <div className="max-w-6xl mx-auto p-4 space-y-6">
-        {/* Page Title */}
+        {/* ... keep existing code (Page Title) */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             📊 Bảng xếp hạng các dạng lừa đảo nguy hiểm
@@ -134,7 +110,7 @@ const ScamRankings = () => {
           </p>
         </div>
 
-        {/* Sort Controls */}
+        {/* ... keep existing code (Sort Controls) */}
         <Card>
           <CardHeader>
             <CardTitle>Sắp xếp theo</CardTitle>
@@ -169,7 +145,7 @@ const ScamRankings = () => {
           </CardContent>
         </Card>
 
-        {/* Scam Statistics List */}
+        {/* ... keep existing code (Scam Statistics List and Warning Note) */}
         <div className="space-y-4">
           {getSortedStats().map((stat, index) => (
             <Card key={stat.id} className="overflow-hidden">
@@ -243,7 +219,6 @@ const ScamRankings = () => {
           ))}
         </div>
 
-        {/* Warning Note */}
         <Card className="bg-yellow-50 border-yellow-200">
           <CardContent className="p-4">
             <div className="flex items-start space-x-3">

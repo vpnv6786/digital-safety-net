@@ -109,12 +109,7 @@ const Index = () => {
     
     default:
       return (
-        <HomePage
-          onSearch={handleSearch}
-          onReport={goToReportForm}
-          onAuth={goToAuth}
-          user={user}
-        />
+        <HomePage />
       );
   }
 };

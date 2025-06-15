@@ -15,6 +15,15 @@ export interface CommunityAlert {
   tags?: string[];
   contact_info?: string;
   evidence_urls?: string[];
+  is_verified?: boolean;
+  reporter_user_id?: string;
+  verified_by?: string;
+  expires_at?: string;
+  view_count?: number;
+  upvotes?: number;
+  downvotes?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ScamStatistic {
@@ -45,7 +54,7 @@ class CommunityService {
         return [];
       }
 
-      return data || [];
+      return data as ScamStatistic[] || [];
     } catch (error) {
       console.error('Error fetching scam statistics:', error);
       return [];
@@ -66,7 +75,7 @@ class CommunityService {
         return [];
       }
 
-      return data || [];
+      return data as CommunityAlert[] || [];
     } catch (error) {
       console.error('Error fetching community alerts:', error);
       return [];
@@ -155,7 +164,7 @@ class CommunityService {
         return [];
       }
 
-      return data || [];
+      return data as ScamStatistic[] || [];
     } catch (error) {
       console.error('Error fetching trending scams:', error);
       return [];

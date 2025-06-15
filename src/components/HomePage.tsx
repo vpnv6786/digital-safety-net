@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Shield, Search, AlertTriangle, Users, TrendingUp, MapPin, Phone, Globe, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -154,11 +153,11 @@ const HomePage = () => {
                     </div>
                   </div>
 
-                  {showResults && <SearchResults query={searchQuery} />}
+                  {showResults && <SearchResults query={searchQuery} riskLevel="safe" onBack={() => setShowResults(false)} />}
                 </div>
               )}
 
-              {activeTab === 'report' && <ReportForm />}
+              {activeTab === 'report' && <ReportForm onBack={() => setActiveTab('search')} />}
               {activeTab === 'image' && <ImageAnalysis />}
             </CardContent>
           </Card>
