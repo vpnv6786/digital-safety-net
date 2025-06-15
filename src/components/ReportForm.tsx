@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSelector from '@/components/LanguageSelector';
 
 interface ReportFormProps {
   onBack: () => void;
@@ -23,23 +25,24 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const { t } = useLanguage();
 
   const targetTypes = [
-    { id: 'phone', label: 'Số điện thoại', icon: Phone, description: 'Số điện thoại lừa đảo' },
-    { id: 'bank_account', label: 'Tài khoản ngân hàng', icon: CreditCard, description: 'STK hoặc thông tin ngân hàng' },
-    { id: 'url', label: 'Website/Link', icon: Globe, description: 'Trang web hoặc đường link lừa đảo' },
-    { id: 'other', label: 'Khác', icon: HelpCircle, description: 'Hình thức lừa đảo khác' }
+    { id: 'phone', label: t('report.step1.phone'), icon: Phone, description: t('report.step1.phone.desc') },
+    { id: 'bank_account', label: t('report.step1.bank'), icon: CreditCard, description: t('report.step1.bank.desc') },
+    { id: 'url', label: t('report.step1.url'), icon: Globe, description: t('report.step1.url.desc') },
+    { id: 'other', label: t('report.step1.other'), icon: HelpCircle, description: t('report.step1.other.desc') }
   ];
 
   const scamCategories = [
-    'Giả danh công an',
-    'Lừa đảo ngân hàng',
-    'Việc làm online',
-    'Đầu tư tài chính',
-    'Mua bán online',
-    'Giả danh nhân viên viễn thông',
-    'Khuyến mãi giả',
-    'Khác'
+    t('report.categories.fake.police'),
+    t('report.categories.bank.fraud'),
+    t('report.categories.job.scam'),
+    t('report.categories.investment'),
+    t('report.categories.online.shopping'),
+    t('report.categories.telecom.fraud'),
+    t('report.categories.fake.promotion'),
+    t('report.categories.other')
   ];
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,13 +82,13 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
             <div className="w-20 h-20 bg-safe-green/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-12 h-12 text-safe-green" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Báo cáo đã được gửi!</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('report.success.title')}</h2>
             <p className="text-gray-600 mb-6">
-              Cảm ơn bạn đã góp phần bảo vệ cộng đồng. Báo cáo của bạn sẽ được xem xét và xác minh trong thời gian sớm nhất.
+              {t('report.success.message')}
             </p>
             <div className="flex flex-col gap-3">
               <Button onClick={onBack} className="bg-trust-blue hover:bg-trust-blue-dark">
-                Về trang chủ
+                {t('report.success.home')}
               </Button>
               <Button variant="outline" onClick={() => {
                 setIsSubmitted(false);
@@ -98,7 +101,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                   evidenceFiles: []
                 });
               }}>
-                Báo cáo khác
+                {t('report.success.report.another')}
               </Button>
             </div>
           </CardContent>
@@ -118,38 +121,41 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
             className="text-trust-blue hover:bg-trust-blue/10"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Quay lại
+            {t('results.back')}
           </Button>
           
-          <div className="flex items-center space-x-2">
-            {[1, 2, 3, 4].map((step) => (
-              <div
-                key={step}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold
-                  ${currentStep >= step ? 'bg-trust-blue text-white' : 'bg-gray-200 text-gray-500'}
-                `}
-              >
-                {step}
-              </div>
-            ))}
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              {[1, 2, 3, 4].map((step) => (
+                <div
+                  key={step}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold
+                    ${currentStep >= step ? 'bg-trust-blue text-white' : 'bg-gray-200 text-gray-500'}
+                  `}
+                >
+                  {step}
+                </div>
+              ))}
+            </div>
+            <LanguageSelector />
           </div>
         </div>
       </header>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Báo cáo Lừa đảo</h1>
-          <p className="text-gray-600">Giúp cộng đồng bằng cách chia sẻ thông tin về lừa đảo</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('report.title')}</h1>
+          <p className="text-gray-600">{t('report.subtitle')}</p>
         </div>
 
         <Card className="animate-fade-in-up">
           <CardHeader>
             <CardTitle className="flex items-center">
               <AlertTriangle className="w-6 h-6 text-warning-orange mr-2" />
-              {currentStep === 1 && "Loại thông tin muốn báo cáo"}
-              {currentStep === 2 && "Thông tin chi tiết"}
-              {currentStep === 3 && "Mô tả sự việc"}
-              {currentStep === 4 && "Bằng chứng (tùy chọn)"}
+              {currentStep === 1 && t('report.step1.title')}
+              {currentStep === 2 && t('report.step2.title')}
+              {currentStep === 3 && t('report.step3.title')}
+              {currentStep === 4 && t('report.step4.title')}
             </CardTitle>
           </CardHeader>
           
@@ -157,7 +163,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
             {/* Step 1: Target Type */}
             {currentStep === 1 && (
               <div className="space-y-4">
-                <p className="text-gray-600 mb-6">Bạn muốn báo cáo về loại thông tin nào?</p>
+                <p className="text-gray-600 mb-6">{t('report.step1.question')}</p>
                 <div className="grid gap-4">
                   {targetTypes.map((type) => {
                     const IconComponent = type.icon;
@@ -190,26 +196,26 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
             {currentStep === 2 && (
               <div className="space-y-4">
                 <Label htmlFor="targetValue" className="text-lg font-semibold">
-                  {formData.targetType === 'phone' && 'Nhập số điện thoại'}
-                  {formData.targetType === 'bank_account' && 'Nhập số tài khoản ngân hàng'}
-                  {formData.targetType === 'url' && 'Nhập website hoặc link'}
-                  {formData.targetType === 'other' && 'Mô tả thông tin cần báo cáo'}
+                  {formData.targetType === 'phone' && t('report.step2.phone.label')}
+                  {formData.targetType === 'bank_account' && t('report.step2.bank.label')}
+                  {formData.targetType === 'url' && t('report.step2.url.label')}
+                  {formData.targetType === 'other' && t('report.step2.other.label')}
                 </Label>
                 <Input
                   id="targetValue"
                   type="text"
                   placeholder={
-                    formData.targetType === 'phone' ? 'VD: 0123456789' :
-                    formData.targetType === 'bank_account' ? 'VD: 1234567890' :
-                    formData.targetType === 'url' ? 'VD: https://example.com' :
-                    'VD: Tên công ty, địa chỉ email...'
+                    formData.targetType === 'phone' ? t('report.step2.phone.placeholder') :
+                    formData.targetType === 'bank_account' ? t('report.step2.bank.placeholder') :
+                    formData.targetType === 'url' ? t('report.step2.url.placeholder') :
+                    t('report.step2.other.placeholder')
                   }
                   value={formData.targetValue}
                   onChange={(e) => setFormData({ ...formData, targetValue: e.target.value })}
                   className="text-lg py-3"
                 />
                 <p className="text-sm text-gray-500">
-                  Thông tin này sẽ được bảo mật và chỉ sử dụng để cảnh báo cộng đồng
+                  {t('report.step2.privacy')}
                 </p>
               </div>
             )}
@@ -219,7 +225,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
               <div className="space-y-6">
                 <div>
                   <Label htmlFor="category" className="text-lg font-semibold mb-3 block">
-                    Loại lừa đảo
+                    {t('report.step3.category.label')}
                   </Label>
                   <div className="grid grid-cols-2 gap-2">
                     {scamCategories.map((category) => (
@@ -241,17 +247,17 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
 
                 <div>
                   <Label htmlFor="description" className="text-lg font-semibold mb-3 block">
-                    Mô tả chi tiết sự việc
+                    {t('report.step3.description.label')}
                   </Label>
                   <Textarea
                     id="description"
-                    placeholder="Hãy mô tả những gì đã xảy ra: họ nói gì, yêu cầu gì, thời gian diễn ra..."
+                    placeholder={t('report.step3.description.placeholder')}
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="min-h-32 text-base"
                   />
                   <p className="text-sm text-gray-500 mt-2">
-                    Càng chi tiết càng giúp cảnh báo hiệu quả hơn
+                    {t('report.step3.description.tip')}
                   </p>
                 </div>
               </div>
@@ -262,15 +268,15 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
               <div className="space-y-6">
                 <div>
                   <Label className="text-lg font-semibold mb-3 block">
-                    Tải lên bằng chứng
+                    {t('report.step4.upload.label')}
                   </Label>
                   <p className="text-gray-600 mb-4">
-                    Ảnh chụp màn hình tin nhắn, cuộc gọi, hoặc bất kỳ bằng chứng nào khác (không bắt buộc)
+                    {t('report.step4.upload.description')}
                   </p>
                   
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-trust-blue transition-colors">
                     <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-4">Kéo thả file vào đây hoặc click để chọn</p>
+                    <p className="text-gray-600 mb-4">{t('report.step4.upload.instruction')}</p>
                     <input
                       type="file"
                       multiple
@@ -281,14 +287,14 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                     />
                     <Label htmlFor="fileUpload">
                       <Button variant="outline" className="cursor-pointer">
-                        Chọn file
+                        {t('report.step4.upload.button')}
                       </Button>
                     </Label>
                   </div>
 
                   {formData.evidenceFiles.length > 0 && (
                     <div className="mt-4 space-y-2">
-                      <Label className="font-semibold">File đã chọn:</Label>
+                      <Label className="font-semibold">{t('report.step4.files.selected')}</Label>
                       {formData.evidenceFiles.map((file, index) => (
                         <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                           <span className="text-sm">{file.name}</span>
@@ -298,7 +304,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                             onClick={() => removeFile(index)}
                             className="text-red-500 hover:text-red-700 hover:bg-red-50"
                           >
-                            Xóa
+                            {t('report.step4.remove')}
                           </Button>
                         </div>
                       ))}
@@ -307,10 +313,9 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                 </div>
 
                 <div className="bg-trust-blue/5 border border-trust-blue/20 rounded-lg p-4">
-                  <h4 className="font-semibold text-trust-blue mb-2">Cam kết bảo mật</h4>
+                  <h4 className="font-semibold text-trust-blue mb-2">{t('report.step4.privacy.title')}</h4>
                   <p className="text-sm text-gray-600">
-                    Mọi thông tin và bằng chứng bạn cung cấp sẽ được bảo mật tuyệt đối. 
-                    Chúng tôi chỉ sử dụng để xác minh và cảnh báo cộng đồng mà không tiết lộ danh tính của bạn.
+                    {t('report.step4.privacy.message')}
                   </p>
                 </div>
               </div>
@@ -324,7 +329,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                 disabled={currentStep === 1}
                 className="border-trust-blue text-trust-blue hover:bg-trust-blue hover:text-white"
               >
-                Quay lại
+                {t('report.navigation.back')}
               </Button>
 
               {currentStep < 4 ? (
@@ -333,7 +338,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                   disabled={!canProceed(currentStep)}
                   className="bg-trust-blue hover:bg-trust-blue-dark"
                 >
-                  Tiếp tục
+                  {t('report.navigation.continue')}
                 </Button>
               ) : (
                 <Button
@@ -344,10 +349,10 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                   {isSubmitting ? (
                     <div className="flex items-center">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      Đang gửi...
+                      {t('report.navigation.submitting')}
                     </div>
                   ) : (
-                    'Gửi báo cáo'
+                    t('report.navigation.submit')
                   )}
                 </Button>
               )}

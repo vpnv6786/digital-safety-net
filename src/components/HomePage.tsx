@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSelector from '@/components/LanguageSelector';
 
 interface HomePageProps {
   onSearch: (query: string) => void;
@@ -14,6 +16,7 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const { t } = useLanguage();
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -32,35 +35,35 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
       id: 1,
       type: 'phone',
       value: '0987654321',
-      category: 'Giả danh công an',
+      category: t('warnings.categories.fake.police'),
       reports: 15,
       risk: 'high',
-      time: '2 giờ trước'
+      time: '2 ' + t('results.reported.at')
     },
     {
       id: 2,
       type: 'url',
       value: 'fake-bank-site.com',
-      category: 'Lừa đảo ngân hàng',
+      category: t('warnings.categories.bank.fraud'),
       reports: 8,
       risk: 'high',
-      time: '5 giờ trước'
+      time: '5 ' + t('results.reported.at')
     },
     {
       id: 3,
       type: 'phone',
       value: '0123456789',
-      category: 'Việc làm online',
+      category: t('warnings.categories.job.scam'),
       reports: 12,
       risk: 'medium',
-      time: '1 ngày trước'
+      time: '1 ' + t('results.reported.at')
     }
   ];
 
   const stats = [
-    { label: 'Báo cáo đã xử lý', value: '2,847', icon: Shield },
-    { label: 'Người dùng đã tham gia', value: '15,420', icon: Users },
-    { label: 'Tình huống đã ngăn chặn', value: '892', icon: CheckCircle }
+    { label: t('stats.reports.processed'), value: '2,847', icon: Shield },
+    { label: t('stats.users.joined'), value: '15,420', icon: Users },
+    { label: t('stats.situations.prevented'), value: '892', icon: CheckCircle }
   ];
 
   const handleWarningClick = (warning: typeof recentWarnings[0]) => {
@@ -77,13 +80,16 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-trust-blue">Vệ Binh Mạng</h1>
-              <p className="text-sm text-gray-600">Tra cứu trước khi tin</p>
+              <h1 className="text-xl font-bold text-trust-blue">{t('app.name')}</h1>
+              <p className="text-sm text-gray-600">{t('app.tagline')}</p>
             </div>
           </div>
-          <Button variant="outline" className="border-trust-blue text-trust-blue hover:bg-trust-blue hover:text-white">
-            Đăng nhập
-          </Button>
+          <div className="flex items-center space-x-3">
+            <LanguageSelector />
+            <Button variant="outline" className="border-trust-blue text-trust-blue hover:bg-trust-blue hover:text-white">
+              {t('header.login')}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -91,11 +97,11 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
       <section className="max-w-6xl mx-auto px-4 py-16 text-center">
         <div className="mb-8 animate-fade-in-up">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Nhận tin nhắn lạ? <br />
-            <span className="text-trust-blue">Tra cứu trước khi tin.</span>
+            {t('hero.title.line1')} <br />
+            <span className="text-trust-blue">{t('hero.title.line2')}</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Vệ Binh Mạng là lá chắn cộng đồng miễn phí, giúp bạn kiểm tra và báo cáo lừa đảo trực tuyến chỉ trong vài giây.
+            {t('hero.subtitle')}
           </p>
         </div>
 
@@ -105,7 +111,7 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
             <div className="flex rounded-2xl border-2 border-trust-blue shadow-lg bg-white overflow-hidden">
               <Input
                 type="text"
-                placeholder="Nhập SĐT, tài khoản ngân hàng, website để kiểm tra..."
+                placeholder={t('hero.search.placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -122,7 +128,7 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
                 ) : (
                   <>
                     <Search className="w-6 h-6 mr-2" />
-                    Kiểm tra
+                    {t('hero.search.button')}
                   </>
                 )}
               </Button>
@@ -143,13 +149,13 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
             className="bg-warning-orange hover:bg-orange-600 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg"
           >
             <AlertTriangle className="w-6 h-6 mr-2" />
-            Báo cáo Lừa đảo
+            {t('hero.report.button')}
           </Button>
         </div>
 
         {/* Quick test examples */}
         <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-          <p className="text-gray-500 mb-4">Thử ngay với các ví dụ:</p>
+          <p className="text-gray-500 mb-4">{t('hero.examples')}</p>
           <div className="flex flex-wrap justify-center gap-2">
             <Button
               variant="outline"
@@ -157,7 +163,7 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
               onClick={() => setSearchQuery('0987654321')}
               className="border-danger-red text-danger-red hover:bg-danger-red hover:text-white"
             >
-              0987654321 (Nguy hiểm)
+              0987654321 {t('hero.examples.dangerous')}
             </Button>
             <Button
               variant="outline"
@@ -165,7 +171,7 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
               onClick={() => setSearchQuery('0123456789')}
               className="border-warning-orange text-warning-orange hover:bg-warning-orange hover:text-white"
             >
-              0123456789 (Nghi ngờ)
+              0123456789 {t('hero.examples.suspicious')}
             </Button>
             <Button
               variant="outline"
@@ -173,7 +179,7 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
               onClick={() => setSearchQuery('0999888777')}
               className="border-safe-green text-safe-green hover:bg-safe-green hover:text-white"
             >
-              0999888777 (An toàn)
+              0999888777 {t('hero.examples.safe')}
             </Button>
           </div>
         </div>
@@ -197,8 +203,8 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
       {/* Recent Warnings */}
       <section className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Bảng tin Cảnh báo</h2>
-          <p className="text-gray-600">Những cảnh báo mới nhất từ cộng đồng</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('warnings.title')}</h2>
+          <p className="text-gray-600">{t('warnings.subtitle')}</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -215,7 +221,7 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
                     variant={warning.risk === 'high' ? 'destructive' : 'secondary'}
                     className={warning.risk === 'high' ? 'bg-danger-red' : 'bg-warning-orange'}
                   >
-                    {warning.risk === 'high' ? 'NGUY HIỂM' : 'NGHI NGỜ'}
+                    {warning.risk === 'high' ? t('results.dangerous.title').split(' ')[1] : t('results.suspicious.title').split(' ')[1]}
                   </Badge>
                   <span className="text-sm text-gray-500">{warning.time}</span>
                 </div>
@@ -226,8 +232,8 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
               <CardContent>
                 <p className="text-gray-600 mb-3">{warning.category}</p>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">{warning.reports} báo cáo</span>
-                  <span className="text-trust-blue font-medium">Xem chi tiết →</span>
+                  <span className="text-gray-500">{warning.reports} {t('warnings.reports')}</span>
+                  <span className="text-trust-blue font-medium">{t('warnings.view.details')}</span>
                 </div>
               </CardContent>
             </Card>
@@ -239,7 +245,7 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
       <section className="bg-white py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Vệ Binh Mạng hoạt động như thế nào?</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('how.title')}</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -247,24 +253,24 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
               <div className="w-16 h-16 bg-trust-blue rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">1. Tra cứu tức thì</h3>
-              <p className="text-gray-600">Nhập thông tin nghi ngờ vào thanh tìm kiếm</p>
+              <h3 className="text-xl font-semibold mb-2">{t('how.step1.title')}</h3>
+              <p className="text-gray-600">{t('how.step1.desc')}</p>
             </div>
 
             <div className="text-center">
               <div className="w-16 h-16 bg-warning-orange rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">2. Nhận cảnh báo</h3>
-              <p className="text-gray-600">Xem kết quả từ cơ sở dữ liệu cộng đồng</p>
+              <h3 className="text-xl font-semibold mb-2">{t('how.step2.title')}</h3>
+              <p className="text-gray-600">{t('how.step2.desc')}</p>
             </div>
 
             <div className="text-center">
               <div className="w-16 h-16 bg-safe-green rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">3. Chung tay bảo vệ</h3>
-              <p className="text-gray-600">Báo cáo để giúp đỡ người khác</p>
+              <h3 className="text-xl font-semibold mb-2">{t('how.step3.title')}</h3>
+              <p className="text-gray-600">{t('how.step3.desc')}</p>
             </div>
           </div>
         </div>
@@ -280,38 +286,36 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
                   <Shield className="w-6 h-6 text-trust-blue" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold">Vệ Binh Mạng</h3>
-                  <p className="text-blue-200">Tra cứu trước khi tin</p>
+                  <h3 className="text-xl font-bold">{t('app.name')}</h3>
+                  <p className="text-blue-200">{t('app.tagline')}</p>
                 </div>
               </div>
               <p className="text-blue-200 leading-relaxed">
-                Tham gia cùng hàng ngàn người dùng xây dựng một không gian mạng an toàn hơn. 
-                Mỗi báo cáo của bạn đều góp phần bảo vệ cộng đồng.
+                {t('footer.description')}
               </p>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Liên kết</h4>
+              <h4 className="font-semibold mb-4">{t('footer.links')}</h4>
               <ul className="space-y-2 text-blue-200">
-                <li><a href="#" className="hover:text-white transition-colors">Hướng dẫn sử dụng</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Câu hỏi thường gặp</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Chính sách bảo mật</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Điều khoản sử dụng</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.user.guide')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.faq')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.privacy')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.terms')}</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Liên hệ</h4>
+              <h4 className="font-semibold mb-4">{t('footer.contact')}</h4>
               <ul className="space-y-2 text-blue-200">
-                <li>Email: support@vebinhmang.vn</li>
-                <li>Hotline: 1900-xxx-xxx</li>
-                <li>Zalo: Vệ Binh Mạng</li>
+                <li>{t('footer.email')}</li>
+                <li>{t('footer.hotline')}</li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-blue-400 mt-8 pt-8 text-center text-blue-200">
-            <p>&copy; 2024 Vệ Binh Mạng. Tất cả quyền được bảo lưu.</p>
+            <p>{t('footer.copyright')}</p>
           </div>
         </div>
       </footer>
