@@ -1,5 +1,6 @@
 
 import { scamAnalysisAgent, ScamAnalysisRequest, ScamAnalysisResponse } from './aiAgent';
+import { searchEntityInSupabase, SupabaseSearchResult } from './supabaseService';
 
 export interface SearchResult {
   riskLevel: 'safe' | 'suspicious' | 'dangerous';
@@ -23,92 +24,132 @@ export interface ReportSummary {
   verifiedBy: number;
 }
 
-// Mock database - in production this would be a real database
-const mockReports: { [key: string]: ReportSummary[] } = {
-  '0987654321': [
-    {
-      id: '1',
-      category: 'Giả danh công an',
-      description: 'Gọi điện tự xưng là công an, yêu cầu chuyển tiền để giải quyết vụ án',
-      reportedAt: '2 ngày trước',
-      verifiedBy: 3
-    },
-    {
-      id: '2',
-      category: 'Lừa đảo đầu tư',
-      description: 'Mời tham gia đầu tư online với lợi nhuận cao',
-      reportedAt: '1 tuần trước',
-      verifiedBy: 7
-    }
-  ],
-  '0123456789': [
-    {
-      id: '3',
-      category: 'Lừa đảo việc làm',
-      description: 'Yêu cầu chuyển tiền phí xử lý hồ sơ việc làm',
-      reportedAt: '3 ngày trước',
-      verifiedBy: 2
-    }
-  ],
-  'fake-bank-site.com': [
-    {
-      id: '4',
-      category: 'Lừa đảo ngân hàng',
-      description: 'Website giả mạo ngân hàng để đánh cắp thông tin',
-      reportedAt: '1 ngày trước',
-      verifiedBy: 5
-    }
-  ]
-};
-
-// Initialize AI Agent with stored API key
-const initializeAIAgent = () => {
-  const apiKey = localStorage.getItem('gemini-api-key');
-  if (apiKey) {
-    scamAnalysisAgent.initialize(apiKey);
-  }
-};
-
-// Enhanced search with AI Agent
+// Enhanced search with both Supabase and AI
 export const searchEntity = async (query: string): Promise<SearchResult> => {
   console.log('Searching for:', query);
   
-  // Initialize AI Agent if needed
-  initializeAIAgent();
+  // First search in Supabase database
+  const supabaseResult = await searchEntityInSupabase(query);
   
-  // Get existing reports from mock database
-  const reports = mockReports[query] || [];
-  
-  // Determine entity type
+  // Prepare for AI analysis
   const type = detectEntityType(query);
   
+  // Convert Supabase reports to expected format
+  const existingReports = supabaseResult?.relatedReports.map(report => ({
+    id: report.id,
+    category: report.category,
+    description: report.description,
+    reportedAt: report.reportedAt,
+    verifiedBy: report.verifiedBy
+  })) || [];
+
   // Prepare AI Agent request
   const aiRequest: ScamAnalysisRequest = {
     query,
     type,
-    existingReports: reports,
-    userContext: `Tìm kiếm từ ứng dụng Vệ Binh Mạng`
+    existingReports,
+    userContext: `Tìm kiếm từ ứng dụng Vệ Binh Mạng. Database có ${existingReports.length} báo cáo.`
   };
   
   // Get AI Agent analysis
-  const aiAnalysis: ScamAnalysisResponse = await scamAnalysisAgent.analyzeScamRisk(aiRequest);
-  
-  return {
-    riskLevel: aiAnalysis.riskLevel,
-    reportCount: reports.length,
-    confidence: aiAnalysis.confidence,
-    reasons: aiAnalysis.reasons,
+  let aiAnalysis: ScamAnalysisResponse;
+  try {
+    aiAnalysis = await scamAnalysisAgent.analyzeScamRisk(aiRequest);
+  } catch (error) {
+    console.error('AI analysis failed, using fallback:', error);
+    // Fallback to Supabase data if available
+    if (supabaseResult) {
+      aiAnalysis = {
+        riskLevel: supabaseResult.riskLevel,
+        confidence: supabaseResult.confidence,
+        reasons: supabaseResult.reasons,
+        aiAnalysis: supabaseResult.summary,
+        recommendations: supabaseResult.recommendations,
+        urgencyLevel: supabaseResult.urgencyLevel,
+        similarPatterns: [],
+        preventionTips: getDefaultPreventionTips()
+      };
+    } else {
+      // Complete fallback
+      aiAnalysis = getFallbackAnalysis(query);
+    }
+  }
+
+  // Combine Supabase and AI results
+  const finalResult: SearchResult = {
+    riskLevel: supabaseResult?.riskLevel || aiAnalysis.riskLevel,
+    reportCount: supabaseResult?.reportCount || 0,
+    confidence: Math.max(supabaseResult?.confidence || 0, aiAnalysis.confidence),
+    reasons: [...(supabaseResult?.reasons || []), ...aiAnalysis.reasons],
     aiAnalysis: aiAnalysis.aiAnalysis,
-    relatedReports: reports,
-    summary: generateSummary(reports, aiAnalysis),
+    relatedReports: supabaseResult?.relatedReports || [],
+    summary: supabaseResult?.summary || aiAnalysis.aiAnalysis,
     recommendations: aiAnalysis.recommendations,
-    urgencyLevel: aiAnalysis.urgencyLevel,
+    urgencyLevel: getHigherUrgency(supabaseResult?.urgencyLevel, aiAnalysis.urgencyLevel),
     similarPatterns: aiAnalysis.similarPatterns,
     preventionTips: aiAnalysis.preventionTips
   };
+
+  return finalResult;
 };
 
-// Detect entity type from input
+// Enhanced report submission with both Supabase and AI
+export const submitReport = async (reportData: {
+  targetType: string;
+  targetValue: string;
+  scamCategory: string;
+  description: string;
+  evidenceFiles: File[];
+}): Promise<{ success: boolean; reportId: string; aiInsights?: string }> => {
+  try {
+    // Submit to Supabase first
+    const supabaseResult = await supabaseService.submitReportToSupabase(reportData);
+    
+    if (!supabaseResult.success) {
+      return {
+        success: false,
+        reportId: '',
+        aiInsights: supabaseResult.message
+      };
+    }
+
+    // AI analysis of the report description for insights
+    let aiInsights = '';
+    try {
+      const aiRequest: ScamAnalysisRequest = {
+        query: reportData.description,
+        type: 'text',
+        userContext: 'Báo cáo từ người dùng'
+      };
+      
+      const aiAnalysis = await scamAnalysisAgent.analyzeScamRisk(aiRequest);
+      aiInsights = aiAnalysis.aiAnalysis;
+    } catch (error) {
+      console.error('AI insights failed:', error);
+      aiInsights = 'Báo cáo đã được ghi nhận. Cảm ơn bạn đã đóng góp bảo vệ cộng đồng.';
+    }
+
+    console.log('Report submitted successfully:', {
+      reportId: supabaseResult.reportId,
+      aiInsights
+    });
+    
+    return {
+      success: true,
+      reportId: supabaseResult.reportId,
+      aiInsights
+    };
+  } catch (error) {
+    console.error('Failed to submit report:', error);
+    return {
+      success: false,
+      reportId: '',
+      aiInsights: 'Có lỗi xảy ra khi gửi báo cáo'
+    };
+  }
+};
+
+// Helper functions
 const detectEntityType = (input: string): 'phone' | 'url' | 'text' | 'email' => {
   if (/^[0-9+\-\s()]+$/.test(input.replace(/\s/g, ''))) {
     return 'phone';
@@ -122,72 +163,35 @@ const detectEntityType = (input: string): 'phone' | 'url' | 'text' | 'email' => 
   return 'text';
 };
 
-// Generate summary combining reports and AI analysis
-const generateSummary = (reports: ReportSummary[], aiAnalysis: ScamAnalysisResponse): string => {
-  if (reports.length === 0) {
-    return aiAnalysis.aiAnalysis;
-  }
+const getHigherUrgency = (
+  urgency1?: 'low' | 'medium' | 'high' | 'critical',
+  urgency2?: 'low' | 'medium' | 'high' | 'critical'
+): 'low' | 'medium' | 'high' | 'critical' => {
+  const levels = { low: 1, medium: 2, high: 3, critical: 4 };
+  const level1 = levels[urgency1 || 'low'];
+  const level2 = levels[urgency2 || 'low'];
+  const maxLevel = Math.max(level1, level2);
   
-  const reportSummary = `Có ${reports.length} báo cáo từ cộng đồng. `;
-  return reportSummary + aiAnalysis.aiAnalysis;
+  return Object.keys(levels).find(key => levels[key as keyof typeof levels] === maxLevel) as 'low' | 'medium' | 'high' | 'critical';
 };
 
-// Enhanced report submission with AI pre-analysis
-export const submitReport = async (reportData: {
-  targetType: string;
-  targetValue: string;
-  scamCategory: string;
-  description: string;
-  evidenceFiles: File[];
-}): Promise<{ success: boolean; reportId: string; aiInsights?: string }> => {
-  try {
-    // Initialize AI Agent if needed
-    initializeAIAgent();
-    
-    // AI analysis of the report description
-    const aiRequest: ScamAnalysisRequest = {
-      query: reportData.description,
-      type: 'text',
-      userContext: 'Báo cáo từ người dùng'
-    };
-    
-    const aiAnalysis = await scamAnalysisAgent.analyzeScamRisk(aiRequest);
-    
-    // Generate unique report ID
-    const reportId = 'RPT_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    
-    console.log('Report submitted with AI insights:', {
-      ...reportData,
-      reportId,
-      aiConfidence: aiAnalysis.confidence,
-      aiRiskLevel: aiAnalysis.riskLevel,
-      aiRecommendations: aiAnalysis.recommendations
-    });
-    
-    // Add to mock database
-    if (!mockReports[reportData.targetValue]) {
-      mockReports[reportData.targetValue] = [];
-    }
-    
-    mockReports[reportData.targetValue].push({
-      id: reportId,
-      category: reportData.scamCategory,
-      description: reportData.description,
-      reportedAt: 'vừa xong',
-      verifiedBy: 0
-    });
-    
-    return {
-      success: true,
-      reportId,
-      aiInsights: aiAnalysis.aiAnalysis
-    };
-  } catch (error) {
-    console.error('Failed to submit report:', error);
-    return {
-      success: false,
-      reportId: '',
-      aiInsights: 'Không thể phân tích AI cho báo cáo này'
-    };
-  }
-};
+const getDefaultPreventionTips = (): string[] => [
+  'Không cung cấp thông tin cá nhân cho người lạ',
+  'Luôn xác minh qua kênh chính thức',
+  'Không chuyển tiền khi chưa chắc chắn',
+  'Báo cáo ngay khi phát hiện dấu hiệu lừa đảo'
+];
+
+const getFallbackAnalysis = (query: string): ScamAnalysisResponse => ({
+  riskLevel: 'safe',
+  confidence: 50,
+  reasons: ['Chưa có thông tin từ cơ sở dữ liệu'],
+  aiAnalysis: 'Không tìm thấy thông tin cụ thể về đối tượng này. Vui lòng cẩn thận và báo cáo nếu phát hiện dấu hiệu bất thường.',
+  recommendations: getDefaultPreventionTips(),
+  urgencyLevel: 'low',
+  similarPatterns: [],
+  preventionTips: getDefaultPreventionTips()
+});
+
+// Import statement fix
+import * as supabaseService from './supabaseService';

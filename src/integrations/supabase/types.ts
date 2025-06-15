@@ -9,7 +9,110 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      entities: {
+        Row: {
+          created_at: string
+          entity_type: string
+          entity_value: string
+          id: string
+          last_reported_at: string | null
+          report_count: number | null
+          risk_score: number | null
+        }
+        Insert: {
+          created_at?: string
+          entity_type: string
+          entity_value: string
+          id?: string
+          last_reported_at?: string | null
+          report_count?: number | null
+          risk_score?: number | null
+        }
+        Update: {
+          created_at?: string
+          entity_type?: string
+          entity_value?: string
+          id?: string
+          last_reported_at?: string | null
+          report_count?: number | null
+          risk_score?: number | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          last_active_at: string | null
+          phone_number: string | null
+          report_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          last_active_at?: string | null
+          phone_number?: string | null
+          report_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_active_at?: string | null
+          phone_number?: string | null
+          report_count?: number | null
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          confirmations: string[] | null
+          created_at: string
+          description: string
+          entity_id: string
+          evidence_urls: string[] | null
+          id: string
+          reporter_user_id: string
+          scam_category: string
+          status: string | null
+          updated_at: string
+          verified_by_moderator_id: string | null
+        }
+        Insert: {
+          confirmations?: string[] | null
+          created_at?: string
+          description: string
+          entity_id: string
+          evidence_urls?: string[] | null
+          id?: string
+          reporter_user_id: string
+          scam_category: string
+          status?: string | null
+          updated_at?: string
+          verified_by_moderator_id?: string | null
+        }
+        Update: {
+          confirmations?: string[] | null
+          created_at?: string
+          description?: string
+          entity_id?: string
+          evidence_urls?: string[] | null
+          id?: string
+          reporter_user_id?: string
+          scam_category?: string
+          status?: string | null
+          updated_at?: string
+          verified_by_moderator_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
