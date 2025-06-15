@@ -5,34 +5,34 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, Phone, Key, ArrowLeft } from 'lucide-react';
+import { Shield, Phone, Key, ArrowLeft, Mail } from 'lucide-react';
 import { toast } from 'sonner';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface AuthPageProps {
   onBack: () => void;
 }
 
 const AuthPage = ({ onBack }: AuthPageProps) => {
-  const [step, setStep] = useState<'phone' | 'otp'>('phone');
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const [method, setMethod] = useState<'phone' | 'email' | 'social'>('phone');
+  const [step, setStep] = useState<'input' | 'otp'>('input');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { t } = useLanguage();
 
   const formatPhoneNumber = (phoneNumber: string) => {
-    // Remove all non-numeric characters
     const cleaned = phoneNumber.replace(/\D/g, '');
-    
-    // Add +84 if it starts with 0
     if (cleaned.startsWith('0')) {
       return '+84' + cleaned.substring(1);
     }
-    
-    // Add +84 if no country code
     if (!cleaned.startsWith('84')) {
       return '+84' + cleaned;
     }
-    
     return '+' + cleaned;
   };
 
@@ -50,15 +50,10 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
       
       const { error } = await supabase.auth.signInWithOtp({
         phone: formattedPhone,
-        options: {
-          channel: 'sms'
-        }
+        options: { channel: 'sms' }
       });
 
-      if (error) {
-        throw error;
-      }
-
+      if (error) throw error;
       setStep('otp');
       toast.success('Mã OTP đã được gửi đến số điện thoại của bạn');
     } catch (error: any) {
@@ -87,12 +82,9 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
         type: 'sms'
       });
 
-      if (error) {
-        throw error;
-      }
-
+      if (error) throw error;
       toast.success('Đăng nhập thành công!');
-      onBack(); // Return to main app
+      onBack();
     } catch (error: any) {
       console.error('OTP verify error:', error);
       setError(error.message || 'Mã OTP không đúng. Vui lòng thử lại.');
@@ -101,9 +93,68 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
     }
   };
 
+  const handleEmailAuth = async () => {
+    if (!email || !password) {
+      setError('Vui lòng nhập đầy đủ email và mật khẩu');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      if (authMode === 'signup') {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: redirectUrl }
+        });
+        if (error) throw error;
+        toast.success('Vui lòng kiểm tra email để xác thực tài khoản');
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        if (error) throw error;
+        toast.success('Đăng nhập thành công!');
+        onBack();
+      }
+    } catch (error: any) {
+      console.error('Email auth error:', error);
+      setError(error.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSocialAuth = async (provider: 'google' | 'facebook') => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: redirectUrl
+        }
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      console.error('Social auth error:', error);
+      setError(error.message || 'Không thể đăng nhập. Vui lòng thử lại.');
+      setLoading(false);
+    }
+  };
+
   const handleBack = () => {
     if (step === 'otp') {
-      setStep('phone');
+      setStep('input');
       setOtp('');
       setError('');
     } else {
@@ -114,11 +165,7 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 p-4">
       <div className="max-w-md mx-auto pt-20">
-        <Button
-          variant="ghost"
-          onClick={handleBack}
-          className="mb-4 text-gray-600"
-        >
+        <Button variant="ghost" onClick={handleBack} className="mb-4 text-gray-600">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Quay lại
         </Button>
@@ -129,56 +176,151 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
               <Shield className="h-8 w-8 text-blue-600" />
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
-              Vệ Binh Mạng
+              ScamGuard
             </CardTitle>
             <CardDescription className="text-gray-600">
-              {step === 'phone' ? 'Đăng nhập với số điện thoại' : 'Xác thực mã OTP'}
+              {step === 'otp' ? 'Xác thực mã OTP' : 
+               authMode === 'signin' ? 'Đăng nhập tài khoản' : 'Tạo tài khoản mới'}
             </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {step === 'phone' ? (
+            {step === 'input' ? (
               <>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Số điện thoại
-                  </label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      type="tel"
-                      placeholder="0901234567"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="pl-10"
-                      disabled={loading}
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Chúng tôi sẽ gửi mã xác thực qua SMS
-                  </p>
+                {/* Auth Mode Toggle */}
+                <div className="flex rounded-lg border p-1">
+                  <Button
+                    variant={authMode === 'signin' ? 'default' : 'ghost'}
+                    onClick={() => setAuthMode('signin')}
+                    className="flex-1"
+                  >
+                    Đăng nhập
+                  </Button>
+                  <Button
+                    variant={authMode === 'signup' ? 'default' : 'ghost'}
+                    onClick={() => setAuthMode('signup')}
+                    className="flex-1"
+                  >
+                    Đăng ký
+                  </Button>
                 </div>
+
+                {/* Method Selection */}
+                <div className="flex rounded-lg border p-1">
+                  <Button
+                    variant={method === 'phone' ? 'default' : 'ghost'}
+                    onClick={() => setMethod('phone')}
+                    className="flex-1 text-xs"
+                  >
+                    <Phone className="h-3 w-3 mr-1" />
+                    SĐT
+                  </Button>
+                  <Button
+                    variant={method === 'email' ? 'default' : 'ghost'}
+                    onClick={() => setMethod('email')}
+                    className="flex-1 text-xs"
+                  >
+                    <Mail className="h-3 w-3 mr-1" />
+                    Email
+                  </Button>
+                  <Button
+                    variant={method === 'social' ? 'default' : 'ghost'}
+                    onClick={() => setMethod('social')}
+                    className="flex-1 text-xs"
+                  >
+                    Social
+                  </Button>
+                </div>
+
+                {/* Phone Method */}
+                {method === 'phone' && (
+                  <>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Số điện thoại</label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          type="tel"
+                          placeholder="0901234567"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          className="pl-10"
+                          disabled={loading}
+                        />
+                      </div>
+                    </div>
+                    <Button onClick={handleSendOTP} disabled={loading} className="w-full">
+                      {loading ? 'Đang gửi...' : 'Gửi mã OTP'}
+                    </Button>
+                  </>
+                )}
+
+                {/* Email Method */}
+                {method === 'email' && (
+                  <>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Email</label>
+                        <Input
+                          type="email"
+                          placeholder="example@email.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          disabled={loading}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Mật khẩu</label>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          disabled={loading}
+                        />
+                      </div>
+                    </div>
+                    <Button onClick={handleEmailAuth} disabled={loading} className="w-full">
+                      {loading ? 'Đang xử lý...' : authMode === 'signin' ? 'Đăng nhập' : 'Đăng ký'}
+                    </Button>
+                  </>
+                )}
+
+                {/* Social Method */}
+                {method === 'social' && (
+                  <div className="space-y-3">
+                    <Button
+                      onClick={() => handleSocialAuth('google')}
+                      disabled={loading}
+                      variant="outline"
+                      className="w-full flex items-center justify-center space-x-2"
+                    >
+                      <span>🔍</span>
+                      <span>Tiếp tục với Google</span>
+                    </Button>
+                    <Button
+                      onClick={() => handleSocialAuth('facebook')}
+                      disabled={loading}
+                      variant="outline"
+                      className="w-full flex items-center justify-center space-x-2"
+                    >
+                      <span>📘</span>
+                      <span>Tiếp tục với Facebook</span>
+                    </Button>
+                  </div>
+                )}
 
                 {error && (
                   <Alert variant="destructive">
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
-
-                <Button
-                  onClick={handleSendOTP}
-                  disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  {loading ? 'Đang gửi...' : 'Gửi mã OTP'}
-                </Button>
               </>
             ) : (
+              // OTP Step
               <>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Mã OTP
-                  </label>
+                  <label className="text-sm font-medium text-gray-700">Mã OTP</label>
                   <div className="relative">
                     <Key className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
@@ -191,9 +333,7 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                       maxLength={6}
                     />
                   </div>
-                  <p className="text-xs text-gray-500">
-                    Nhập mã 6 số được gửi đến {phone}
-                  </p>
+                  <p className="text-xs text-gray-500">Nhập mã 6 số được gửi đến {phone}</p>
                 </div>
 
                 {error && (
@@ -206,14 +346,13 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                   <Button
                     onClick={handleVerifyOTP}
                     disabled={loading || otp.length !== 6}
-                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    className="w-full"
                   >
                     {loading ? 'Đang xác thực...' : 'Xác thực OTP'}
                   </Button>
-
                   <Button
                     variant="outline"
-                    onClick={() => setStep('phone')}
+                    onClick={() => setStep('input')}
                     disabled={loading}
                     className="w-full"
                   >
@@ -226,10 +365,8 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
             <div className="text-center pt-4">
               <p className="text-xs text-gray-500">
                 Bằng cách đăng nhập, bạn đồng ý với{' '}
-                <span className="text-blue-600 underline cursor-pointer">
-                  Điều khoản sử dụng
-                </span>{' '}
-                của chúng tôi
+                <span className="text-blue-600 underline cursor-pointer">Điều khoản sử dụng</span>
+                {' '}của chúng tôi
               </p>
             </div>
           </CardContent>
