@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { locationService } from '@/services/locationService';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const EmergencyButton = () => {
+  const { language } = useLanguage();
   const [isActivating, setIsActivating] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const { toast } = useToast();
@@ -32,8 +34,10 @@ const EmergencyButton = () => {
     setIsActivating(false);
     setCountdown(0);
     toast({
-      title: "Đã hủy",
-      description: "Cảnh báo khẩn cấp đã được hủy",
+      title: language === 'en' ? "Cancelled" : "Đã hủy",
+      description: language === 'en' 
+        ? "Emergency alert has been cancelled"
+        : "Cảnh báo khẩn cấp đã được hủy",
     });
   };
 
@@ -43,22 +47,28 @@ const EmergencyButton = () => {
       
       if (success) {
         toast({
-          title: "🚨 Cảnh báo đã gửi!",
-          description: "Thông báo khẩn cấp đã được gửi đến những người liên hệ",
+          title: language === 'en' ? "🚨 Alert sent!" : "🚨 Cảnh báo đã gửi!",
+          description: language === 'en' 
+            ? "Emergency notification has been sent to your contacts"
+            : "Thông báo khẩn cấp đã được gửi đến những người liên hệ",
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Lỗi",
-          description: "Không thể gửi cảnh báo khẩn cấp. Vui lòng thử lại.",
+          title: language === 'en' ? "Error" : "Lỗi",
+          description: language === 'en' 
+            ? "Could not send emergency alert. Please try again."
+            : "Không thể gửi cảnh báo khẩn cấp. Vui lòng thử lại.",
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error('Emergency activation failed:', error);
       toast({
-        title: "Lỗi",
-        description: "Có lỗi xảy ra khi gửi cảnh báo",
+        title: language === 'en' ? "Error" : "Lỗi",
+        description: language === 'en' 
+          ? "An error occurred while sending the alert"
+          : "Có lỗi xảy ra khi gửi cảnh báo",
         variant: "destructive",
       });
     } finally {
@@ -75,7 +85,10 @@ const EmergencyButton = () => {
             <AlertTriangle className="w-16 h-16 text-red-500 mx-auto animate-pulse" />
           </div>
           <h3 className="text-lg font-bold text-red-700 mb-2">
-            Đang kích hoạt cảnh báo khẩn cấp
+            {language === 'en' 
+              ? 'Activating emergency alert'
+              : 'Đang kích hoạt cảnh báo khẩn cấp'
+            }
           </h3>
           <div className="text-3xl font-bold text-red-600 mb-4">
             {countdown}
@@ -85,7 +98,7 @@ const EmergencyButton = () => {
             variant="outline"
             className="w-full"
           >
-            HỦY CẢNH BÁO
+            {language === 'en' ? 'CANCEL ALERT' : 'HỦY CẢNH BÁO'}
           </Button>
         </CardContent>
       </Card>
@@ -99,10 +112,13 @@ const EmergencyButton = () => {
           <AlertTriangle className="w-12 h-12 text-red-500 mx-auto" />
         </div>
         <h3 className="text-lg font-bold text-gray-800 mb-2">
-          Cảnh báo khẩn cấp
+          {language === 'en' ? 'Emergency Alert' : 'Cảnh báo khẩn cấp'}
         </h3>
         <p className="text-sm text-gray-600 mb-4">
-          Nhấn để gửi thông báo khẩn cấp đến những người liên hệ của bạn
+          {language === 'en' 
+            ? 'Press to send emergency notification to your contacts'
+            : 'Nhấn để gửi thông báo khẩn cấp đến những người liên hệ của bạn'
+          }
         </p>
         
         <Button 
@@ -111,12 +127,15 @@ const EmergencyButton = () => {
           size="lg"
         >
           <Phone className="w-5 h-5 mr-2" />
-          KHẨN CẤP
+          {language === 'en' ? 'EMERGENCY' : 'KHẨN CẤP'}
         </Button>
         
         <div className="mt-4 text-xs text-gray-500">
           <MapPin className="w-4 h-4 inline mr-1" />
-          Vị trí GPS sẽ được gửi kèm
+          {language === 'en' 
+            ? 'GPS location will be included'
+            : 'Vị trí GPS sẽ được gửi kèm'
+          }
         </div>
       </CardContent>
     </Card>
