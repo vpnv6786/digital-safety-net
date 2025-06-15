@@ -20,11 +20,20 @@ const TranslatedText: React.FC<TranslatedTextProps> = ({
 
   useEffect(() => {
     const translateText = async () => {
-      if (language === 'en' || !translationService.hasApiKey()) {
+      // If English is selected, always show the original text (which should be English)
+      if (language === 'en') {
         setTranslatedText(children);
         return;
       }
 
+      // If Vietnamese is selected but no translation API key, 
+      // show the original text as is (assuming it might already be Vietnamese)
+      if (!translationService.hasApiKey()) {
+        setTranslatedText(children);
+        return;
+      }
+
+      // If we have API key and Vietnamese is selected, translate from English to Vietnamese
       setIsLoading(true);
       try {
         const translated = await translationService.translateText(children, language);
