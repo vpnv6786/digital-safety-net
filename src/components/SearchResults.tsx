@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { ArrowLeft, Shield, AlertTriangle, XCircle, CheckCircle, Share2, Flag } from 'lucide-react';
+import { ArrowLeft, Shield, AlertTriangle, XCircle, CheckCircle, Share2, Flag, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,10 +10,11 @@ import LanguageSelector from '@/components/LanguageSelector';
 interface SearchResultsProps {
   query: string;
   riskLevel: 'safe' | 'suspicious' | 'dangerous';
+  searchResult?: any;
   onBack: () => void;
 }
 
-const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, onBack }) => {
+const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchResult, onBack }) => {
   const { t } = useLanguage();
 
   const getResultConfig = (risk: string) => {
@@ -60,7 +60,15 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, onBack 
   const config = getResultConfig(riskLevel);
   const IconComponent = config.icon;
 
-  const mockReports = riskLevel !== 'safe' ? [
+  // Use AI-enhanced data if available
+  const reportCount = searchResult?.reportCount || (riskLevel !== 'safe' ? 8 : 0);
+  const confidence = searchResult?.confidence || 70;
+  const aiAnalysis = searchResult?.aiAnalysis;
+  const reasons = searchResult?.reasons || [];
+  const relatedReports = searchResult?.relatedReports || [];
+
+  // Fallback to mock data if no AI results
+  const mockReports = relatedReports.length > 0 ? relatedReports : (riskLevel !== 'safe' ? [
     {
       id: 1,
       category: t('warnings.categories.fake.police'),
@@ -75,7 +83,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, onBack 
       reportedAt: '1 tuần trước',
       verifiedBy: 7
     }
-  ] : [];
+  ] : []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-light to-white font-be-vietnam">
@@ -119,6 +127,46 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, onBack 
               {config.message}
             </p>
             
+            {/* AI Confidence Score */}
+            {confidence && (
+              <div className="mb-4">
+                <div className="text-sm text-gray-600 mb-2">AI Confidence Score</div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className={`h-2 rounded-full ${
+                      confidence >= 80 ? 'bg-red-500' : 
+                      confidence >= 60 ? 'bg-yellow-500' : 'bg-green-500'
+                    }`}
+                    style={{ width: `${confidence}%` }}
+                  ></div>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">{confidence}% confident</div>
+              </div>
+            )}
+
+            {/* AI Analysis */}
+            {aiAnalysis && (
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center mb-2">
+                  <Brain className="w-5 h-5 text-blue-500 mr-2" />
+                  <span className="text-sm font-semibold text-blue-700">AI Analysis</span>
+                </div>
+                <p className="text-sm text-gray-700 text-left">{aiAnalysis}</p>
+              </div>
+            )}
+
+            {/* Detection Reasons */}
+            {reasons.length > 0 && (
+              <div className="mb-6 text-left">
+                <h4 className="font-semibold text-gray-800 mb-2">Detection Factors:</h4>
+                <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                  {reasons.map((reason, index) => (
+                    <li key={index}>{reason}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
             <p className="text-gray-600 mb-8">
               {config.description}
             </p>
@@ -146,7 +194,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, onBack 
             <Card className="text-center">
               <CardContent className="pt-6">
                 <div className="text-3xl font-bold text-danger-red mb-2">
-                  {riskLevel === 'dangerous' ? '24' : '8'}
+                  {reportCount}
                 </div>
                 <div className="text-gray-600">{t('results.reports.received')}</div>
               </CardContent>
@@ -155,7 +203,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, onBack 
             <Card className="text-center">
               <CardContent className="pt-6">
                 <div className="text-3xl font-bold text-warning-orange mb-2">
-                  {riskLevel === 'dangerous' ? '15' : '5'}
+                  {Math.floor(reportCount * 0.6)}
                 </div>
                 <div className="text-gray-600">{t('results.verified')}</div>
               </CardContent>
@@ -164,7 +212,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, onBack 
             <Card className="text-center">
               <CardContent className="pt-6">
                 <div className="text-3xl font-bold text-trust-blue mb-2">
-                  {riskLevel === 'dangerous' ? '95%' : '70%'}
+                  {confidence}%
                 </div>
                 <div className="text-gray-600">{t('results.reliability')}</div>
               </CardContent>

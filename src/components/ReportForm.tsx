@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, Upload, CheckCircle, AlertTriangle, Phone, CreditCard, Globe, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
+import { submitReport } from '@/services/searchService';
 
 interface ReportFormProps {
   onBack: () => void;
@@ -58,11 +58,25 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     
-    // Simulate submission
-    setTimeout(() => {
+    try {
+      // Use the enhanced report submission with AI analysis
+      const result = await submitReport(formData);
+      
+      if (result.success) {
+        console.log('Report submitted successfully:', result.reportId);
+        if (result.aiInsights) {
+          console.log('AI Insights:', result.aiInsights);
+        }
+        setIsSubmitted(true);
+      } else {
+        alert('Failed to submit report. Please try again.');
+      }
+    } catch (error) {
+      console.error('Report submission failed:', error);
+      alert('An error occurred while submitting the report.');
+    } finally {
       setIsSubmitting(false);
-      setIsSubmitted(true);
-    }, 2000);
+    }
   };
 
   const canProceed = (step: number) => {
@@ -146,6 +160,9 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('report.title')}</h1>
           <p className="text-gray-600">{t('report.subtitle')}</p>
+          <div className="mt-2 text-xs text-blue-600 bg-blue-50 inline-block px-3 py-1 rounded-full">
+            🤖 AI-enhanced report analysis
+          </div>
         </div>
 
         <Card className="animate-fade-in-up">

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, Shield, AlertTriangle, CheckCircle, Users, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,9 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
+import { searchEntity } from '@/services/searchService';
+import AIKeyInput from '@/components/AIKeyInput';
 
 interface HomePageProps {
-  onSearch: (query: string) => void;
+  onSearch: (query: string, result?: any) => void;
   onReport: () => void;
 }
 
@@ -23,11 +24,21 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
     
     setIsSearching(true);
     
-    // Simulate search animation
-    setTimeout(() => {
-      setIsSearching(false);
-      onSearch(searchQuery);
-    }, 1500);
+    try {
+      // Use the enhanced search service with AI
+      const result = await searchEntity(searchQuery.trim());
+      console.log('Search result:', result);
+      
+      // Pass the result to the parent component
+      onSearch(searchQuery, result);
+    } catch (error) {
+      console.error('Search failed:', error);
+      // Fallback to basic search
+      setTimeout(() => {
+        setIsSearching(false);
+        onSearch(searchQuery);
+      }, 1000);
+    }
   };
 
   const recentWarnings = [
@@ -85,6 +96,7 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
             </div>
           </div>
           <div className="flex items-center space-x-3">
+            <AIKeyInput />
             <LanguageSelector />
             <Button variant="outline" className="border-trust-blue text-trust-blue hover:bg-trust-blue hover:text-white">
               {t('header.login')}
@@ -138,6 +150,9 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
                 <div className="absolute bottom-0 left-0 h-1 bg-trust-blue animate-radar-scan rounded-full"></div>
               </div>
             )}
+          </div>
+          <div className="mt-2 text-xs text-gray-500 text-center">
+            🤖 AI-powered scam detection • Enhanced with Gemini
           </div>
         </div>
 

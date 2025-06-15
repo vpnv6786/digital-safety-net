@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import HomePage from '@/components/HomePage';
 import SearchResults from '@/components/SearchResults';
@@ -9,20 +8,25 @@ type AppState = 'home' | 'search-results' | 'report-form';
 const Index = () => {
   const [currentView, setCurrentView] = useState<AppState>('home');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchRisk, setSearchRisk] = useState<'safe' | 'suspicious' | 'dangerous'>('safe');
+  const [searchResult, setSearchResult] = useState<any>(null);
 
-  // Mock search function - in real app this would call API
-  const handleSearch = (query: string) => {
+  // Enhanced search handler that accepts AI results
+  const handleSearch = (query: string, result?: any) => {
     setSearchQuery(query);
     
-    // Mock risk assessment based on query content
-    const lowerQuery = query.toLowerCase();
-    if (lowerQuery.includes('0987654321') || lowerQuery.includes('fake-bank') || lowerQuery.includes('danger')) {
-      setSearchRisk('dangerous');
-    } else if (lowerQuery.includes('0123456789') || lowerQuery.includes('suspicious')) {
-      setSearchRisk('suspicious');
+    if (result) {
+      // Use AI-enhanced result
+      setSearchResult(result);
     } else {
-      setSearchRisk('safe');
+      // Fallback to mock logic for demo
+      const lowerQuery = query.toLowerCase();
+      if (lowerQuery.includes('0987654321') || lowerQuery.includes('fake-bank') || lowerQuery.includes('danger')) {
+        setSearchResult({ riskLevel: 'dangerous', reportCount: 15, confidence: 90 });
+      } else if (lowerQuery.includes('0123456789') || lowerQuery.includes('suspicious')) {
+        setSearchResult({ riskLevel: 'suspicious', reportCount: 5, confidence: 70 });
+      } else {
+        setSearchResult({ riskLevel: 'safe', reportCount: 0, confidence: 60 });
+      }
     }
     
     setCurrentView('search-results');
@@ -55,7 +59,8 @@ const Index = () => {
       return (
         <SearchResults
           query={searchQuery}
-          riskLevel={searchRisk}
+          riskLevel={searchResult?.riskLevel || 'safe'}
+          searchResult={searchResult}
           onBack={goHome}
         />
       );
