@@ -111,12 +111,15 @@ class CommunityService {
     }
   }
 
-  // Upvote an alert
+  // Upvote an alert using direct SQL update
   async upvoteAlert(alertId: string): Promise<boolean> {
     try {
-      const { error } = await supabase.rpc('increment_alert_upvotes', {
-        alert_id: alertId
-      });
+      const { error } = await supabase
+        .from('community_alerts')
+        .update({ 
+          upvotes: supabase.sql`upvotes + 1`
+        })
+        .eq('id', alertId);
 
       if (error) {
         console.error('Error upvoting alert:', error);
@@ -130,12 +133,15 @@ class CommunityService {
     }
   }
 
-  // Downvote an alert
+  // Downvote an alert using direct SQL update
   async downvoteAlert(alertId: string): Promise<boolean> {
     try {
-      const { error } = await supabase.rpc('increment_alert_downvotes', {
-        alert_id: alertId
-      });
+      const { error } = await supabase
+        .from('community_alerts')
+        .update({ 
+          downvotes: supabase.sql`downvotes + 1`
+        })
+        .eq('id', alertId);
 
       if (error) {
         console.error('Error downvoting alert:', error);
