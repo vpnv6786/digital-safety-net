@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Shield, Search, AlertTriangle, Users, TrendingUp, MapPin, Phone, Globe, CreditCard, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -288,77 +287,6 @@ const HomePage = () => {
           <AIProviderSetup />
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 sm:py-12">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-            <div className="col-span-1 sm:col-span-2 md:col-span-1">
-              <div className="flex items-center space-x-2 mb-4">
-                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
-                <span className="text-lg sm:text-xl font-bold">ScamGuard</span>
-              </div>
-              <p className="text-sm sm:text-base text-gray-400">
-                {language === 'en' 
-                  ? 'Protect yourself from scams with advanced AI technology and community alerts.'
-                  : 'Bảo vệ bạn khỏi lừa đảo với công nghệ AI tiên tiến và cảnh báo cộng đồng.'
-                }
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4 text-sm sm:text-base">
-                {language === 'en' ? 'Quick Links' : 'Liên kết nhanh'}
-              </h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link to="/safety" className="hover:text-white">
-                  {language === 'en' ? 'Personal Safety' : 'An toàn cá nhân'}
-                </Link></li>
-                <li><Link to="/scam-rankings" className="hover:text-white">
-                  {language === 'en' ? 'Rankings' : 'Bảng xếp hạng'}
-                </Link></li>
-                <li><Link to="/community-alerts" className="hover:text-white">
-                  {language === 'en' ? 'Community Alerts' : 'Cảnh báo cộng đồng'}
-                </Link></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4 text-sm sm:text-base">
-                {language === 'en' ? 'Support' : 'Hỗ trợ'}
-              </h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link to="/about" className="hover:text-white">
-                  {language === 'en' ? 'About' : 'Giới thiệu'}
-                </Link></li>
-                <li><Link to="/contact" className="hover:text-white">
-                  {language === 'en' ? 'Contact' : 'Liên hệ'}
-                </Link></li>
-                <li><Link to="/privacy" className="hover:text-white">
-                  {language === 'en' ? 'Privacy Policy' : 'Chính sách bảo mật'}
-                </Link></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4 text-sm sm:text-base">
-                {language === 'en' ? 'Authorities' : 'Cơ quan chức năng'}
-              </h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link to="/authorities" className="hover:text-white">
-                  {language === 'en' ? 'Emergency Numbers' : 'Số điện thoại khẩn cấp'}
-                </Link></li>
-                <li><a href="tel:113" className="hover:text-white">113 - {language === 'en' ? 'Police' : 'Cảnh sát'}</a></li>
-                <li><a href="tel:1900545464" className="hover:text-white">1900 545464 - {language === 'en' ? 'Banking' : 'Ngân hàng'}</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-800 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-xs sm:text-sm text-gray-400">
-            <p>&copy; 2024 ScamGuard. {language === 'en' ? 'All rights reserved.' : 'Tất cả quyền được bảo lưu.'}</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };
