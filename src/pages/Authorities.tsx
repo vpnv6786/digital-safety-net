@@ -1,11 +1,9 @@
-
 import React from 'react';
 import { Phone, Shield, AlertTriangle, MapPin, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Header from '@/components/Header';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const Authorities = () => {
@@ -246,8 +244,6 @@ const Authorities = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
-      <Header />
-      
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
