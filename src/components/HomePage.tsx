@@ -19,7 +19,7 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -64,19 +64,19 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
               <Link to="/about" className="text-gray-600 hover:text-trust-blue transition-colors">
                 <div className="flex items-center space-x-1">
                   <Info className="w-4 h-4" />
-                  <span>Giới thiệu</span>
+                  <span>{language === 'en' ? 'About' : 'Giới thiệu'}</span>
                 </div>
               </Link>
               <Link to="/contact" className="text-gray-600 hover:text-trust-blue transition-colors">
                 <div className="flex items-center space-x-1">
                   <Phone className="w-4 h-4" />
-                  <span>Liên hệ</span>
+                  <span>{language === 'en' ? 'Contact' : 'Liên hệ'}</span>
                 </div>
               </Link>
               <Link to="/privacy" className="text-gray-600 hover:text-trust-blue transition-colors">
                 <div className="flex items-center space-x-1">
                   <Lock className="w-4 h-4" />
-                  <span>Bảo mật</span>
+                  <span>{language === 'en' ? 'Privacy' : 'Bảo mật'}</span>
                 </div>
               </Link>
             </nav>
@@ -113,7 +113,7 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
               disabled={isSearching || !searchQuery.trim()}
             >
               <Search className={`w-5 h-5 mr-2 ${isSearching ? 'animate-spin' : ''}`} />
-              {isSearching ? 'Đang phân tích...' : t('home.search.button')}
+              {isSearching ? (language === 'en' ? 'Analyzing...' : 'Đang phân tích...') : t('home.search.button')}
             </Button>
           </div>
           <Button variant="link" onClick={onReport} className="mt-4">
@@ -128,9 +128,16 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
             <CardContent className="p-6">
               <div className="flex items-center space-x-4 mb-4">
                 <Lightbulb className="w-8 h-8 text-blue-500" />
-                <h3 className="text-lg font-semibold text-gray-900">AI Agent Thông Minh</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {language === 'en' ? 'Smart AI Agent' : 'AI Agent Thông Minh'}
+                </h3>
               </div>
-              <p className="text-gray-600">Phân tích chuyên sâu với AI Agent chuyên dụng, đưa ra cảnh báo chính xác và khuyến nghị phòng tránh.</p>
+              <p className="text-gray-600">
+                {language === 'en' 
+                  ? 'Advanced AI agent for deep analysis, providing accurate alerts and prevention recommendations.'
+                  : 'Phân tích chuyên sâu với AI Agent chuyên dụng, đưa ra cảnh báo chính xác và khuyến nghị phòng tránh.'
+                }
+              </p>
             </CardContent>
           </Card>
 
@@ -232,43 +239,52 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
                 <span className="text-lg font-semibold">Vệ Binh Mạng</span>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Bảo vệ cộng đồng khỏi lừa đảo trực tuyến với công nghệ AI tiên tiến và sức mạnh cộng đồng.
+                {language === 'en' 
+                  ? 'Protecting the community from online scams with advanced AI technology and community power.'
+                  : 'Bảo vệ cộng đồng khỏi lừa đảo trực tuyến với công nghệ AI tiên tiến và sức mạnh cộng đồng.'
+                }
               </p>
             </div>
 
             {/* Quick Links */}
             <div className="col-span-1">
-              <h3 className="font-semibold mb-4">Liên kết nhanh</h3>
+              <h3 className="font-semibold mb-4">
+                {language === 'en' ? 'Quick Links' : 'Liên kết nhanh'}
+              </h3>
               <div className="space-y-2">
                 <Link to="/about" className="block text-gray-400 hover:text-white transition-colors text-sm">
-                  Giới thiệu
+                  {language === 'en' ? 'About' : 'Giới thiệu'}
                 </Link>
                 <Link to="/contact" className="block text-gray-400 hover:text-white transition-colors text-sm">
-                  Liên hệ
+                  {language === 'en' ? 'Contact' : 'Liên hệ'}
                 </Link>
                 <Link to="/privacy" className="block text-gray-400 hover:text-white transition-colors text-sm">
-                  Chính sách bảo mật
+                  {language === 'en' ? 'Privacy Policy' : 'Chính sách bảo mật'}
                 </Link>
               </div>
             </div>
 
             {/* Support */}
             <div className="col-span-1">
-              <h3 className="font-semibold mb-4">Hỗ trợ</h3>
+              <h3 className="font-semibold mb-4">
+                {language === 'en' ? 'Support' : 'Hỗ trợ'}
+              </h3>
               <div className="space-y-2 text-sm text-gray-400">
                 <p>Email: support@vebinh.com</p>
                 <p>Hotline: 1900-888-999</p>
-                <p>Khẩn cấp: 113</p>
+                <p>{language === 'en' ? 'Emergency: 113' : 'Khẩn cấp: 113'}</p>
               </div>
             </div>
 
             {/* Legal */}
             <div className="col-span-1">
-              <h3 className="font-semibold mb-4">Pháp lý</h3>
+              <h3 className="font-semibold mb-4">
+                {language === 'en' ? 'Legal' : 'Pháp lý'}
+              </h3>
               <div className="space-y-2 text-sm text-gray-400">
                 <p>© 2024 Vệ Binh Mạng</p>
-                <p>Bảo lưu mọi quyền</p>
-                <p>Phiên bản 1.0</p>
+                <p>{language === 'en' ? 'All rights reserved' : 'Bảo lưu mọi quyền'}</p>
+                <p>{language === 'en' ? 'Version 1.0' : 'Phiên bản 1.0'}</p>
               </div>
             </div>
           </div>
@@ -276,8 +292,10 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
           {/* Bottom Bar */}
           <div className="border-t border-gray-800 mt-8 pt-6 text-center text-sm text-gray-400">
             <p>
-              Vệ Binh Mạng - Nền tảng bảo vệ cộng đồng khỏi lừa đảo trực tuyến. 
-              Được phát triển với ❤️ tại Việt Nam.
+              {language === 'en' 
+                ? 'Vệ Binh Mạng - Platform protecting community from online scams. Developed with ❤️ in Vietnam.'
+                : 'Vệ Binh Mạng - Nền tảng bảo vệ cộng đồng khỏi lừa đảo trực tuyến. Được phát triển với ❤️ tại Việt Nam.'
+              }
             </p>
           </div>
         </div>

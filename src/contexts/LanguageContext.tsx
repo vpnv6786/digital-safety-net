@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export type Language = 'en' | 'vi' | 'zh' | 'es';
@@ -745,7 +744,7 @@ const translations: { [key: string]: Translation } = {
 const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem('language');
-    return (saved as Language) || 'vi';
+    return (saved as Language) || 'en'; // Changed default to English
   });
 
   useEffect(() => {
