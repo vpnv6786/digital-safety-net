@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, TrendingUp, TrendingDown, Minus, AlertTriangle, Shield, Eye, DollarSign } from 'lucide-react';
@@ -5,11 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { communityService, ScamStatistic } from '@/services/communityService';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const ScamRankings = () => {
   const [scamStats, setScamStats] = useState<ScamStatistic[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'frequency' | 'damage' | 'reports'>('frequency');
+  const { language } = useLanguage();
 
   useEffect(() => {
     loadScamStatistics();
@@ -61,10 +64,20 @@ const ScamRankings = () => {
 
   const getTrendText = (trend: string) => {
     switch (trend) {
-      case 'increasing': return 'Đang tăng';
-      case 'decreasing': return 'Đang giảm';
-      case 'stable': return 'Ổn định';
-      default: return 'Không rõ';
+      case 'increasing': return language === 'en' ? 'Increasing' : 'Đang tăng';
+      case 'decreasing': return language === 'en' ? 'Decreasing' : 'Đang giảm';
+      case 'stable': return language === 'en' ? 'Stable' : 'Ổn định';
+      default: return language === 'en' ? 'Unknown' : 'Không rõ';
+    }
+  };
+
+  const getDangerLevelText = (level: string) => {
+    switch (level) {
+      case 'critical': return language === 'en' ? 'Extremely dangerous' : 'Cực kỳ nguy hiểm';
+      case 'high': return language === 'en' ? 'High risk' : 'Nguy hiểm cao';
+      case 'medium': return language === 'en' ? 'Medium risk' : 'Nguy hiểm trung bình';
+      case 'low': return language === 'en' ? 'Low risk' : 'Nguy hiểm thấp';
+      default: return level;
     }
   };
 
@@ -74,7 +87,9 @@ const ScamRankings = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-trust-blue mx-auto"></div>
-            <p className="mt-4 text-gray-600">Đang tải dữ liệu...</p>
+            <p className="mt-4 text-gray-600">
+              {language === 'en' ? 'Loading data...' : 'Đang tải dữ liệu...'}
+            </p>
           </div>
         </div>
       </div>
@@ -89,31 +104,34 @@ const ScamRankings = () => {
           <Link to="/">
             <Button variant="ghost" className="text-trust-blue hover:bg-trust-blue/10">
               <ArrowLeft className="w-5 h-5 mr-2" />
-              Về trang chủ
+              {language === 'en' ? 'Back to home' : 'Về trang chủ'}
             </Button>
           </Link>
           <div className="flex items-center space-x-2">
             <AlertTriangle className="w-6 h-6 text-trust-blue" />
-            <span className="text-lg font-semibold text-gray-800">Bảng xếp hạng lừa đảo</span>
+            <span className="text-lg font-semibold text-gray-800">
+              {language === 'en' ? 'Scam Rankings' : 'Bảng xếp hạng lừa đảo'}
+            </span>
           </div>
         </div>
       </header>
 
       <div className="max-w-6xl mx-auto p-4 space-y-6">
-        {/* ... keep existing code (Page Title) */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            📊 Bảng xếp hạng các dạng lừa đảo nguy hiểm
+            📊 {language === 'en' ? 'Dangerous scam types ranking' : 'Bảng xếp hạng các dạng lừa đảo nguy hiểm'}
           </h1>
           <p className="text-gray-600">
-            Thống kê và phân tích các hình thức lừa đảo phổ biến nhất hiện nay
+            {language === 'en' 
+              ? 'Statistics and analysis of the most common scam types today'
+              : 'Thống kê và phân tích các hình thức lừa đảo phổ biến nhất hiện nay'
+            }
           </p>
         </div>
 
-        {/* ... keep existing code (Sort Controls) */}
         <Card>
           <CardHeader>
-            <CardTitle>Sắp xếp theo</CardTitle>
+            <CardTitle>{language === 'en' ? 'Sort by' : 'Sắp xếp theo'}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
@@ -123,7 +141,7 @@ const ScamRankings = () => {
                 className="flex items-center space-x-2"
               >
                 <Eye className="w-4 h-4" />
-                <span>Tần suất xuất hiện</span>
+                <span>{language === 'en' ? 'Frequency' : 'Tần suất xuất hiện'}</span>
               </Button>
               <Button
                 variant={sortBy === 'damage' ? 'default' : 'outline'}
@@ -131,7 +149,7 @@ const ScamRankings = () => {
                 className="flex items-center space-x-2"
               >
                 <DollarSign className="w-4 h-4" />
-                <span>Mức độ thiệt hại</span>
+                <span>{language === 'en' ? 'Damage level' : 'Mức độ thiệt hại'}</span>
               </Button>
               <Button
                 variant={sortBy === 'reports' ? 'default' : 'outline'}
@@ -139,13 +157,12 @@ const ScamRankings = () => {
                 className="flex items-center space-x-2"
               >
                 <Shield className="w-4 h-4" />
-                <span>Số báo cáo</span>
+                <span>{language === 'en' ? 'Number of reports' : 'Số báo cáo'}</span>
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* ... keep existing code (Scam Statistics List and Warning Note) */}
         <div className="space-y-4">
           {getSortedStats().map((stat, index) => (
             <Card key={stat.id} className="overflow-hidden">
@@ -162,10 +179,7 @@ const ScamRankings = () => {
                   </div>
                   <div className="flex flex-col items-end space-y-2">
                     <Badge variant={getDangerBadgeVariant(stat.danger_level)}>
-                      {stat.danger_level === 'critical' && 'Cực kỳ nguy hiểm'}
-                      {stat.danger_level === 'high' && 'Nguy hiểm cao'}
-                      {stat.danger_level === 'medium' && 'Nguy hiểm trung bình'}
-                      {stat.danger_level === 'low' && 'Nguy hiểm thấp'}
+                      {getDangerLevelText(stat.danger_level)}
                     </Badge>
                     <div className="flex items-center space-x-1 text-sm">
                       {getTrendIcon(stat.recent_trend)}
@@ -178,21 +192,29 @@ const ScamRankings = () => {
                 <div className="grid md:grid-cols-3 gap-4 mb-4">
                   <div className="text-center p-3 bg-red-50 rounded-lg">
                     <div className="text-2xl font-bold text-red-600">{stat.frequency_score}</div>
-                    <div className="text-sm text-gray-600">Điểm tần suất</div>
+                    <div className="text-sm text-gray-600">
+                      {language === 'en' ? 'Frequency score' : 'Điểm tần suất'}
+                    </div>
                   </div>
                   <div className="text-center p-3 bg-orange-50 rounded-lg">
                     <div className="text-2xl font-bold text-orange-600">{stat.damage_score}</div>
-                    <div className="text-sm text-gray-600">Điểm thiệt hại</div>
+                    <div className="text-sm text-gray-600">
+                      {language === 'en' ? 'Damage score' : 'Điểm thiệt hại'}
+                    </div>
                   </div>
                   <div className="text-center p-3 bg-blue-50 rounded-lg">
                     <div className="text-2xl font-bold text-blue-600">{stat.total_reports.toLocaleString()}</div>
-                    <div className="text-sm text-gray-600">Số báo cáo</div>
+                    <div className="text-sm text-gray-600">
+                      {language === 'en' ? 'Reports' : 'Số báo cáo'}
+                    </div>
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">🚨 Dấu hiệu cảnh báo:</h4>
+                    <h4 className="font-medium text-gray-900 mb-2">
+                      🚨 {language === 'en' ? 'Warning signs:' : 'Dấu hiệu cảnh báo:'}
+                    </h4>
                     <ul className="text-sm text-gray-600 space-y-1">
                       {stat.warning_signs.map((sign, idx) => (
                         <li key={idx} className="flex items-start space-x-2">
@@ -203,7 +225,9 @@ const ScamRankings = () => {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">🛡️ Cách phòng chống:</h4>
+                    <h4 className="font-medium text-gray-900 mb-2">
+                      🛡️ {language === 'en' ? 'Prevention tips:' : 'Cách phòng chống:'}
+                    </h4>
                     <ul className="text-sm text-gray-600 space-y-1">
                       {stat.prevention_tips.map((tip, idx) => (
                         <li key={idx} className="flex items-start space-x-2">
@@ -224,10 +248,14 @@ const ScamRankings = () => {
             <div className="flex items-start space-x-3">
               <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
               <div>
-                <h4 className="font-medium text-yellow-800 mb-1">Lưu ý quan trọng</h4>
+                <h4 className="font-medium text-yellow-800 mb-1">
+                  {language === 'en' ? 'Important note' : 'Lưu ý quan trọng'}
+                </h4>
                 <p className="text-sm text-yellow-700">
-                  Dữ liệu này được thu thập từ báo cáo của cộng đồng và các cơ quan chức năng. 
-                  Hãy luôn cảnh giác và cập nhật thông tin mới nhất để bảo vệ bản thân.
+                  {language === 'en' 
+                    ? 'This data is collected from community reports and authorities. Always stay vigilant and update with the latest information to protect yourself.'
+                    : 'Dữ liệu này được thu thập từ báo cáo của cộng đồng và các cơ quan chức năng. Hãy luôn cảnh giác và cập nhật thông tin mới nhất để bảo vệ bản thân.'
+                  }
                 </p>
               </div>
             </div>

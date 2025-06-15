@@ -4,8 +4,11 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Shield, Lock, Eye, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Privacy = () => {
+  const { language } = useLanguage();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-light to-white font-be-vietnam">
       {/* Header */}
@@ -14,12 +17,14 @@ const Privacy = () => {
           <Link to="/">
             <Button variant="ghost" className="text-trust-blue hover:bg-trust-blue/10">
               <ArrowLeft className="w-5 h-5 mr-2" />
-              Về trang chủ
+              {language === 'en' ? 'Back to home' : 'Về trang chủ'}
             </Button>
           </Link>
           <div className="flex items-center space-x-2">
             <Shield className="w-6 h-6 text-trust-blue" />
-            <span className="text-lg font-semibold text-gray-800">Vệ Binh Mạng</span>
+            <span className="text-lg font-semibold text-gray-800">
+              {language === 'en' ? 'ScamGuard' : 'Vệ Binh Mạng'}
+            </span>
           </div>
         </div>
       </header>
@@ -28,13 +33,16 @@ const Privacy = () => {
         {/* Hero Section */}
         <section className="text-center mb-16">
           <h1 className="text-4xl font-bold text-gray-900 mb-6">
-            Chính sách bảo mật
+            {language === 'en' ? 'Privacy Policy' : 'Chính sách bảo mật'}
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Chúng tôi cam kết bảo vệ quyền riêng tư và thông tin cá nhân của bạn với tiêu chuẩn bảo mật cao nhất.
+            {language === 'en' 
+              ? 'We are committed to protecting your privacy and personal information with the highest security standards.'
+              : 'Chúng tôi cam kết bảo vệ quyền riêng tư và thông tin cá nhân của bạn với tiêu chuẩn bảo mật cao nhất.'
+            }
           </p>
           <p className="text-sm text-gray-500 mt-4">
-            Cập nhật lần cuối: {new Date().toLocaleDateString('vi-VN')}
+            {language === 'en' ? 'Last updated: ' : 'Cập nhật lần cuối: '}{new Date().toLocaleDateString(language === 'en' ? 'en-US' : 'vi-VN')}
           </p>
         </section>
 
@@ -44,12 +52,15 @@ const Privacy = () => {
             <CardHeader>
               <CardTitle className="text-xl text-trust-blue flex items-center">
                 <Lock className="w-6 h-6 mr-2" />
-                Bảo mật thông tin
+                {language === 'en' ? 'Information Security' : 'Bảo mật thông tin'}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-700">
-                Mọi thông tin bạn cung cấp đều được mã hóa và bảo vệ bằng công nghệ bảo mật tiên tiến.
+                {language === 'en' 
+                  ? 'All information you provide is encrypted and protected with advanced security technology.'
+                  : 'Mọi thông tin bạn cung cấp đều được mã hóa và bảo vệ bằng công nghệ bảo mật tiên tiến.'
+                }
               </p>
             </CardContent>
           </Card>
@@ -58,12 +69,15 @@ const Privacy = () => {
             <CardHeader>
               <CardTitle className="text-xl text-trust-blue flex items-center">
                 <Eye className="w-6 h-6 mr-2" />
-                Minh bạch
+                {language === 'en' ? 'Transparency' : 'Minh bạch'}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-700">
-                Chúng tôi luôn minh bạch về cách thu thập, sử dụng và bảo vệ dữ liệu của bạn.
+                {language === 'en' 
+                  ? 'We are always transparent about how we collect, use and protect your data.'
+                  : 'Chúng tôi luôn minh bạch về cách thu thập, sử dụng và bảo vệ dữ liệu của bạn.'
+                }
               </p>
             </CardContent>
           </Card>
@@ -73,23 +87,31 @@ const Privacy = () => {
         <section className="space-y-8">
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle className="text-2xl">1. Thông tin chúng tôi thu thập</CardTitle>
+              <CardTitle className="text-2xl">
+                {language === 'en' ? '1. Information we collect' : '1. Thông tin chúng tôi thu thập'}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h4 className="font-semibold mb-2">Thông tin tìm kiếm:</h4>
+                <h4 className="font-semibold mb-2">
+                  {language === 'en' ? 'Search information:' : 'Thông tin tìm kiếm:'}
+                </h4>
                 <p className="text-gray-700">
-                  - Số điện thoại, website, email mà bạn tìm kiếm<br/>
-                  - Nội dung mô tả trong báo cáo<br/>
-                  - Hình ảnh được upload để phân tích
+                  {language === 'en' 
+                    ? '- Phone numbers, websites, emails you search\n- Content descriptions in reports\n- Images uploaded for analysis'
+                    : '- Số điện thoại, website, email mà bạn tìm kiếm\n- Nội dung mô tả trong báo cáo\n- Hình ảnh được upload để phân tích'
+                  }
                 </p>
               </div>
               <div>
-                <h4 className="font-semibold mb-2">Thông tin kỹ thuật:</h4>
+                <h4 className="font-semibold mb-2">
+                  {language === 'en' ? 'Technical information:' : 'Thông tin kỹ thuật:'}
+                </h4>
                 <p className="text-gray-700">
-                  - Địa chỉ IP và thông tin trình duyệt<br/>
-                  - Thời gian truy cập và sử dụng dịch vụ<br/>
-                  - Logs hệ thống để cải thiện dịch vụ
+                  {language === 'en' 
+                    ? '- IP address and browser information\n- Access time and service usage\n- System logs to improve service'
+                    : '- Địa chỉ IP và thông tin trình duyệt\n- Thời gian truy cập và sử dụng dịch vụ\n- Logs hệ thống để cải thiện dịch vụ'
+                  }
                 </p>
               </div>
             </CardContent>
@@ -97,88 +119,109 @@ const Privacy = () => {
 
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle className="text-2xl">2. Cách chúng tôi sử dụng thông tin</CardTitle>
+              <CardTitle className="text-2xl">
+                {language === 'en' ? '2. How we use information' : '2. Cách chúng tôi sử dụng thông tin'}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-gray-700">
-                <strong>Mục đích sử dụng:</strong>
+                <strong>{language === 'en' ? 'Purpose of use:' : 'Mục đích sử dụng:'}</strong>
               </p>
               <ul className="list-disc list-inside text-gray-700 space-y-2">
-                <li>Phân tích và cảnh báo về các mối đe dọa lừa đảo</li>
-                <li>Cập nhật cơ sở dữ liệu cộng đồng</li>
-                <li>Cải thiện độ chính xác của AI Agent</li>
-                <li>Cung cấp thống kê và báo cáo cho cộng đồng</li>
-                <li>Liên hệ hỗ trợ khi cần thiết</li>
+                <li>{language === 'en' ? 'Analyze and alert about scam threats' : 'Phân tích và cảnh báo về các mối đe dọa lừa đảo'}</li>
+                <li>{language === 'en' ? 'Update community database' : 'Cập nhật cơ sở dữ liệu cộng đồng'}</li>
+                <li>{language === 'en' ? 'Improve AI Agent accuracy' : 'Cải thiện độ chính xác của AI Agent'}</li>
+                <li>{language === 'en' ? 'Provide statistics and reports for community' : 'Cung cấp thống kê và báo cáo cho cộng đồng'}</li>
+                <li>{language === 'en' ? 'Contact support when necessary' : 'Liên hệ hỗ trợ khi cần thiết'}</li>
               </ul>
             </CardContent>
           </Card>
 
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle className="text-2xl">3. Chia sẻ thông tin</CardTitle>
+              <CardTitle className="text-2xl">
+                {language === 'en' ? '3. Information sharing' : '3. Chia sẻ thông tin'}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-gray-700">
-                <strong>Chúng tôi KHÔNG bán hoặc cho thuê thông tin cá nhân của bạn.</strong>
+                <strong>
+                  {language === 'en' 
+                    ? 'We DO NOT sell or rent your personal information.'
+                    : 'Chúng tôi KHÔNG bán hoặc cho thuê thông tin cá nhân của bạn.'
+                  }
+                </strong>
               </p>
               <p className="text-gray-700">
-                Thông tin chỉ được chia sẻ trong các trường hợp:
+                {language === 'en' 
+                  ? 'Information is only shared in the following cases:'
+                  : 'Thông tin chỉ được chia sẻ trong các trường hợp:'
+                }
               </p>
               <ul className="list-disc list-inside text-gray-700 space-y-2">
-                <li>Với cơ quan chức năng khi có yêu cầu pháp lý</li>
-                <li>Dữ liệu đã được ẩn danh để nghiên cứu bảo mật</li>
-                <li>Với đối tác công nghệ để cải thiện dịch vụ (sau khi ẩn danh)</li>
+                <li>{language === 'en' ? 'With authorities when legally required' : 'Với cơ quan chức năng khi có yêu cầu pháp lý'}</li>
+                <li>{language === 'en' ? 'Anonymized data for security research' : 'Dữ liệu đã được ẩn danh để nghiên cứu bảo mật'}</li>
+                <li>{language === 'en' ? 'With technology partners to improve service (after anonymization)' : 'Với đối tác công nghệ để cải thiện dịch vụ (sau khi ẩn danh)'}</li>
               </ul>
             </CardContent>
           </Card>
 
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle className="text-2xl">4. Bảo mật dữ liệu</CardTitle>
+              <CardTitle className="text-2xl">
+                {language === 'en' ? '4. Data security' : '4. Bảo mật dữ liệu'}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-gray-700">
-                <strong>Các biện pháp bảo mật:</strong>
+                <strong>{language === 'en' ? 'Security measures:' : 'Các biện pháp bảo mật:'}</strong>
               </p>
               <ul className="list-disc list-inside text-gray-700 space-y-2">
-                <li>Mã hóa SSL/TLS cho mọi giao tiếp</li>
-                <li>Hệ thống xác thực đa lớp</li>
-                <li>Sao lưu dữ liệu định kỳ</li>
-                <li>Kiểm tra bảo mật thường xuyên</li>
-                <li>Đào tạo nhân viên về bảo mật thông tin</li>
+                <li>{language === 'en' ? 'SSL/TLS encryption for all communications' : 'Mã hóa SSL/TLS cho mọi giao tiếp'}</li>
+                <li>{language === 'en' ? 'Multi-layer authentication system' : 'Hệ thống xác thực đa lớp'}</li>
+                <li>{language === 'en' ? 'Regular data backup' : 'Sao lưu dữ liệu định kỳ'}</li>
+                <li>{language === 'en' ? 'Regular security audits' : 'Kiểm tra bảo mật thường xuyên'}</li>
+                <li>{language === 'en' ? 'Staff training on information security' : 'Đào tạo nhân viên về bảo mật thông tin'}</li>
               </ul>
             </CardContent>
           </Card>
 
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle className="text-2xl">5. Quyền của người dùng</CardTitle>
+              <CardTitle className="text-2xl">
+                {language === 'en' ? '5. User rights' : '5. Quyền của người dùng'}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-gray-700">Bạn có quyền:</p>
+              <p className="text-gray-700">{language === 'en' ? 'You have the right to:' : 'Bạn có quyền:'}</p>
               <ul className="list-disc list-inside text-gray-700 space-y-2">
-                <li>Truy cập và xem thông tin cá nhân đã cung cấp</li>
-                <li>Yêu cầu chỉnh sửa thông tin không chính xác</li>
-                <li>Yêu cầu xóa dữ liệu cá nhân (trừ dữ liệu cần thiết cho an ninh)</li>
-                <li>Rút lại sự đồng ý xử lý dữ liệu</li>
-                <li>Khiếu nại về việc xử lý dữ liệu</li>
+                <li>{language === 'en' ? 'Access and view personal information provided' : 'Truy cập và xem thông tin cá nhân đã cung cấp'}</li>
+                <li>{language === 'en' ? 'Request correction of inaccurate information' : 'Yêu cầu chỉnh sửa thông tin không chính xác'}</li>
+                <li>{language === 'en' ? 'Request deletion of personal data (except data necessary for security)' : 'Yêu cầu xóa dữ liệu cá nhân (trừ dữ liệu cần thiết cho an ninh)'}</li>
+                <li>{language === 'en' ? 'Withdraw consent for data processing' : 'Rút lại sự đồng ý xử lý dữ liệu'}</li>
+                <li>{language === 'en' ? 'Complain about data processing' : 'Khiếu nại về việc xử lý dữ liệu'}</li>
               </ul>
             </CardContent>
           </Card>
 
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle className="text-2xl">6. Liên hệ</CardTitle>
+              <CardTitle className="text-2xl">
+                {language === 'en' ? '6. Contact' : '6. Liên hệ'}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-700 mb-4">
-                Nếu có câu hỏi về chính sách bảo mật này, vui lòng liên hệ:
+                {language === 'en' 
+                  ? 'If you have questions about this privacy policy, please contact:'
+                  : 'Nếu có câu hỏi về chính sách bảo mật này, vui lòng liên hệ:'
+                }
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-gray-700">
                   <strong>Email:</strong> privacy@vebinh.com<br/>
-                  <strong>Địa chỉ:</strong> Tầng 10, Tòa nhà ABC, Quận 1, TP.HCM<br/>
-                  <strong>Điện thoại:</strong> 1900-888-999
+                  <strong>{language === 'en' ? 'Address:' : 'Địa chỉ'}:</strong> {language === 'en' ? 'Floor 10, ABC Building, District 1, Ho Chi Minh City' : 'Tầng 10, Tòa nhà ABC, Quận 1, TP.HCM'}<br/>
+                  <strong>{language === 'en' ? 'Phone:' : 'Điện thoại'}:</strong> 1900-888-999
                 </p>
               </div>
             </CardContent>
@@ -188,16 +231,18 @@ const Privacy = () => {
         {/* Footer CTA */}
         <section className="bg-trust-blue/5 rounded-lg py-8 px-6 text-center mt-16">
           <h2 className="text-2xl font-bold text-trust-blue mb-4">
-            Bảo mật là ưu tiên hàng đầu
+            {language === 'en' ? 'Security is our top priority' : 'Bảo mật là ưu tiên hàng đầu'}
           </h2>
           <p className="text-gray-700 mb-6">
-            Chúng tôi cam kết bảo vệ thông tin của bạn với mức độ bảo mật cao nhất. 
-            Mọi thắc mắc về quyền riêng tư, vui lòng liên hệ với chúng tôi.
+            {language === 'en' 
+              ? 'We are committed to protecting your information with the highest level of security. For any privacy questions, please contact us.'
+              : 'Chúng tôi cam kết bảo vệ thông tin của bạn với mức độ bảo mật cao nhất. Mọi thắc mắc về quyền riêng tư, vui lòng liên hệ với chúng tôi.'
+            }
           </p>
           <Link to="/contact">
             <Button className="bg-trust-blue hover:bg-trust-blue-dark">
               <UserCheck className="w-4 h-4 mr-2" />
-              Liên hệ hỗ trợ
+              {language === 'en' ? 'Contact support' : 'Liên hệ hỗ trợ'}
             </Button>
           </Link>
         </section>
