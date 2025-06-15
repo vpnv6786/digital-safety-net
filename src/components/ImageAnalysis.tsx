@@ -79,6 +79,16 @@ const ImageAnalysis: React.FC = () => {
     }
   };
 
+  const getRiskText = (riskLevel: string) => {
+    if (riskLevel === 'dangerous') {
+      return language === 'en' ? 'High Risk - Dangerous' : 'Rủi ro cao - Nguy hiểm';
+    }
+    if (riskLevel === 'suspicious') {
+      return language === 'en' ? 'Medium Risk - Suspicious' : 'Rủi ro trung bình - Đáng nghi';
+    }
+    return language === 'en' ? 'Low Risk - Safe' : 'Rủi ro thấp - An toàn';
+  };
+
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
@@ -163,11 +173,7 @@ const ImageAnalysis: React.FC = () => {
                 {getRiskIcon(analysisResult.riskLevel)}
                 <div className="flex-1">
                   <div className="font-semibold text-lg">
-                    <TranslatedText>
-                      {analysisResult.riskLevel === 'dangerous' && (language === 'en' ? 'High Risk - Dangerous' : 'Rủi ro cao - Nguy hiểm')}
-                      {analysisResult.riskLevel === 'suspicious' && (language === 'en' ? 'Medium Risk - Suspicious' : 'Rủi ro trung bình - Đáng nghi')}
-                      {analysisResult.riskLevel === 'safe' && (language === 'en' ? 'Low Risk - Safe' : 'Rủi ro thấp - An toàn')}
-                    </TranslatedText>
+                    <TranslatedText>{getRiskText(analysisResult.riskLevel)}</TranslatedText>
                   </div>
                   <div className="text-sm opacity-75">
                     <TranslatedText>

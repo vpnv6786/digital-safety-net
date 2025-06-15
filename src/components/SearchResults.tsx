@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ArrowLeft, Shield, AlertTriangle, XCircle, CheckCircle, Share2, Flag, Brain, Clock, Target, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
+import TranslatedText from './TranslatedText';
 
 interface SearchResultsProps {
   query: string;
@@ -16,7 +16,7 @@ interface SearchResultsProps {
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchResult, onBack }) => {
-  const { t } = useLanguage();
+  const { language } = useLanguage();
 
   const getResultConfig = (risk: string) => {
     switch (risk) {
@@ -26,10 +26,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
           iconColor: 'text-safe-green',
           bgColor: 'bg-safe-green/10',
           borderColor: 'border-safe-green',
-          title: t('results.safe.title'),
-          message: t('results.safe.message'),
-          description: t('results.safe.description'),
-          actionButton: t('results.safe.action')
+          title: language === 'en' ? 'Safe - No Threats Detected' : 'An toàn - Không phát hiện mối đe dọa',
+          message: language === 'en' ? 'This appears to be legitimate' : 'Đây có vẻ là hợp pháp',
+          description: language === 'en' ? 'No scam reports found' : 'Không tìm thấy báo cáo lừa đảo',
+          actionButton: language === 'en' ? 'Report if Incorrect' : 'Báo cáo nếu sai'
         };
       case 'suspicious':
         return {
@@ -37,10 +37,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
           iconColor: 'text-warning-orange',
           bgColor: 'bg-warning-orange/10',
           borderColor: 'border-warning-orange',
-          title: t('results.suspicious.title'),
-          message: t('results.suspicious.message'),
-          description: t('results.suspicious.description'),
-          actionButton: t('results.suspicious.action')
+          title: language === 'en' ? 'Suspicious - Exercise Caution' : 'Đáng nghi - Hãy thận trọng',
+          message: language === 'en' ? 'Be careful when dealing with this' : 'Hãy cẩn thận khi giao dịch',
+          description: language === 'en' ? 'Some warning signs detected' : 'Phát hiện một số dấu hiệu cảnh báo',
+          actionButton: language === 'en' ? 'Report Scam' : 'Báo cáo lừa đảo'
         };
       case 'dangerous':
         return {
@@ -48,10 +48,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
           iconColor: 'text-danger-red',
           bgColor: 'bg-danger-red/10',
           borderColor: 'border-danger-red',
-          title: t('results.dangerous.title'),
-          message: t('results.dangerous.message'),
-          description: t('results.dangerous.description'),
-          actionButton: t('results.dangerous.action')
+          title: language === 'en' ? 'Dangerous - Confirmed Scam' : 'Nguy hiểm - Xác nhận lừa đảo',
+          message: language === 'en' ? 'Do not proceed! This is a known scam' : 'Đừng tiếp tục! Đây là lừa đảo đã biết',
+          description: language === 'en' ? 'Multiple reports confirmed' : 'Nhiều báo cáo đã xác nhận',
+          actionButton: language === 'en' ? 'Report Incident' : 'Báo cáo sự cố'
         };
       default:
         return getResultConfig('safe');
@@ -92,7 +92,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
             className="text-trust-blue hover:bg-trust-blue/10"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            {t('results.back')}
+            <TranslatedText>{language === 'en' ? 'Back' : 'Quay lại'}</TranslatedText>
           </Button>
           <LanguageSelector />
         </div>
@@ -101,9 +101,13 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Search Query Display */}
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('results.title')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <TranslatedText>{language === 'en' ? 'Search Results' : 'Kết quả tìm kiếm'}</TranslatedText>
+          </h1>
           <div className="inline-flex items-center bg-gray-100 rounded-lg px-4 py-2">
-            <span className="text-gray-600">{t('results.searched.for')}</span>
+            <span className="text-gray-600">
+              <TranslatedText>{language === 'en' ? 'Searched for:' : 'Đã tìm kiếm:'}</TranslatedText>
+            </span>
             <span className="font-semibold text-trust-blue ml-2">{query}</span>
           </div>
         </div>
@@ -119,7 +123,9 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
             <div className="flex justify-center mb-4">
               <Badge className={`${getUrgencyColor(urgencyLevel)} text-white`}>
                 <Clock className="w-3 h-3 mr-1" />
-                Mức độ: {urgencyLevel.toUpperCase()}
+                <TranslatedText>
+                  {language === 'en' ? `Level: ${urgencyLevel.toUpperCase()}` : `Mức độ: ${urgencyLevel.toUpperCase()}`}
+                </TranslatedText>
               </Badge>
             </div>
             
@@ -200,7 +206,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
               
               <Button variant="outline" size="lg" className="border-trust-blue text-trust-blue hover:bg-trust-blue hover:text-white">
                 <Share2 className="w-5 h-5 mr-2" />
-                {t('results.share.warning')}
+                <TranslatedText>{language === 'en' ? 'Share Warning' : 'Chia sẻ cảnh báo'}</TranslatedText>
               </Button>
             </div>
           </CardContent>
@@ -254,7 +260,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
                 <div className="text-3xl font-bold text-danger-red mb-2">
                   {reportCount}
                 </div>
-                <div className="text-gray-600">{t('results.reports.received')}</div>
+                <div className="text-gray-600">{language === 'en' ? 'Reports Received' : 'Báo cáo đã nhận'}</div>
               </CardContent>
             </Card>
             
@@ -263,7 +269,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
                 <div className="text-3xl font-bold text-warning-orange mb-2">
                   {Math.floor(reportCount * 0.6)}
                 </div>
-                <div className="text-gray-600">{t('results.verified')}</div>
+                <div className="text-gray-600">{language === 'en' ? 'Verified Reports' : 'Báo cáo đã xác minh'}</div>
               </CardContent>
             </Card>
             
@@ -272,7 +278,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
                 <div className="text-3xl font-bold text-trust-blue mb-2">
                   {confidence}%
                 </div>
-                <div className="text-gray-600">{t('results.reliability')}</div>
+                <div className="text-gray-600">{language === 'en' ? 'Reliability Score' : 'Độ tin cậy'}</div>
               </CardContent>
             </Card>
           </div>
@@ -281,7 +287,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
         {/* Related Reports */}
         {relatedReports.length > 0 && (
           <div className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            <h3 className="text-xl font-bold text-gray-900 mb-6">{t('results.related.reports')}</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-6">{language === 'en' ? 'Related Reports' : 'Báo cáo liên quan'}</h3>
             
             <div className="space-y-4">
               {relatedReports.map((report, index) => (
@@ -298,7 +304,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
                     <p className="text-gray-700 mb-3">{report.description}</p>
                     <div className="flex items-center text-sm text-gray-500">
                       <CheckCircle className="w-4 h-4 text-safe-green mr-1" />
-                      <span>{report.verifiedBy} {t('results.verified.by')}</span>
+                      <span>{report.verifiedBy} {language === 'en' ? 'Verified by' : 'Xác minh bởi'}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -311,7 +317,17 @@ const SearchResults: React.FC<SearchResultsProps> = ({ query, riskLevel, searchR
         <Alert className="mt-8 border-trust-blue bg-trust-blue/5">
           <Shield className="h-4 w-4 text-trust-blue" />
           <AlertDescription className="text-trust-blue font-medium">
-            <strong>AI Agent khuyến nghị:</strong> {preventionTips[0] || 'Luôn xác minh thông tin từ nguồn chính thức trước khi hành động.'}
+            <strong>
+              <TranslatedText>{language === 'en' ? 'AI Agent Recommendation:' : 'Khuyến nghị của AI Agent:'}</TranslatedText>
+            </strong>{' '}
+            {preventionTips[0] || (
+              <TranslatedText>
+                {language === 'en' 
+                  ? 'Always verify information from official sources before taking action.'
+                  : 'Luôn xác minh thông tin từ nguồn chính thức trước khi hành động.'
+                }
+              </TranslatedText>
+            )}
           </AlertDescription>
         </Alert>
       </div>

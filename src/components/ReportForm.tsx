@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import { submitReport } from '@/services/searchService';
+import TranslatedText from './TranslatedText';
 
 interface ReportFormProps {
   onBack: () => void;
@@ -25,24 +26,44 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const { t } = useLanguage();
+  const { language } = useLanguage();
 
   const targetTypes = [
-    { id: 'phone', label: t('report.step1.phone'), icon: Phone, description: t('report.step1.phone.desc') },
-    { id: 'bank_account', label: t('report.step1.bank'), icon: CreditCard, description: t('report.step1.bank.desc') },
-    { id: 'url', label: t('report.step1.url'), icon: Globe, description: t('report.step1.url.desc') },
-    { id: 'other', label: t('report.step1.other'), icon: HelpCircle, description: t('report.step1.other.desc') }
+    { 
+      id: 'phone', 
+      label: language === 'en' ? 'Phone Number' : 'Số điện thoại', 
+      icon: Phone, 
+      description: language === 'en' ? 'Report scam phone calls or SMS' : 'Báo cáo cuộc gọi lừa đảo hoặc SMS'
+    },
+    { 
+      id: 'bank_account', 
+      label: language === 'en' ? 'Bank Account' : 'Tài khoản ngân hàng', 
+      icon: CreditCard, 
+      description: language === 'en' ? 'Report fraudulent bank accounts' : 'Báo cáo tài khoản ngân hàng lừa đảo'
+    },
+    { 
+      id: 'url', 
+      label: language === 'en' ? 'Website/URL' : 'Website/URL', 
+      icon: Globe, 
+      description: language === 'en' ? 'Report suspicious websites' : 'Báo cáo website đáng nghi'
+    },
+    { 
+      id: 'other', 
+      label: language === 'en' ? 'Other' : 'Khác', 
+      icon: HelpCircle, 
+      description: language === 'en' ? 'Other type of scam' : 'Loại lừa đảo khác'
+    }
   ];
 
   const scamCategories = [
-    t('report.categories.fake.police'),
-    t('report.categories.bank.fraud'),
-    t('report.categories.job.scam'),
-    t('report.categories.investment'),
-    t('report.categories.online.shopping'),
-    t('report.categories.telecom.fraud'),
-    t('report.categories.fake.promotion'),
-    t('report.categories.other')
+    language === 'en' ? 'Fake Police/Authority' : 'Giả mạo công an/cơ quan chức năng',
+    language === 'en' ? 'Bank Fraud' : 'Lừa đảo ngân hàng',
+    language === 'en' ? 'Job Scam' : 'Lừa đảo việc làm',
+    language === 'en' ? 'Investment Scam' : 'Lừa đảo đầu tư',
+    language === 'en' ? 'Online Shopping' : 'Mua sắm online',
+    language === 'en' ? 'Telecom Fraud' : 'Lừa đảo viễn thông',
+    language === 'en' ? 'Fake Promotion' : 'Khuyến mãi giả',
+    language === 'en' ? 'Other' : 'Khác'
   ];
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,13 +117,20 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
             <div className="w-20 h-20 bg-safe-green/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-12 h-12 text-safe-green" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('report.success.title')}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              <TranslatedText>{language === 'en' ? 'Report Submitted!' : 'Đã gửi báo cáo!'}</TranslatedText>
+            </h2>
             <p className="text-gray-600 mb-6">
-              {t('report.success.message')}
+              <TranslatedText>
+                {language === 'en' 
+                  ? 'Thank you for helping protect the community!'
+                  : 'Cảm ơn bạn đã giúp bảo vệ cộng đồng!'
+                }
+              </TranslatedText>
             </p>
             <div className="flex flex-col gap-3">
               <Button onClick={onBack} className="bg-trust-blue hover:bg-trust-blue-dark">
-                {t('report.success.home')}
+                <TranslatedText>{language === 'en' ? 'Back to Home' : 'Về trang chủ'}</TranslatedText>
               </Button>
               <Button variant="outline" onClick={() => {
                 setIsSubmitted(false);
@@ -115,7 +143,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                   evidenceFiles: []
                 });
               }}>
-                {t('report.success.report.another')}
+                <TranslatedText>{language === 'en' ? 'Report Another' : 'Báo cáo khác'}</TranslatedText>
               </Button>
             </div>
           </CardContent>
@@ -135,7 +163,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
             className="text-trust-blue hover:bg-trust-blue/10"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            {t('results.back')}
+            <TranslatedText>{language === 'en' ? 'Back' : 'Quay lại'}</TranslatedText>
           </Button>
           
           <div className="flex items-center space-x-4">
@@ -158,8 +186,17 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
 
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('report.title')}</h1>
-          <p className="text-gray-600">{t('report.subtitle')}</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <TranslatedText>{language === 'en' ? 'Report Scam' : 'Báo cáo lừa đảo'}</TranslatedText>
+          </h1>
+          <p className="text-gray-600">
+            <TranslatedText>
+              {language === 'en' 
+                ? 'Help protect others by reporting scam activities'
+                : 'Giúp bảo vệ mọi người bằng cách báo cáo hoạt động lừa đảo'
+              }
+            </TranslatedText>
+          </p>
           <div className="mt-2 text-xs text-blue-600 bg-blue-50 inline-block px-3 py-1 rounded-full">
             🤖 AI-enhanced report analysis
           </div>
@@ -169,10 +206,10 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <AlertTriangle className="w-6 h-6 text-warning-orange mr-2" />
-              {currentStep === 1 && t('report.step1.title')}
-              {currentStep === 2 && t('report.step2.title')}
-              {currentStep === 3 && t('report.step3.title')}
-              {currentStep === 4 && t('report.step4.title')}
+              {currentStep === 1 && <TranslatedText>{language === 'en' ? 'What are you reporting?' : 'Bạn muốn báo cáo gì?'}</TranslatedText>}
+              {currentStep === 2 && <TranslatedText>{language === 'en' ? 'Enter Details' : 'Nhập chi tiết'}</TranslatedText>}
+              {currentStep === 3 && <TranslatedText>{language === 'en' ? 'Describe the Scam' : 'Mô tả vụ lừa đảo'}</TranslatedText>}
+              {currentStep === 4 && <TranslatedText>{language === 'en' ? 'Upload Evidence' : 'Tải lên bằng chứng'}</TranslatedText>}
             </CardTitle>
           </CardHeader>
           
@@ -180,7 +217,14 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
             {/* Step 1: Target Type */}
             {currentStep === 1 && (
               <div className="space-y-4">
-                <p className="text-gray-600 mb-6">{t('report.step1.question')}</p>
+                <p className="text-gray-600 mb-6">
+                  <TranslatedText>
+                    {language === 'en' 
+                      ? 'Select the type of scam you want to report:'
+                      : 'Chọn loại lừa đảo bạn muốn báo cáo:'
+                    }
+                  </TranslatedText>
+                </p>
                 <div className="grid gap-4">
                   {targetTypes.map((type) => {
                     const IconComponent = type.icon;
@@ -213,26 +257,26 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
             {currentStep === 2 && (
               <div className="space-y-4">
                 <Label htmlFor="targetValue" className="text-lg font-semibold">
-                  {formData.targetType === 'phone' && t('report.step2.phone.label')}
-                  {formData.targetType === 'bank_account' && t('report.step2.bank.label')}
-                  {formData.targetType === 'url' && t('report.step2.url.label')}
-                  {formData.targetType === 'other' && t('report.step2.other.label')}
+                  {formData.targetType === 'phone' && <TranslatedText>{language === 'en' ? 'Phone Number' : 'Số điện thoại'}</TranslatedText>}
+                  {formData.targetType === 'bank_account' && <TranslatedText>{language === 'en' ? 'Bank Account' : 'Tài khoản ngân hàng'}</TranslatedText>}
+                  {formData.targetType === 'url' && <TranslatedText>{language === 'en' ? 'Website/URL' : 'Website/URL'}</TranslatedText>}
+                  {formData.targetType === 'other' && <TranslatedText>{language === 'en' ? 'Other Target' : 'Mục tiêu khác'}</TranslatedText>}
                 </Label>
                 <Input
                   id="targetValue"
                   type="text"
                   placeholder={
-                    formData.targetType === 'phone' ? t('report.step2.phone.placeholder') :
-                    formData.targetType === 'bank_account' ? t('report.step2.bank.placeholder') :
-                    formData.targetType === 'url' ? t('report.step2.url.placeholder') :
-                    t('report.step2.other.placeholder')
+                    formData.targetType === 'phone' ? (language === 'en' ? 'Enter phone number' : 'Nhập số điện thoại') :
+                    formData.targetType === 'bank_account' ? (language === 'en' ? 'Enter bank account number' : 'Nhập số tài khoản ngân hàng') :
+                    formData.targetType === 'url' ? (language === 'en' ? 'Enter website URL' : 'Nhập địa chỉ website') :
+                    (language === 'en' ? 'Enter other target' : 'Nhập mục tiêu khác')
                   }
                   value={formData.targetValue}
                   onChange={(e) => setFormData({ ...formData, targetValue: e.target.value })}
                   className="text-lg py-3"
                 />
                 <p className="text-sm text-gray-500">
-                  {t('report.step2.privacy')}
+                  <TranslatedText>{language === 'en' ? 'We will keep your data private' : 'Chúng tôi sẽ giữ kín thông tin của bạn'}</TranslatedText>
                 </p>
               </div>
             )}
@@ -242,7 +286,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
               <div className="space-y-6">
                 <div>
                   <Label htmlFor="category" className="text-lg font-semibold mb-3 block">
-                    {t('report.step3.category.label')}
+                    <TranslatedText>{language === 'en' ? 'Scam Category' : 'Loại lừa đảo'}</TranslatedText>
                   </Label>
                   <div className="grid grid-cols-2 gap-2">
                     {scamCategories.map((category) => (
@@ -264,17 +308,17 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
 
                 <div>
                   <Label htmlFor="description" className="text-lg font-semibold mb-3 block">
-                    {t('report.step3.description.label')}
+                    <TranslatedText>{language === 'en' ? 'Description' : 'Mô tả'}</TranslatedText>
                   </Label>
                   <Textarea
                     id="description"
-                    placeholder={t('report.step3.description.placeholder')}
+                    placeholder={language === 'en' ? 'Describe the scam in detail' : 'Mô tả chi tiết vụ lừa đảo'}
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="min-h-32 text-base"
                   />
                   <p className="text-sm text-gray-500 mt-2">
-                    {t('report.step3.description.tip')}
+                    <TranslatedText>{language === 'en' ? 'Provide as much detail as possible' : 'Cung cấp càng nhiều chi tiết càng tốt'}</TranslatedText>
                   </p>
                 </div>
               </div>
@@ -285,15 +329,24 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
               <div className="space-y-6">
                 <div>
                   <Label className="text-lg font-semibold mb-3 block">
-                    {t('report.step4.upload.label')}
+                    <TranslatedText>{language === 'en' ? 'Upload Evidence' : 'Tải lên bằng chứng'}</TranslatedText>
                   </Label>
                   <p className="text-gray-600 mb-4">
-                    {t('report.step4.upload.description')}
+                    <TranslatedText>
+                      {language === 'en' 
+                        ? 'Upload any evidence that supports your report (images, screenshots, etc.)'
+                        : 'Tải lên bất kỳ bằng chứng nào hỗ trợ báo cáo của bạn (hình ảnh, ảnh chụp màn hình, v.v.)'
+                      }
+                    </TranslatedText>
                   </p>
                   
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-trust-blue transition-colors">
                     <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-4">{t('report.step4.upload.instruction')}</p>
+                    <p className="text-gray-600 mb-4">
+                      <TranslatedText>
+                        {language === 'en' ? 'Click to upload files' : 'Nhấp để tải lên tệp'}
+                      </TranslatedText>
+                    </p>
                     <input
                       type="file"
                       multiple
@@ -304,14 +357,16 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                     />
                     <Label htmlFor="fileUpload">
                       <Button variant="outline" className="cursor-pointer">
-                        {t('report.step4.upload.button')}
+                        <TranslatedText>{language === 'en' ? 'Upload Files' : 'Tải lên tệp'}</TranslatedText>
                       </Button>
                     </Label>
                   </div>
 
                   {formData.evidenceFiles.length > 0 && (
                     <div className="mt-4 space-y-2">
-                      <Label className="font-semibold">{t('report.step4.files.selected')}</Label>
+                      <Label className="font-semibold">
+                        <TranslatedText>{language === 'en' ? 'Selected Files' : 'Tệp đã chọn'}</TranslatedText>
+                      </Label>
                       {formData.evidenceFiles.map((file, index) => (
                         <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                           <span className="text-sm">{file.name}</span>
@@ -321,7 +376,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                             onClick={() => removeFile(index)}
                             className="text-red-500 hover:text-red-700 hover:bg-red-50"
                           >
-                            {t('report.step4.remove')}
+                            <TranslatedText>{language === 'en' ? 'Remove' : 'Xóa'}</TranslatedText>
                           </Button>
                         </div>
                       ))}
@@ -330,9 +385,16 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                 </div>
 
                 <div className="bg-trust-blue/5 border border-trust-blue/20 rounded-lg p-4">
-                  <h4 className="font-semibold text-trust-blue mb-2">{t('report.step4.privacy.title')}</h4>
+                  <h4 className="font-semibold text-trust-blue mb-2">
+                    <TranslatedText>{language === 'en' ? 'Privacy Notice' : 'Thông báo về quyền riêng tư'}</TranslatedText>
+                  </h4>
                   <p className="text-sm text-gray-600">
-                    {t('report.step4.privacy.message')}
+                    <TranslatedText>
+                      {language === 'en' 
+                        ? 'Your personal information will be kept confidential and used only for investigation purposes.'
+                        : 'Thông tin cá nhân của bạn sẽ được giữ bí mật và chỉ được sử dụng cho mục đích điều tra.'
+                      }
+                    </TranslatedText>
                   </p>
                 </div>
               </div>
@@ -346,7 +408,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                 disabled={currentStep === 1}
                 className="border-trust-blue text-trust-blue hover:bg-trust-blue hover:text-white"
               >
-                {t('report.navigation.back')}
+                <TranslatedText>{language === 'en' ? 'Back' : 'Quay lại'}</TranslatedText>
               </Button>
 
               {currentStep < 4 ? (
@@ -355,7 +417,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                   disabled={!canProceed(currentStep)}
                   className="bg-trust-blue hover:bg-trust-blue-dark"
                 >
-                  {t('report.navigation.continue')}
+                  <TranslatedText>{language === 'en' ? 'Continue' : 'Tiếp tục'}</TranslatedText>
                 </Button>
               ) : (
                 <Button
@@ -366,10 +428,10 @@ const ReportForm: React.FC<ReportFormProps> = ({ onBack }) => {
                   {isSubmitting ? (
                     <div className="flex items-center">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      {t('report.navigation.submitting')}
+                      <TranslatedText>{language === 'en' ? 'Submitting...' : 'Đang gửi...'}</TranslatedText>
                     </div>
                   ) : (
-                    t('report.navigation.submit')
+                    <TranslatedText>{language === 'en' ? 'Submit Report' : 'Gửi báo cáo'}</TranslatedText>
                   )}
                 </Button>
               )}
