@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, ShieldAlert, Lightbulb, Users, CheckCheck, PlusCircle, Info, Phone, Lock } from 'lucide-react';
+import { Search, ShieldAlert, Lightbulb, Users, CheckCheck, PlusCircle, Info, Phone, Lock, Shield, AlertTriangle, Activity, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -91,37 +91,204 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-12">
-        {/* Hero Section */}
+        {/* Hero Section - Enhanced with proper copy */}
         <section className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {t('home.hero.title')}
+          <h1 className="text-5xl font-bold text-gray-900 mb-4 leading-tight">
+            {language === 'en' 
+              ? 'Suspicious Message? Check Before You Trust.'
+              : 'Nhận tin nhắn lạ? Tra cứu trước khi tin.'
+            }
           </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto mb-8">
-            {t('home.hero.subtitle')}
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
+            {language === 'en'
+              ? 'Scam Guard is a free community shield that helps you verify and report online scams in seconds.'
+              : 'Vệ Binh Mạng là lá chắn cộng đồng miễn phí, giúp bạn kiểm tra và báo cáo lừa đảo trực tuyến chỉ trong vài giây.'
+            }
           </p>
-          <div className="flex justify-center space-x-4">
-            <Input
-              type="text"
-              placeholder={t('home.search.placeholder')}
-              className="w-full max-w-md rounded-full shadow-sm"
-              value={searchQuery}
-              onChange={handleSearchInput}
-              onKeyPress={handleKeyPress}
-              disabled={isSearching}
-            />
+          
+          {/* Enhanced Search Section */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <Input
+                type="text"
+                placeholder={language === 'en' 
+                  ? 'Enter phone, bank account, website to check...'
+                  : 'Nhập SĐT, tài khoản ngân hàng, website để kiểm tra...'
+                }
+                className="w-full text-lg py-4 px-6 rounded-full shadow-lg border-2 border-gray-200 focus:border-trust-blue text-center sm:text-left"
+                value={searchQuery}
+                onChange={handleSearchInput}
+                onKeyPress={handleKeyPress}
+                disabled={isSearching}
+              />
+              <Button 
+                onClick={handleSearchSubmit} 
+                className="w-full sm:w-auto bg-trust-blue hover:bg-trust-blue-dark text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg transition-all transform hover:scale-105"
+                disabled={isSearching || !searchQuery.trim()}
+              >
+                <Search className={`w-5 h-5 mr-2 ${isSearching ? 'animate-spin' : ''}`} />
+                {isSearching 
+                  ? (language === 'en' ? 'Analyzing...' : 'Đang phân tích...') 
+                  : (language === 'en' ? 'Check Now' : 'Kiểm tra ngay')
+                }
+              </Button>
+            </div>
+            
             <Button 
-              onClick={handleSearchSubmit} 
-              className="rounded-full"
-              disabled={isSearching || !searchQuery.trim()}
+              variant="link" 
+              onClick={onReport} 
+              className="mt-4 text-warning-orange hover:text-orange-600 text-lg font-medium"
             >
-              <Search className={`w-5 h-5 mr-2 ${isSearching ? 'animate-spin' : ''}`} />
-              {isSearching ? (language === 'en' ? 'Analyzing...' : 'Đang phân tích...') : t('home.search.button')}
+              <PlusCircle className="w-5 h-5 mr-2" />
+              {language === 'en' ? 'Report a Scam' : 'Báo cáo Lừa đảo'}
             </Button>
           </div>
-          <Button variant="link" onClick={onReport} className="mt-4">
-            <PlusCircle className="w-4 h-4 mr-2" />
-            {t('home.report.button')}
-          </Button>
+
+          {/* Trust Indicators */}
+          <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-500 mb-8">
+            <div className="flex items-center space-x-2">
+              <Shield className="w-4 h-4 text-trust-blue" />
+              <span>{language === 'en' ? 'Community Protected' : 'Bảo vệ cộng đồng'}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCheck className="w-4 h-4 text-safe-green" />
+              <span>{language === 'en' ? 'AI-Powered Analysis' : 'Phân tích AI thông minh'}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Activity className="w-4 h-4 text-warning-orange" />
+              <span>{language === 'en' ? 'Real-time Updates' : 'Cập nhật thời gian thực'}</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Problem Section */}
+        <section className="mb-16 bg-red-50 rounded-2xl p-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              {language === 'en' 
+                ? 'The Growing Threat of Online Scams'
+                : 'Mỗi ngày, hàng ngàn người Việt trở thành nạn nhân của lừa đảo qua mạng'
+              }
+            </h2>
+            <p className="text-gray-600 max-w-3xl mx-auto">
+              {language === 'en'
+                ? 'From fake police calls to fraudulent job offers, scammers are getting more sophisticated every day.'
+                : 'Từ giả danh công an đến lừa đảo việc làm online, các thủ đoạn ngày càng tinh vi và khó nhận biết.'
+              }
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Phone className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                {language === 'en' ? 'Fake Authority Calls' : 'Giả danh công an'}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {language === 'en' 
+                  ? 'Scammers impersonate police officers demanding money transfers'
+                  : 'Gọi điện tự xưng là công an, yêu cầu chuyển tiền để giải quyết vụ án'
+                }
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                {language === 'en' ? 'Fake Job Offers' : 'Việc làm online'}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {language === 'en'
+                  ? 'Fraudulent job postings asking for upfront payments'
+                  : 'Yêu cầu chuyển tiền phí xử lý hồ sơ việc làm'
+                }
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                {language === 'en' ? 'Account Lockouts' : 'Khóa tài khoản ngân hàng'}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {language === 'en'
+                  ? 'Fake bank notifications claiming account suspension'
+                  : 'Website giả mạo ngân hàng để đánh cắp thông tin'
+                }
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Solution Section - How it works */}
+        <section className="mb-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              {language === 'en' ? 'How Scam Guard Works' : 'Vệ Binh Mạng hoạt động như thế nào?'}
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              {language === 'en'
+                ? 'Three simple steps to protect yourself and your community'
+                : 'Ba bước đơn giản để bảo vệ bản thân và cộng đồng'
+              }
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-trust-blue/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Search className="w-10 h-10 text-trust-blue" />
+                <span className="absolute -mt-2 -mr-2 bg-trust-blue text-white rounded-full w-6 h-6 text-sm flex items-center justify-center font-bold">1</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                {language === 'en' ? 'Instant Search' : 'Tra cứu tức thì'}
+              </h3>
+              <p className="text-gray-600">
+                {language === 'en'
+                  ? 'Enter suspicious phone numbers, accounts, or links for immediate verification'
+                  : 'Nhập thông tin nghi ngờ và nhận kết quả phân tích tức thì'
+                }
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-20 h-20 bg-warning-orange/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertTriangle className="w-10 h-10 text-warning-orange" />
+                <span className="absolute -mt-2 -mr-2 bg-warning-orange text-white rounded-full w-6 h-6 text-sm flex items-center justify-center font-bold">2</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                {language === 'en' ? 'Get Alerts' : 'Nhận cảnh báo'}
+              </h3>
+              <p className="text-gray-600">
+                {language === 'en'
+                  ? 'See results from our community-powered database with AI analysis'
+                  : 'Xem kết quả từ cơ sở dữ liệu do cộng đồng đóng góp'
+                }
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-20 h-20 bg-safe-green/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Shield className="w-10 h-10 text-safe-green" />
+                <span className="absolute -mt-2 -mr-2 bg-safe-green text-white rounded-full w-6 h-6 text-sm flex items-center justify-center font-bold">3</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                {language === 'en' ? 'Help Protect Others' : 'Chung tay bảo vệ'}
+              </h3>
+              <p className="text-gray-600">
+                {language === 'en'
+                  ? 'Report cases you encounter to help protect others in the community'
+                  : 'Báo cáo trường hợp bạn gặp phải để giúp người khác'
+                }
+              </p>
+            </div>
+          </div>
         </section>
 
         {/* Enhanced Features Section */}
@@ -162,6 +329,35 @@ const HomePage: React.FC<HomePageProps> = ({ onSearch, onReport }) => {
               <p className="text-gray-600">{t('home.features.verified.description')}</p>
             </CardContent>
           </Card>
+        </section>
+
+        {/* Social Proof Section */}
+        <section className="mb-16 text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-8">
+            {language === 'en' 
+              ? 'Join Thousands Building a Safer Digital Space'
+              : 'Tham gia cùng hàng ngàn người dùng xây dựng một không gian mạng an toàn hơn'
+            }
+          </h2>
+          
+          <div className="grid md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-trust-blue mb-2">5,000+</div>
+              <div className="text-gray-600">{language === 'en' ? 'Scams Reported' : 'Vụ lừa đảo đã báo cáo'}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-safe-green mb-2">15,000+</div>
+              <div className="text-gray-600">{language === 'en' ? 'Users Protected' : 'Người dùng được bảo vệ'}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-warning-orange mb-2">95%</div>
+              <div className="text-gray-600">{language === 'en' ? 'Accuracy Rate' : 'Độ chính xác'}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-purple-600 mb-2">24/7</div>
+              <div className="text-gray-600">{language === 'en' ? 'Protection' : 'Bảo vệ liên tục'}</div>
+            </div>
+          </div>
         </section>
 
         {/* Image Analysis Section */}
