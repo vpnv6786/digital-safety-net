@@ -208,6 +208,34 @@
       @apply text-sm leading-normal;
     }
   }
+
+  /* Bottom navigation adjustments */
+  .bottom-nav-safe {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  }
+
+  @media (min-width: 768px) {
+    .bottom-nav-safe {
+      padding-bottom: 0;
+    }
+  }
+
+  /* Enhanced mobile touch targets */
+  .mobile-touch-target {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  /* Mobile-optimized padding */
+  .mobile-px {
+    @apply px-4;
+  }
+
+  @media (max-width: 640px) {
+    .mobile-px {
+      @apply px-3;
+    }
+  }
 }
 
 /* Custom animations */
@@ -222,6 +250,22 @@
 
 .animate-pulse-trust {
   animation: pulse-trust 2s infinite;
+}
+
+/* Mobile bottom navigation animations */
+@keyframes slideUpIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUpIn 0.3s ease-out;
 }
 
 /* High contrast mode support */
@@ -239,7 +283,8 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in-up,
   .animate-radar-scan,
-  .animate-shield-build {
+  .animate-shield-build,
+  .animate-slide-up {
     animation: none;
   }
   

@@ -27,12 +27,12 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={
-                <Layout showHeader={false} showFooter={false}>
+                <Layout showHeader={false} showFooter={false} showBottomNav={false}>
                   <Index />
                 </Layout>
               } />
               <Route path="/auth" element={
-                <Layout showHeader={false} showFooter={false}>
+                <Layout showHeader={false} showFooter={false} showBottomNav={false}>
                   <AuthPage onBack={() => window.history.back()} />
                 </Layout>
               } />
