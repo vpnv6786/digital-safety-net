@@ -33,9 +33,21 @@ const HomePage = () => {
   };
 
   const exampleSearches = [
-    { icon: Phone, text: "0123456789", type: language === 'en' ? 'Phone number' : 'Số điện thoại' },
-    { icon: Globe, text: "scam-website.com", type: "Website" },
-    { icon: CreditCard, text: "1234567890123456", type: language === 'en' ? 'Account number' : 'Số tài khoản' }
+    { 
+      icon: Phone, 
+      text: "0123456789", 
+      type: language === 'en' ? 'Phone number' : 'Số điện thoại' 
+    },
+    { 
+      icon: Globe, 
+      text: "scam-website.com", 
+      type: "Website" 
+    },
+    { 
+      icon: CreditCard, 
+      text: "1234567890123456", 
+      type: language === 'en' ? 'Account number' : 'Số tài khoản' 
+    }
   ];
 
   return (
@@ -55,7 +67,7 @@ const HomePage = () => {
           <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
             {language === 'en' 
               ? 'Check phone numbers, websites and suspicious information. Get real-time alerts and share experiences with the community.'
-              : 'Kiểm tra số điện thoại, website và thông tin đáng ngờ. Nhận cảnh báo realtime và chia sẻ kinh nghiệm với cộng đồng.'
+              : 'Kiểm tra số điện thoại, website và thông tin đáng ngờ. Nhận cảnh báo thời gian thực và chia sẻ kinh nghiệm với cộng đồng.'
             }
           </p>
 
@@ -105,7 +117,7 @@ const HomePage = () => {
                   <p className="text-xs sm:text-sm text-gray-600">
                     {language === 'en'
                       ? 'Real-time alert information from the community'
-                      : 'Thông tin cảnh báo realtime từ cộng đồng'
+                      : 'Thông tin cảnh báo thời gian thực từ cộng đồng'
                     }
                   </p>
                 </CardContent>
@@ -257,7 +269,7 @@ const HomePage = () => {
               <p className="text-sm sm:text-base text-gray-400">
                 {language === 'en' 
                   ? 'Protect yourself from scams with advanced AI technology and community alerts.'
-                  : 'Bảo vệ bạn khỏi lừa đảo với công nghệ AI tiên tiến và cộng đồng cảnh báo.'
+                  : 'Bảo vệ bạn khỏi lừa đảo với công nghệ AI tiên tiến và cảnh báo cộng đồng.'
                 }
               </p>
             </div>
