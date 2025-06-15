@@ -157,7 +157,12 @@ class LocationService {
         return;
       }
 
-      this.dangerZones = data || [];
+      // Type cast the danger_level to the expected union type
+      this.dangerZones = (data || []).map(zone => ({
+        ...zone,
+        danger_level: zone.danger_level as 'low' | 'medium' | 'high' | 'critical'
+      }));
+      
       console.log(`Loaded ${this.dangerZones.length} danger zones`);
     } catch (error) {
       console.error('Error loading danger zones:', error);
