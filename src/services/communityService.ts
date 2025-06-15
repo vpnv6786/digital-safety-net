@@ -1,4 +1,5 @@
 
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface CommunityAlert {
@@ -111,13 +112,28 @@ class CommunityService {
     }
   }
 
-  // Upvote an alert using direct SQL update
+  // Upvote an alert by getting current value and incrementing
   async upvoteAlert(alertId: string): Promise<boolean> {
     try {
+      // First get the current upvotes count
+      const { data: currentAlert, error: fetchError } = await supabase
+        .from('community_alerts')
+        .select('upvotes')
+        .eq('id', alertId)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching current upvotes:', fetchError);
+        return false;
+      }
+
+      const currentUpvotes = currentAlert?.upvotes || 0;
+
+      // Then update with incremented value
       const { error } = await supabase
         .from('community_alerts')
         .update({ 
-          upvotes: supabase.sql`upvotes + 1`
+          upvotes: currentUpvotes + 1
         })
         .eq('id', alertId);
 
@@ -133,13 +149,28 @@ class CommunityService {
     }
   }
 
-  // Downvote an alert using direct SQL update
+  // Downvote an alert by getting current value and incrementing
   async downvoteAlert(alertId: string): Promise<boolean> {
     try {
+      // First get the current downvotes count
+      const { data: currentAlert, error: fetchError } = await supabase
+        .from('community_alerts')
+        .select('downvotes')
+        .eq('id', alertId)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching current downvotes:', fetchError);
+        return false;
+      }
+
+      const currentDownvotes = currentAlert?.downvotes || 0;
+
+      // Then update with incremented value
       const { error } = await supabase
         .from('community_alerts')
         .update({ 
-          downvotes: supabase.sql`downvotes + 1`
+          downvotes: currentDownvotes + 1
         })
         .eq('id', alertId);
 
@@ -199,3 +230,4 @@ class CommunityService {
 }
 
 export const communityService = new CommunityService();
+
