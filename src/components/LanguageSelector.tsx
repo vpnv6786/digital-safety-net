@@ -16,8 +16,6 @@ const LanguageSelector: React.FC = () => {
   const languages: { code: Language; name: string; flag: string }[] = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
     { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
-    { code: 'zh', name: '中文', flag: '🇨🇳' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
   ];
 
   const currentLanguage = languages.find(lang => lang.code === language);
@@ -26,8 +24,9 @@ const LanguageSelector: React.FC = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
-          <Globe className="w-4 h-4 mr-2" />
-          {currentLanguage?.flag} {currentLanguage?.name}
+          <Globe className="w-4 h-4 mr-1 sm:mr-2" />
+          <span className="hidden sm:inline">{currentLanguage?.flag} {currentLanguage?.name}</span>
+          <span className="sm:hidden">{currentLanguage?.flag}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
