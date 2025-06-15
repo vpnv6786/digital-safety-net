@@ -119,7 +119,7 @@ const ScamRankings = () => {
       <div className="max-w-6xl mx-auto p-4 space-y-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            📊 {language === 'en' ? 'Dangerous Scam Types Ranking' : 'Bảng Xếp Hạng Các Dạng Lừa Đảo Nguy Hiểm'}
+            {language === 'en' ? '📊 Dangerous Scam Types Ranking' : '📊 Bảng Xếp Hạng Các Dạng Lừa Đảo Nguy Hiểm'}
           </h1>
           <p className="text-gray-600">
             {language === 'en' 
@@ -213,7 +213,7 @@ const ScamRankings = () => {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <h4 className="font-medium text-gray-900 mb-2">
-                      🚨 {language === 'en' ? 'Warning Signs:' : 'Dấu Hiệu Cảnh Báo:'}
+                      {language === 'en' ? '🚨 Warning Signs:' : '🚨 Dấu Hiệu Cảnh Báo:'}
                     </h4>
                     <ul className="text-sm text-gray-600 space-y-1">
                       {stat.warning_signs.map((sign, idx) => (
@@ -226,7 +226,7 @@ const ScamRankings = () => {
                   </div>
                   <div>
                     <h4 className="font-medium text-gray-900 mb-2">
-                      🛡️ {language === 'en' ? 'Prevention Tips:' : 'Cách Phòng Chống:'}
+                      {language === 'en' ? '🛡️ Prevention Tips:' : '🛡️ Cách Phòng Chống:'}
                     </h4>
                     <ul className="text-sm text-gray-600 space-y-1">
                       {stat.prevention_tips.map((tip, idx) => (

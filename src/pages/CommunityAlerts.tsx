@@ -164,7 +164,7 @@ const CommunityAlerts = () => {
       <div className="max-w-6xl mx-auto p-4 space-y-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            🚨 {language === 'en' ? 'Real-time Community Alerts' : 'Cảnh Báo Cộng Đồng Realtime'}
+            {language === 'en' ? '🚨 Real-time Community Alerts' : '🚨 Cảnh Báo Cộng Đồng Realtime'}
           </h1>
           <p className="text-gray-600">
             {language === 'en' 
@@ -198,21 +198,21 @@ const CommunityAlerts = () => {
                 onClick={() => setFilter('urgent')}
                 className="flex items-center space-x-2"
               >
-                <span>🚨 {language === 'en' ? 'Urgent' : 'Khẩn Cấp'}</span>
+                <span>{language === 'en' ? '🚨 Urgent' : '🚨 Khẩn Cấp'}</span>
               </Button>
               <Button
                 variant={filter === 'scam' ? 'default' : 'outline'}
                 onClick={() => setFilter('scam')}
                 className="flex items-center space-x-2"
               >
-                <span>⚠️ {language === 'en' ? 'Scam' : 'Lừa Đảo'}</span>
+                <span>{language === 'en' ? '⚠️ Scam' : '⚠️ Lừa Đảo'}</span>
               </Button>
               <Button
                 variant={filter === 'danger' ? 'default' : 'outline'}
                 onClick={() => setFilter('danger')}
                 className="flex items-center space-x-2"
               >
-                <span>⛔ {language === 'en' ? 'Danger Zone' : 'Khu Vực Nguy Hiểm'}</span>
+                <span>{language === 'en' ? '⛔ Danger Zone' : '⛔ Khu Vực Nguy Hiểm'}</span>
               </Button>
             </div>
           </CardContent>
@@ -230,7 +230,7 @@ const CommunityAlerts = () => {
                         <h3 className="text-lg font-semibold text-gray-900">{alert.title}</h3>
                         {alert.is_verified && (
                           <Badge variant="outline" className="text-green-600 border-green-600">
-                            ✓ {language === 'en' ? 'Verified' : 'Đã Xác Minh'}
+                            {language === 'en' ? '✓ Verified' : '✓ Đã Xác Minh'}
                           </Badge>
                         )}
                       </div>
