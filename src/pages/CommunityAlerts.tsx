@@ -12,7 +12,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const CommunityAlerts = () => {
   const [alerts, setAlerts] = useState<CommunityAlert[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'urgent' | 'scam' | 'danger'>('all');
+  const [filter, setFilter] = useState<'all' | 'urgent' | 'scam'>('all');
   const { toast } = useToast();
   const { language } = useLanguage();
 
@@ -21,8 +21,7 @@ const CommunityAlerts = () => {
     
     // Set up real-time subscription
     const channel = communityService.subscribeToAlerts((newAlert: CommunityAlert) => {
-      console.log('New alert received:', newAlert);
-      setAlerts(prev => [newAlert, ...prev]);
+            setAlerts(prev => [newAlert, ...prev]);
       toast({
         title: language === 'en' ? "🚨 New Alert" : "🚨 Cảnh Báo Mới",
         description: language === 'en' ? "New alert from community" : "Có cảnh báo mới từ cộng đồng",
@@ -51,8 +50,6 @@ const CommunityAlerts = () => {
         return alerts.filter(alert => alert.alert_type === 'urgent_alert' || alert.severity === 'critical');
       case 'scam':
         return alerts.filter(alert => alert.alert_type === 'scam_warning');
-      case 'danger':
-        return alerts.filter(alert => alert.alert_type === 'danger_zone');
       default:
         return alerts;
     }
@@ -144,33 +141,16 @@ const CommunityAlerts = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/">
-            <Button variant="ghost" className="text-trust-blue hover:bg-trust-blue/10">
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              {language === 'en' ? 'Back to Home' : 'Về Trang Chủ'}
-            </Button>
-          </Link>
-          <div className="flex items-center space-x-2">
-            <AlertTriangle className="w-6 h-6 text-trust-blue" />
-            <span className="text-lg font-semibold text-gray-800">
-              {language === 'en' ? 'Community Alerts' : 'Cảnh Báo Cộng Đồng'}
-            </span>
-          </div>
-        </div>
-      </header>
 
       <div className="max-w-6xl mx-auto p-4 space-y-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {language === 'en' ? '🚨 Real-time Community Alerts' : '🚨 Cảnh Báo Cộng Đồng Realtime'}
+            {language === 'en' ? 'Community alerts' : 'Cảnh báo cộng đồng'}
           </h1>
           <p className="text-gray-600">
-            {language === 'en' 
-              ? 'Latest alerts from community and authorities'
-              : 'Thông tin cảnh báo mới nhất từ cộng đồng và cơ quan chức năng'
-            }
+            {language === 'en'
+              ? 'Only alerts reviewed by a moderator are shown. Alerts you submit appear here after review.'
+              : 'Chỉ hiển thị cảnh báo đã được kiểm duyệt. Cảnh báo bạn gửi sẽ xuất hiện sau khi được xem xét.'}
           </p>
         </div>
 
@@ -206,13 +186,6 @@ const CommunityAlerts = () => {
                 className="flex items-center space-x-2"
               >
                 <span>{language === 'en' ? '⚠️ Scam' : '⚠️ Lừa Đảo'}</span>
-              </Button>
-              <Button
-                variant={filter === 'danger' ? 'default' : 'outline'}
-                onClick={() => setFilter('danger')}
-                className="flex items-center space-x-2"
-              >
-                <span>{language === 'en' ? '⛔ Danger Zone' : '⛔ Khu Vực Nguy Hiểm'}</span>
               </Button>
             </div>
           </CardContent>

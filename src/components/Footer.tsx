@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Mail, Phone, MapPin } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { CONTACT_EMAIL, SITE_NAME } from '@/lib/site';
 import SocialShare from './SocialShare';
 
 const Footer = () => {
@@ -12,125 +13,81 @@ const Footer = () => {
     <footer className="bg-gray-900 text-white">
       <div className="max-w-6xl mx-auto px-4 py-8 lg:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-          {/* Logo và giới thiệu */}
           <div className="col-span-1 sm:col-span-2 lg:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
               <Shield className="w-6 h-6 lg:w-8 lg:h-8 text-blue-400" />
-              <span className="text-lg lg:text-xl font-bold">ScamGuard</span>
+              <span className="text-lg lg:text-xl font-bold">{SITE_NAME}</span>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-4">
-              {language === 'en' 
-                ? 'Protecting the Vietnamese community from online scams with AI technology and community alerts.'
-                : 'Bảo vệ cộng đồng Việt Nam khỏi lừa đảo trực tuyến bằng công nghệ AI và cảnh báo cộng đồng.'
-              }
+              {language === 'en'
+                ? 'Ask before you pay, install an app or tap a link. Free for everyone.'
+                : 'Hỏi trước khi chuyển tiền, cài app hay bấm link. Miễn phí cho mọi người.'}
             </p>
-            
-            {/* Social Share Section */}
             <div className="mt-4 pt-4 border-t border-gray-700">
               <p className="text-sm text-gray-400 mb-3">
-                {language === 'en' ? 'Share ScamGuard:' : 'Chia sẻ ScamGuard:'}
+                {language === 'en' ? 'Share with your family:' : 'Chia sẻ cho người thân:'}
               </p>
               <SocialShare
-                title={language === 'en' ? 'ScamGuard - Protect Yourself from Online Scams' : 'ScamGuard - Bảo vệ bản thân khỏi lừa đảo trực tuyến'}
-                description={language === 'en' 
-                  ? 'AI-powered protection against online scams for Vietnamese community'
-                  : 'Công nghệ AI bảo vệ cộng đồng Việt Nam khỏi lừa đảo trực tuyến'
-                }
-                hashtags={['ScamGuard', 'OnlineSafety', 'Vietnam', 'CyberSecurity']}
+                title={language === 'en' ? 'Vệ Binh Mạng - Ask before you pay' : 'Vệ Binh Mạng - Hỏi trước khi chuyển tiền'}
+                description={language === 'en' ? 'Check messages, numbers and links for scam signs' : 'Kiểm tra tin nhắn, số điện thoại, link có dấu hiệu lừa đảo'}
+                hashtags={['VeBinhMang', 'ChongLuaDao']}
                 className="justify-start"
               />
             </div>
           </div>
 
-          {/* Liên kết nhanh */}
-          <div className="order-2 lg:order-2">
+          <div>
             <h3 className="text-base lg:text-lg font-semibold mb-3 lg:mb-4">
-              {language === 'en' ? 'Quick Links' : 'Liên kết nhanh'}
+              {language === 'en' ? 'Quick links' : 'Liên kết nhanh'}
             </h3>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/" className="text-gray-400 hover:text-white transition-colors">
-                  {language === 'en' ? 'Home' : 'Trang chủ'}
-                </Link>
-              </li>
-              <li>
-                <Link to="/safety" className="text-gray-400 hover:text-white transition-colors">
-                  {language === 'en' ? 'Safety' : 'An toàn'}
-                </Link>
-              </li>
-              <li>
-                <Link to="/scam-rankings" className="text-gray-400 hover:text-white transition-colors">
-                  {language === 'en' ? 'Scam Rankings' : 'Bảng xếp hạng lừa đảo'}
-                </Link>
-              </li>
-              <li>
-                <Link to="/community-alerts" className="text-gray-400 hover:text-white transition-colors">
-                  {language === 'en' ? 'Community Alerts' : 'Cảnh báo cộng đồng'}
-                </Link>
-              </li>
+              <li><Link to="/" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Check' : 'Kiểm tra'}</Link></li>
+              <li><Link to="/scam-rankings" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Common scams' : 'Thủ đoạn phổ biến'}</Link></li>
+              <li><Link to="/community-alerts" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Community alerts' : 'Cảnh báo cộng đồng'}</Link></li>
+              <li><Link to="/tro-giup" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Already scammed?' : 'Đã lỡ bị lừa?'}</Link></li>
             </ul>
           </div>
 
-          {/* Thông tin */}
-          <div className="order-3 lg:order-3">
+          <div>
             <h3 className="text-base lg:text-lg font-semibold mb-3 lg:mb-4">
               {language === 'en' ? 'Information' : 'Thông tin'}
             </h3>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/about" className="text-gray-400 hover:text-white transition-colors">
-                  {language === 'en' ? 'About' : 'Giới thiệu'}
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-gray-400 hover:text-white transition-colors">
-                  {language === 'en' ? 'Contact' : 'Liên hệ'}
-                </Link>
-              </li>
-              <li>
-                <Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">
-                  {language === 'en' ? 'Privacy Policy' : 'Chính sách bảo mật'}
-                </Link>
-              </li>
-              <li>
-                <Link to="/authorities" className="text-gray-400 hover:text-white transition-colors">
-                  {language === 'en' ? 'Authorities' : 'Cơ quan chức năng'}
-                </Link>
-              </li>
+              <li><Link to="/about" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'About' : 'Giới thiệu'}</Link></li>
+              <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Contact' : 'Liên hệ'}</Link></li>
+              <li><Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Privacy' : 'Quyền riêng tư'}</Link></li>
             </ul>
           </div>
 
-          {/* Liên hệ khẩn cấp */}
-          <div className="order-4 lg:order-4">
+          <div>
             <h3 className="text-base lg:text-lg font-semibold mb-3 lg:mb-4">
-              {language === 'en' ? 'Emergency Contact' : 'Liên hệ khẩn cấp'}
+              {language === 'en' ? 'Emergency' : 'Khẩn cấp'}
             </h3>
             <div className="space-y-3 text-sm">
-              <div className="flex items-center space-x-2">
+              <a href="tel:113" className="flex items-center space-x-2 text-gray-400 hover:text-white">
                 <Phone className="w-4 h-4 text-red-400 flex-shrink-0" />
-                <span className="text-gray-400">
-                  {language === 'en' ? 'Police: 113' : 'Công an: 113'}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                <span className="text-gray-400 break-all">support@scamguard.vn</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="w-4 h-4 text-green-400 flex-shrink-0" />
-                <span className="text-gray-400">Hotline: 1900-888-999</span>
-              </div>
+                <span>{language === 'en' ? 'Police: 113' : 'Công an: 113'}</span>
+              </a>
+              <a href="tel:156" className="flex items-center space-x-2 text-gray-400 hover:text-white">
+                <Phone className="w-4 h-4 text-orange-400 flex-shrink-0" />
+                <span>{language === 'en' ? 'Report scam calls: 156' : 'Phản ánh cuộc gọi lừa đảo: 156'}</span>
+              </a>
+              {CONTACT_EMAIL && (
+                <a href={`mailto:${CONTACT_EMAIL}`} className="flex items-center space-x-2 text-gray-400 hover:text-white">
+                  <Mail className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                  <span className="break-all">{CONTACT_EMAIL}</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Copyright */}
         <div className="border-t border-gray-800 mt-6 lg:mt-8 pt-6 lg:pt-8 text-center">
           <p className="text-gray-400 text-xs lg:text-sm leading-relaxed">
-            {language === 'en' 
-              ? '© 2024 ScamGuard. All rights reserved. Protecting Vietnamese community from online scams.'
-              : '© 2024 ScamGuard. Tất cả quyền được bảo lưu. Bảo vệ cộng đồng Việt Nam khỏi lừa đảo trực tuyến.'
-            }
+            © {new Date().getFullYear()} {SITE_NAME}.{' '}
+            {language === 'en'
+              ? 'Answers are guidance, not legal findings. When in doubt, contact your bank or the police.'
+              : 'Kết luận chỉ mang tính tham khảo, không phải kết luận pháp lý. Khi nghi ngờ, hãy liên hệ ngân hàng hoặc công an.'}
           </p>
         </div>
       </div>

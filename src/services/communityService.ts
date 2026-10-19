@@ -39,6 +39,8 @@ export interface ScamStatistic {
   recent_trend: 'increasing' | 'stable' | 'decreasing';
   prevention_tips: string[];
   warning_signs: string[];
+  sort_order: number | null;
+  source_note: string | null;
 }
 
 class CommunityService {
@@ -48,7 +50,7 @@ class CommunityService {
       const { data, error } = await supabase
         .from('scam_statistics')
         .select('*')
-        .order('frequency_score', { ascending: false });
+        .order('sort_order', { ascending: true, nullsFirst: false });
 
       if (error) {
         console.error('Error fetching scam statistics:', error);
@@ -112,80 +114,6 @@ class CommunityService {
     }
   }
 
-  // Upvote an alert by getting current value and incrementing
-  async upvoteAlert(alertId: string): Promise<boolean> {
-    try {
-      // First get the current upvotes count
-      const { data: currentAlert, error: fetchError } = await supabase
-        .from('community_alerts')
-        .select('upvotes')
-        .eq('id', alertId)
-        .single();
-
-      if (fetchError) {
-        console.error('Error fetching current upvotes:', fetchError);
-        return false;
-      }
-
-      const currentUpvotes = currentAlert?.upvotes || 0;
-
-      // Then update with incremented value
-      const { error } = await supabase
-        .from('community_alerts')
-        .update({ 
-          upvotes: currentUpvotes + 1
-        })
-        .eq('id', alertId);
-
-      if (error) {
-        console.error('Error upvoting alert:', error);
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Error upvoting alert:', error);
-      return false;
-    }
-  }
-
-  // Downvote an alert by getting current value and incrementing
-  async downvoteAlert(alertId: string): Promise<boolean> {
-    try {
-      // First get the current downvotes count
-      const { data: currentAlert, error: fetchError } = await supabase
-        .from('community_alerts')
-        .select('downvotes')
-        .eq('id', alertId)
-        .single();
-
-      if (fetchError) {
-        console.error('Error fetching current downvotes:', fetchError);
-        return false;
-      }
-
-      const currentDownvotes = currentAlert?.downvotes || 0;
-
-      // Then update with incremented value
-      const { error } = await supabase
-        .from('community_alerts')
-        .update({ 
-          downvotes: currentDownvotes + 1
-        })
-        .eq('id', alertId);
-
-      if (error) {
-        console.error('Error downvoting alert:', error);
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Error downvoting alert:', error);
-      return false;
-    }
-  }
-
   // Get trending scam types
   async getTrendingScams(): Promise<ScamStatistic[]> {
     try {
@@ -193,7 +121,7 @@ class CommunityService {
         .from('scam_statistics')
         .select('*')
         .eq('recent_trend', 'increasing')
-        .order('frequency_score', { ascending: false })
+        .order('sort_order', { ascending: true, nullsFirst: false })
         .limit(5);
 
       if (error) {

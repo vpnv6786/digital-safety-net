@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Shield, AlertTriangle, Users, Search } from 'lucide-react';
+import { Home, AlertTriangle, BookOpen, LifeBuoy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const BottomNavigation = () => {
@@ -15,14 +15,9 @@ const BottomNavigation = () => {
       label: language === 'en' ? 'Home' : 'Trang chủ'
     },
     {
-      path: '/safety',
-      icon: Shield,
-      label: language === 'en' ? 'Safety' : 'An toàn'
-    },
-    {
       path: '/scam-rankings',
-      icon: Search,
-      label: language === 'en' ? 'Rankings' : 'Xếp hạng'
+      icon: BookOpen,
+      label: language === 'en' ? 'Scam types' : 'Thủ đoạn'
     },
     {
       path: '/community-alerts',
@@ -30,9 +25,9 @@ const BottomNavigation = () => {
       label: language === 'en' ? 'Alerts' : 'Cảnh báo'
     },
     {
-      path: '/authorities',
-      icon: Users,
-      label: language === 'en' ? 'Authorities' : 'Cơ quan'
+      path: '/tro-giup',
+      icon: LifeBuoy,
+      label: language === 'en' ? 'Scammed?' : 'Đã bị lừa?'
     }
   ];
 
