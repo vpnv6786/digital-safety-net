@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      agent_proposals: {
+        Row: {
+          agent: string
+          confidence: number | null
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          kind: string
+          payload: Json
+          rationale: string
+          status: string
+          target_id: string | null
+        }
+        Insert: {
+          agent: string
+          confidence?: number | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          kind: string
+          payload?: Json
+          rationale: string
+          status?: string
+          target_id?: string | null
+        }
+        Update: {
+          agent?: string
+          confidence?: number | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          kind?: string
+          payload?: Json
+          rationale?: string
+          status?: string
+          target_id?: string | null
+        }
+        Relationships: []
+      }
       alert_votes: {
         Row: {
           alert_id: string
@@ -547,6 +589,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      decide_proposal: {
+        Args: { p_proposal_id: string; p_decision: string; p_note?: string | null }
+        Returns: undefined
+      }
       has_role: {
         Args: { _user_id: string; _role: string }
         Returns: boolean

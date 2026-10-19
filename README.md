@@ -47,6 +47,10 @@ Chạy bộ lõi trên máy chủ và thêm các tín hiệu mà trình duyệt 
 
 Deploy: `supabase functions deploy check` rồi `supabase secrets set ANTHROPIC_API_KEY=... WEB_RISK_API_KEY=...`.
 
+## Vận hành bằng agent
+
+Agent đọc hàng chờ (đã che dữ liệu) qua Edge Function `agent-api` và chỉ ghi đề xuất. Người kiểm duyệt chấp nhận hoặc bỏ qua ở `/kiem-duyet`. Chi tiết: [`docs/agents/README.md`](docs/agents/README.md). Bộ mẫu chuẩn: `npm run eval`.
+
 ## Dữ liệu và quyền riêng tư
 
 - Trình duyệt không đọc, ghi trực tiếp bảng `entities`, `reports`. Tra cứu đi qua `lookup_entity()` (chỉ trả số lượng, không trả danh tính hay nội dung báo cáo); báo cáo đi qua `submit_report()` (bắt đăng nhập, kiểm tra định dạng, mỗi người một lần mỗi mục, tối đa 10 báo cáo/24 giờ).
