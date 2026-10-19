@@ -15,6 +15,8 @@ export interface CheckResult {
   verdict: Verdict;
   /** Every reason found, before trimming to the few shown first. */
   allReasons: Reason[];
+  /** True when at least one community lookup failed. */
+  lookupFailed: boolean;
 }
 
 export async function runCheck(raw: string, lookup: CommunityLookup, opts: { bankCode?: string; now?: Date } = {}): Promise<CheckResult> {
@@ -37,6 +39,6 @@ export async function runCheck(raw: string, lookup: CommunityLookup, opts: { ban
   );
   for (const s of signals) if (s) reasons.push(...communityReasons(s.entity, s.signal, opts.now));
 
-  const verdict = decide({ reasons, lookupFailed: lookupFailed && entities.length > 0 });
-  return { input: text, isMessage, entities, verdict, allReasons: reasons };
+  const verdict = decide({ reasons, lookupFailed });
+  return { input: text, isMessage, entities, verdict, allReasons: reasons, lookupFailed };
 }

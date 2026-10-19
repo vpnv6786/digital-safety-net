@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { ACTIONS, bankName, type CheckResult as Result, type Entity, type ReasonSource, type VerdictLevel } from '@core/index.ts';
+import { ACTIONS, bankName, type Entity, type ReasonSource, type VerdictLevel } from '@core/index.ts';
+import type { CheckOutcome } from '@/services/checkService';
 
 const LEVELS: Record<
   VerdictLevel,
@@ -72,7 +73,7 @@ export function entityDisplay(e: Entity): string {
 }
 
 interface CheckResultProps {
-  result: Result;
+  result: CheckOutcome;
   onReport: (entity?: Entity) => void;
 }
 
@@ -139,6 +140,13 @@ const CheckResult: React.FC<CheckResultProps> = ({ result, onReport }) => {
             </div>
           )}
 
+          {result.extractedText && (
+            <details className="mt-5 text-sm">
+              <summary className="cursor-pointer text-gray-600">{vi ? 'Chữ đọc được trong ảnh' : 'Text read from the screenshot'}</summary>
+              <p className="mt-2 whitespace-pre-wrap rounded bg-white p-3 border text-gray-800">{result.extractedText}</p>
+            </details>
+          )}
+
           {entities.length > 0 && (
             <div className="mt-5">
               <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">
@@ -179,8 +187,8 @@ const CheckResult: React.FC<CheckResultProps> = ({ result, onReport }) => {
 
       <p className="text-xs text-gray-500">
         {vi
-          ? 'Không công cụ nào chắc chắn 100%. Kết luận dựa trên dấu hiệu trong nội dung, danh sách tên miền chính thức và báo cáo của cộng đồng. Khi còn nghi ngờ, hãy tự gọi số chính thức hoặc hỏi người thân.'
-          : 'No tool is 100% certain. This answer uses signals in the content, official domain lists and community reports. When in doubt, call the official number yourself or ask family.'}
+          ? `Không công cụ nào chắc chắn 100%. Kết luận dựa trên dấu hiệu trong nội dung, danh sách tên miền chính thức, báo cáo của cộng đồng${result.aiUsed ? ' và phần giải thích của AI (AI chỉ có thể nâng tới mức "có dấu hiệu")' : ''}. Khi còn nghi ngờ, hãy tự gọi số chính thức hoặc hỏi người thân.`
+          : `No tool is 100% certain. This answer uses signals in the content, official domain lists, community reports${result.aiUsed ? ' and an AI explanation (AI can raise an answer only up to "signs of a scam")' : ''}. When in doubt, call the official number yourself or ask family.`}
       </p>
     </div>
   );
