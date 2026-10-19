@@ -1,0 +1,65 @@
+# Runs the reference operating agents. They only write proposals; moderators
+# decide in /kiem-duyet. Skips quietly until the repository secrets are set:
+#   AGENT_API_URL     https://<project>.supabase.co/functions/v1/agent-api
+#   AGENT_API_TOKEN   same value as the Edge Function secret
+#   ANTHROPIC_API_KEY optional; without it triage only groups reports and content does nothing
+# Optional repository variable LLM_MODEL overrides the model.
+name: Agents
+
+on:
+  schedule:
+    - cron: '17 * * * *' # triage, hourly
+    - cron: '43 1 * * 1' # content, Mondays 08:43 Vietnam time
+  workflow_dispatch:
+    inputs:
+      agent:
+        type: choice
+        options: [triage, content]
+        default: triage
+      dry_run:
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agents-${{ github.event.schedule || inputs.agent }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      AGENT_API_URL: ${{ secrets.AGENT_API_URL }}
+      AGENT_API_TOKEN: ${{ secrets.AGENT_API_TOKEN }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      LLM_MODEL: ${{ vars.LLM_MODEL }}
+    steps:
+      - name: Check configuration
+        id: cfg
+        run: |
+          if [ -z "$AGENT_API_URL" ] || [ -z "$AGENT_API_TOKEN" ]; then
+            echo "Agent secrets are not set; skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "agent=${{ inputs.agent }}" >> "$GITHUB_OUTPUT"
+            if [ "${{ inputs.dry_run }}" = "true" ]; then echo "flags=--dry-run" >> "$GITHUB_OUTPUT"; fi
+          elif [ "${{ github.event.schedule }}" = "43 1 * * 1" ]; then
+            echo "agent=content" >> "$GITHUB_OUTPUT"
+          else
+            echo "agent=triage" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.skip != 'true'
+      - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.skip != 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - if: steps.cfg.outputs.skip != 'true'
+        run: npm ci
+      - if: steps.cfg.outputs.skip != 'true'
+        run: npx tsx agents/${{ steps.cfg.outputs.agent }}.ts ${{ steps.cfg.outputs.flags }}

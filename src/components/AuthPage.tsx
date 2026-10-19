@@ -55,9 +55,9 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
       if (error) throw error;
       setStep('otp');
       toast.success('Mã OTP đã được gửi đến số điện thoại của bạn');
-    } catch (error: any) {
+    } catch (error) {
       console.error('OTP send error:', error);
-      setError(error.message || 'Không thể gửi mã OTP. Vui lòng thử lại.');
+      setError((error as Error).message || 'Không thể gửi mã OTP. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -84,9 +84,9 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
       if (error) throw error;
       toast.success('Đăng nhập thành công!');
       onBack();
-    } catch (error: any) {
+    } catch (error) {
       console.error('OTP verify error:', error);
-      setError(error.message || 'Mã OTP không đúng. Vui lòng thử lại.');
+      setError((error as Error).message || 'Mã OTP không đúng. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -121,9 +121,9 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
         toast.success('Đăng nhập thành công!');
         onBack();
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Email auth error:', error);
-      setError(error.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+      setError((error as Error).message || 'Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -144,9 +144,9 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
       });
 
       if (error) throw error;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Social auth error:', error);
-      setError(error.message || 'Không thể đăng nhập. Vui lòng thử lại.');
+      setError((error as Error).message || 'Không thể đăng nhập. Vui lòng thử lại.');
       setLoading(false);
     }
   };

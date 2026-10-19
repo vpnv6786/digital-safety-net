@@ -27,7 +27,7 @@ Agent làm phần việc lặp lại; người giữ mọi quyết định có h
 | `triage` (sàng lọc) | Mỗi giờ | `GET /queue` | `verify_report`, `reject_report`, `cluster_reports` |
 | `intel` (trinh sát) | Mỗi ngày | Cảnh báo chính thức của công an, ngân hàng, tinnhiemmang.vn; nhật ký Certificate Transparency | `takedown_request`, `draft_alert`; đề xuất thêm luật bằng PR (người review) |
 | `content` (cảnh báo) | Mỗi tuần, hoặc khi một thủ đoạn tăng đột biến | `GET /summary?days=14` | `draft_alert` |
-| `qa` (kiểm định) | Mỗi đêm và trên mọi PR | `npm run eval`, `npm test`, `scripts/test-db.sh` | Không đề xuất; CI đỏ thì chặn merge |
+| `qa` (kiểm định) | Trên mọi PR và mỗi lần push lên `main` (`.github/workflows/ci.yml`) | lint, typecheck, `npm test` (gồm bộ mẫu chuẩn), `deno check`, `scripts/test-db.sh` | Không đề xuất; CI đỏ thì không merge |
 
 Agent kiểm tra (trả lời người dân) chính là Edge Function `check`, không cần agent riêng.
 
@@ -68,6 +68,19 @@ supabase functions deploy agent-api --no-verify-jwt
 supabase secrets set AGENT_API_TOKEN=$(openssl rand -hex 32)
 ```
 
+## Agent tham chiếu chạy được ngay
+
+`agents/triage.ts` và `agents/content.ts` dùng SDK Anthropic chính thức. Model mặc định là `claude-opus-5-5` ở effort `low`, đổi được bằng biến `LLM_MODEL`.
+
+```bash
+AGENT_API_URL=https://<project>.supabase.co/functions/v1/agent-api AGENT_API_TOKEN=... ANTHROPIC_API_KEY=... \
+  npm run agent:triage -- --dry-run      # in đề xuất, không gửi
+```
+
+- `triage` gom các báo cáo về cùng một số/trang (không cần model). Khi có khoá API, nó đọc tối đa 20 báo cáo mỗi lần, gợi ý xác minh hoặc từ chối, và chỉ gửi đề xuất có độ tin cậy từ 0,75 trở lên. Đề xuất cho id báo cáo không có trong hàng chờ bị bỏ qua.
+- `content` chỉ soạn cảnh báo khi một thủ đoạn có ít nhất 5 báo cáo trong tuần và tăng gấp đôi so với tuần trước. Bản nháp mô tả kịch bản, không nêu tên số hay trang cụ thể.
+- `.github/workflows/agents.yml` chạy `triage` mỗi giờ và `content` mỗi thứ Hai. Workflow tự bỏ qua khi chưa đặt secrets `AGENT_API_URL` và `AGENT_API_TOKEN`; chạy tay mặc định ở chế độ thử (`dry_run`).
+
 ## Nối với MiteClaw
 
 MiteClaw chạy cục bộ (desktop/gateway). Vì Agent API là kiểu kéo (agent tự gọi ra), MiteClaw không cần địa chỉ công khai để làm việc nền.
@@ -81,7 +94,7 @@ MiteClaw chạy cục bộ (desktop/gateway). Vì Agent API là kiểu kéo (age
 
 Phần còn thiếu nên làm thành một domain mới trong MiteClaw (`npm run new-domain -- antoanso "An toàn số" "Digital safety"`), gồm công cụ `scam_check` (đọc, cho khách), `scam_queue` và `scam_propose` (cho agent nền), cùng tài liệu hướng dẫn trong `internal/tool/guidecorpus/`. Theo quy định cổng khách hàng của MiteClaw (`docs/harness/decisions/2026-10-17-customer-gate.md`), story cho domain này phải nêu một đối tác thí điểm hoặc một giả thuyết trong lean canvas. **Việc này chờ chủ dự án chọn đối tác thí điểm.**
 
-Cho đến khi có domain đó, có thể chạy agent nền bằng bất kỳ runtime nào gọi được HTTP với header `x-agent-token`.
+Cho đến khi có domain đó, các agent tham chiếu ở trên (GitHub Actions) đã đủ cho việc vận hành nền.
 
 ## Chỉ số theo dõi
 
