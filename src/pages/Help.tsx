@@ -1,59 +1,28 @@
-import React from 'react';
+import { useState } from 'react';
 import { ExternalLink, Phone, ShieldAlert } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
+import PoliceReportDraft from '@/components/PoliceReportDraft';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { VERIFIED_CONTACTS } from '@core/index.ts';
-
-const STEPS: { vi: string; en: string; detailVi: string; detailEn: string }[] = [
-  {
-    vi: 'Gọi ngay ngân hàng của bạn để khoá thẻ, tài khoản',
-    en: 'Call your bank now to block your card and account',
-    detailVi:
-      'Dùng số tổng đài in ở mặt sau thẻ hoặc trong ứng dụng ngân hàng chính thức. Không dùng số ai đó gửi cho bạn. Đề nghị ngân hàng tra soát, phong toả giao dịch đến tài khoản nhận.',
-    detailEn:
-      'Use the hotline printed on your card or inside the official banking app, never a number someone sent you. Ask the bank to trace and freeze the transfer to the receiving account.',
-  },
-  {
-    vi: 'Ngắt quyền điều khiển điện thoại nếu đã cài ứng dụng lạ',
-    en: 'Cut off remote control if you installed an unknown app',
-    detailVi:
-      'Bật chế độ máy bay, gỡ ứng dụng lạ, tắt Trợ năng (Accessibility) cho ứng dụng đó. Nếu không gỡ được, tắt nguồn và mang máy tới cửa hàng uy tín. Dùng máy khác để đổi mật khẩu ngân hàng, email, Zalo.',
-    detailEn:
-      'Turn on airplane mode, uninstall the unknown app and turn off its Accessibility access. If you cannot remove it, power off and take the phone to a trusted shop. Change banking, email and Zalo passwords from another device.',
-  },
-  {
-    vi: 'Giữ lại bằng chứng',
-    en: 'Keep the evidence',
-    detailVi:
-      'Chụp màn hình tin nhắn, cuộc gọi, tài khoản nhận tiền, link; lưu sao kê, biên lai chuyển tiền. Đừng xoá cuộc trò chuyện.',
-    detailEn: 'Screenshot messages, calls, the receiving account and links; keep statements and transfer receipts. Do not delete the chat.',
-  },
-  {
-    vi: 'Trình báo công an',
-    en: 'Report to the police',
-    detailVi: 'Đến công an xã, phường nơi bạn ở, hoặc gửi tố giác trên ứng dụng VNeID. Gọi 113 nếu đang bị đe doạ.',
-    detailEn: 'Go to your commune or ward police, or file a report in the VNeID app. Call 113 if you are being threatened.',
-  },
-  {
-    vi: 'Cảnh giác với "lừa đảo lần hai"',
-    en: 'Watch out for a "second scam"',
-    detailVi:
-      'Sau khi bị lừa, bạn dễ bị nhắm lại bởi người xưng luật sư, hacker, cán bộ hứa lấy lại tiền nếu đóng phí. Không ai lấy lại tiền giúp bạn qua mạng. Chỉ làm việc với công an.',
-    detailEn:
-      'After a scam, people posing as lawyers, hackers or officials often promise to recover the money for a fee. Nobody recovers money for you online. Deal only with the police.',
-  },
-  {
-    vi: 'Báo cho người thân và báo cáo lên Vệ Binh Mạng',
-    en: 'Tell your family and report it on Vệ Binh Mạng',
-    detailVi: 'Kẻ gian thường dùng tài khoản của bạn để lừa tiếp người quen. Báo cáo giúp người khác được cảnh báo sớm.',
-    detailEn: 'Scammers often use your accounts to target your contacts next. Your report helps warn others early.',
-  },
-];
+import { RECOVERY_SITUATIONS, VERIFIED_CONTACTS, recoverySteps, type RecoverySituation } from '@core/index.ts';
 
 const Help = () => {
   const { language } = useLanguage();
   const vi = language === 'vi';
+  const [situations, setSituations] = useState<RecoverySituation[]>([]);
+  const [done, setDone] = useState<Set<string>>(new Set());
+  const steps = recoverySteps(situations);
+
+  const toggleSituation = (code: RecoverySituation) =>
+    setSituations((s) => (s.includes(code) ? s.filter((c) => c !== code) : [...s, code]));
+  const toggleDone = (id: string) =>
+    setDone((d) => {
+      const next = new Set(d);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   return (
     <div className="min-h-screen bg-neutral-light">
@@ -70,23 +39,61 @@ const Help = () => {
           </p>
         </div>
 
-        <ol className="space-y-3">
-          {STEPS.map((s, i) => (
-            <li key={s.en}>
-              <Card>
-                <CardContent className="p-4 flex gap-3">
-                  <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-trust-blue text-white font-bold">
-                    {i + 1}
-                  </span>
-                  <div>
-                    <h2 className="font-semibold text-gray-900">{vi ? s.vi : s.en}</h2>
-                    <p className="text-sm text-gray-700 mt-1">{vi ? s.detailVi : s.detailEn}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </li>
-          ))}
+        <section aria-labelledby="situation-heading" className="space-y-2">
+          <h2 id="situation-heading" className="font-semibold text-gray-900">
+            {vi ? 'Chuyện gì đã xảy ra? Chọn tất cả những gì đúng với bạn' : 'What happened? Choose everything that applies'}
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {RECOVERY_SITUATIONS.map((s) => {
+              const on = situations.includes(s.code);
+              return (
+                <button
+                  key={s.code}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => toggleSituation(s.code)}
+                  className={`rounded-full border px-4 py-2 text-sm text-left transition-colors ${
+                    on ? 'bg-trust-blue text-white border-trust-blue' : 'bg-white text-gray-800 border-gray-300 hover:border-trust-blue'
+                  }`}
+                >
+                  {vi ? s.vi : s.en}
+                </button>
+              );
+            })}
+          </div>
+          {situations.length === 0 && (
+            <p className="text-sm text-gray-500">
+              {vi ? 'Chưa chọn gì thì hiện tất cả các bước.' : 'With nothing chosen, every step is shown.'}
+            </p>
+          )}
+        </section>
+
+        <ol className="space-y-3" aria-live="polite">
+          {steps.map((s, i) => {
+            const checked = done.has(s.id);
+            return (
+              <li key={s.id}>
+                <Card className={checked ? 'opacity-60' : undefined}>
+                  <CardContent className="p-4 flex gap-3">
+                    <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-trust-blue text-white font-bold">
+                      {i + 1}
+                    </span>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{vi ? s.vi : s.en}</h3>
+                      <p className="text-sm text-gray-700 mt-1">{vi ? s.detailVi : s.detailEn}</p>
+                      <label className="mt-2 inline-flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                        <Checkbox checked={checked} onCheckedChange={() => toggleDone(s.id)} />
+                        {vi ? 'Đã làm' : 'Done'}
+                      </label>
+                    </div>
+                  </CardContent>
+                </Card>
+              </li>
+            );
+          })}
         </ol>
+
+        <PoliceReportDraft situations={situations} />
 
         <Card>
           <CardHeader>
