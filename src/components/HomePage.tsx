@@ -1,290 +1,254 @@
-import React, { useState } from 'react';
-import { Shield, Search, AlertTriangle, Users, TrendingUp, MapPin, Phone, Globe, CreditCard, Share } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import SearchResults from './SearchResults';
+import { AlertTriangle, BookOpen, Flag, LifeBuoy, Loader2, Search, Share, Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import CheckResult from './CheckResult';
 import ReportForm from './ReportForm';
-import ImageAnalysis from './ImageAnalysis';
-import AIProviderSetup from './AIProviderSetup';
 import SocialShare from './SocialShare';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { checkInput } from '@/services/checkService';
+import { BANKS, type CheckResult as Result, type Entity } from '@core/index.ts';
+
+const EXAMPLES = [
+  {
+    vi: 'Tin nhắn mạo danh công an',
+    en: 'Fake police message',
+    text: 'Công an phường thông báo: tài khoản định danh mức 2 của bạn bị lỗi. Vui lòng tải ứng dụng VNeID mới tại link vneid-capnhat.online để cập nhật trong 24 giờ.',
+  },
+  { vi: 'Link giả ngân hàng', en: 'Fake bank link', text: 'vietcombank-hotro.com' },
+  {
+    vi: 'Việc làm online',
+    en: 'Online job offer',
+    text: 'Tuyển CTV làm nhiệm vụ trên app, hoa hồng 10-30% mỗi đơn. Nạp tiền để nhận nhiệm vụ tiếp theo và rút cả gốc lẫn lãi.',
+  },
+];
+
+const LEVEL_GUIDE = [
+  { dot: 'bg-danger-red', vi: 'Rất nguy hiểm', en: 'Dangerous', noteVi: 'Khớp kịch bản lừa đảo đã biết hoặc báo cáo đã kiểm duyệt.', noteEn: 'Matches a known scam script or moderator-verified reports.' },
+  { dot: 'bg-warning-orange', vi: 'Có dấu hiệu lừa đảo', en: 'Signs of a scam', noteVi: 'Có dấu hiệu đáng ngờ hoặc nhiều người báo cáo chưa xác minh.', noteEn: 'Suspicious signals or several unverified reports.' },
+  { dot: 'bg-slate-400', vi: 'Chưa đủ thông tin', en: 'Not enough information', noteVi: 'Mặc định khi chưa có dữ liệu. Không có nghĩa là an toàn.', noteEn: 'The default when there is no data. It does not mean safe.' },
+  { dot: 'bg-trust-blue', vi: 'Khớp kênh chính thức', en: 'Official channel', noteVi: 'Tên miền chính thức của ngân hàng, cơ quan nhà nước (.gov.vn).', noteEn: 'Official domain of a bank or a government body (.gov.vn).' },
+];
 
 const HomePage = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showResults, setShowResults] = useState(false);
-  const [activeTab, setActiveTab] = useState<'search' | 'report' | 'image'>('search');
   const { language } = useLanguage();
-  const isMobile = useIsMobile();
+  const vi = language === 'vi';
+  const [tab, setTab] = useState<'check' | 'report'>('check');
+  const [input, setInput] = useState('');
+  const [bankCode, setBankCode] = useState<string | undefined>();
+  const [checking, setChecking] = useState(false);
+  const [result, setResult] = useState<Result | null>(null);
+  const [reportPrefill, setReportPrefill] = useState<Entity | undefined>();
+  const resultRef = useRef<HTMLDivElement>(null);
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      setShowResults(true);
+  const digitsOnly = /^[\d\s.-]{6,}$/.test(input.trim());
+
+  const runCheck = async (text = input) => {
+    if (!text.trim()) return;
+    setChecking(true);
+    try {
+      setResult(await checkInput(text, digitsOnly ? bankCode : undefined));
+    } finally {
+      setChecking(false);
+      setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
+  const startReport = (entity?: Entity) => {
+    setReportPrefill(entity);
+    setTab('report');
   };
-
-  const exampleSearches = [
-    { 
-      icon: Phone, 
-      text: "0123456789", 
-      type: language === 'en' ? 'Phone number' : 'Số điện thoại' 
-    },
-    { 
-      icon: Globe, 
-      text: "scam-website.com", 
-      type: "Website" 
-    },
-    { 
-      icon: CreditCard, 
-      text: "1234567890123456", 
-      type: language === 'en' ? 'Account number' : 'Số tài khoản' 
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
-      {/* Hero Section */}
-      <section className="px-4 py-8 sm:py-16 text-center">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex justify-center mb-4 sm:mb-6">
-            <Shield className="w-12 h-12 sm:w-16 sm:h-16 text-blue-600" />
-          </div>
-          <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
-            {language === 'en' ? 'Protect yourself from' : 'Bảo vệ bạn khỏi'}{' '}
-            <span className="text-blue-600">
-              {language === 'en' ? 'scams' : 'lừa đảo'}
-            </span>
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
-            {language === 'en' 
-              ? 'Check phone numbers, websites and suspicious information. Get real-time alerts and share experiences with the community.'
-              : 'Kiểm tra số điện thoại, website và thông tin đáng ngờ. Nhận cảnh báo thời gian thực và chia sẻ kinh nghiệm với cộng đồng.'
-            }
+      <section className="px-4 pt-8 pb-6 sm:pt-14 text-center">
+        <div className="max-w-3xl mx-auto">
+          <Shield className="w-12 h-12 sm:w-14 sm:h-14 text-trust-blue mx-auto mb-4" aria-hidden="true" />
+          <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-3">Vệ Binh Mạng</h1>
+          <p className="text-lg sm:text-2xl text-gray-800 font-medium">
+            {vi ? 'Hỏi trước khi chuyển tiền, cài app hay bấm link.' : 'Ask before you pay, install an app or tap a link.'}
           </p>
-
-          {/* Social Share Section */}
-          <div className="mb-6 sm:mb-8">
-            <Card className="bg-white/80 backdrop-blur shadow-lg max-w-2xl mx-auto">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center justify-center space-x-2 mb-3">
-                  <Share className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                  <h3 className="text-sm sm:text-base font-semibold text-gray-900">
-                    {language === 'en' ? 'Help protect the community' : 'Giúp bảo vệ cộng đồng'}
-                  </h3>
-                </div>
-                <p className="text-xs sm:text-sm text-gray-600 mb-3 text-center">
-                  {language === 'en' 
-                    ? 'Share ScamGuard with your friends and family to keep them safe'
-                    : 'Chia sẻ ScamGuard với bạn bè và gia đình để bảo vệ họ'
-                  }
-                </p>
-                <div className="flex justify-center">
-                  <SocialShare
-                    title={language === 'en' ? 'ScamGuard - Protect Yourself from Online Scams' : 'ScamGuard - Bảo vệ bản thân khỏi lừa đảo trực tuyến'}
-                    description={language === 'en' 
-                      ? 'AI-powered protection against online scams for Vietnamese community'
-                      : 'Công nghệ AI bảo vệ cộng đồng Việt Nam khỏi lừa đảo trực tuyến'
-                    }
-                    hashtags={['ScamGuard', 'OnlineSafety', 'Vietnam', 'CyberSecurity']}
-                    className="justify-center"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 sm:mb-8">
-            <Link to="/safety" className="block">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/80 backdrop-blur h-full">
-                <CardContent className="p-4 sm:p-6 text-center">
-                  <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 mx-auto mb-2 sm:mb-3" />
-                  <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base">
-                    {language === 'en' ? 'Personal Safety' : 'An toàn cá nhân'}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-600">
-                    {language === 'en' 
-                      ? 'GPS tracking and dangerous area alerts'
-                      : 'Theo dõi GPS và cảnh báo khu vực nguy hiểm'
-                    }
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link to="/scam-rankings" className="block">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/80 backdrop-blur h-full">
-                <CardContent className="p-4 sm:p-6 text-center">
-                  <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 mx-auto mb-2 sm:mb-3" />
-                  <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base">
-                    {language === 'en' ? 'Scam Rankings' : 'Bảng xếp hạng lừa đảo'}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-600">
-                    {language === 'en'
-                      ? 'Statistics of the most dangerous scam types'
-                      : 'Thống kê các hình thức lừa đảo nguy hiểm nhất'
-                    }
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link to="/community-alerts" className="block sm:col-span-2 md:col-span-1">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer bg-white/80 backdrop-blur h-full">
-                <CardContent className="p-4 sm:p-6 text-center">
-                  <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 mx-auto mb-2 sm:mb-3" />
-                  <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base">
-                    {language === 'en' ? 'Community Alerts' : 'Cảnh báo cộng đồng'}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-600">
-                    {language === 'en'
-                      ? 'Real-time alert information from the community'
-                      : 'Thông tin cảnh báo thời gian thực từ cộng đồng'
-                    }
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
+          <p className="text-sm sm:text-base text-gray-600 mt-3">
+            {vi
+              ? 'Dán tin nhắn, số điện thoại, link, email hoặc số tài khoản. Bạn sẽ biết có dấu hiệu lừa đảo không và nên làm gì ngay.'
+              : 'Paste a message, phone number, link, email or bank account. You will see whether it shows signs of a scam and what to do now.'}
+          </p>
         </div>
       </section>
 
-      {/* Main Search Section */}
-      <section className="px-4 pb-8 sm:pb-16">
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-white/90 backdrop-blur shadow-xl">
-            <CardHeader className="pb-4">
-              <div className="flex flex-wrap justify-center gap-2 mb-4">
-                <Button
-                  variant={activeTab === 'search' ? 'default' : 'outline'}
-                  onClick={() => setActiveTab('search')}
-                  className="flex items-center space-x-2 text-xs sm:text-sm"
-                  size={isMobile ? 'sm' : 'default'}
-                >
-                  <Search className="w-3 h-3 sm:w-4 sm:h-4" />
-                  {language === 'en' ? 'Check Information' : 'Kiểm tra thông tin'}
+      <section className="px-4 pb-10">
+        <div className="max-w-3xl mx-auto">
+          <Card className="bg-white shadow-xl">
+            <CardHeader className="pb-2">
+              <div className="flex gap-2" role="tablist">
+                <Button role="tab" aria-selected={tab === 'check'} variant={tab === 'check' ? 'default' : 'outline'} onClick={() => setTab('check')}>
+                  <Search className="w-4 h-4 mr-2" />
+                  {vi ? 'Kiểm tra' : 'Check'}
                 </Button>
-                <Button
-                  variant={activeTab === 'report' ? 'default' : 'outline'}
-                  onClick={() => setActiveTab('report')}
-                  className="flex items-center space-x-2 text-xs sm:text-sm"
-                  size={isMobile ? 'sm' : 'default'}
-                >
-                  <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4" />
-                  {language === 'en' ? 'Report Scam' : 'Báo cáo lừa đảo'}
-                </Button>
-                <Button
-                  variant={activeTab === 'image' ? 'default' : 'outline'}
-                  onClick={() => setActiveTab('image')}
-                  className="flex items-center space-x-2 text-xs sm:text-sm"
-                  size={isMobile ? 'sm' : 'default'}
-                >
-                  <Shield className="w-3 h-3 sm:w-4 sm:h-4" />
-                  {language === 'en' ? 'Image Analysis' : 'Phân tích hình ảnh'}
+                <Button role="tab" aria-selected={tab === 'report'} variant={tab === 'report' ? 'default' : 'outline'} onClick={() => startReport(undefined)}>
+                  <Flag className="w-4 h-4 mr-2" />
+                  {vi ? 'Báo cáo lừa đảo' : 'Report a scam'}
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
-              {activeTab === 'search' && (
-                <div className="space-y-4 sm:space-y-6">
-                  <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Input
-                        placeholder={
-                          language === 'en' 
-                            ? "Enter phone number, website, email or information to check..."
-                            : "Nhập số điện thoại, website, email hoặc thông tin cần kiểm tra..."
-                        }
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        className="flex-1 h-10 sm:h-12 text-sm sm:text-lg"
-                      />
-                      <Button onClick={handleSearch} size={isMobile ? 'default' : 'lg'} className="px-4 sm:px-8">
-                        <Search className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-                        {language === 'en' ? 'Check' : 'Kiểm tra'}
-                      </Button>
+              {tab === 'check' ? (
+                <div className="space-y-4">
+                  <Label htmlFor="check-input" className="sr-only">
+                    {vi ? 'Nội dung cần kiểm tra' : 'Content to check'}
+                  </Label>
+                  <Textarea
+                    id="check-input"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) runCheck();
+                    }}
+                    rows={4}
+                    className="text-base"
+                    placeholder={
+                      vi
+                        ? 'Dán tin nhắn, số điện thoại, link, email hoặc số tài khoản…'
+                        : 'Paste a message, phone number, link, email or bank account…'
+                    }
+                  />
+                  {digitsOnly && (
+                    <div className="space-y-1">
+                      <Label className="text-sm text-gray-600">
+                        {vi ? 'Nếu đây là số tài khoản, chọn ngân hàng (không bắt buộc)' : 'If this is a bank account, choose the bank (optional)'}
+                      </Label>
+                      <Select value={bankCode} onValueChange={setBankCode}>
+                        <SelectTrigger className="sm:w-72">
+                          <SelectValue placeholder={vi ? 'Ngân hàng' : 'Bank'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {BANKS.map((b) => (
+                            <SelectItem key={b.code} value={b.code}>
+                              {b.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                    
-                    <div className="flex flex-wrap gap-2 justify-center">
-                      <span className="text-xs sm:text-sm text-gray-600 mr-2">
-                        {language === 'en' ? 'Examples:' : 'Ví dụ:'}
-                      </span>
-                      {exampleSearches.map((example, index) => (
+                  )}
+                  <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                    <Button onClick={() => runCheck()} disabled={!input.trim() || checking} size="lg">
+                      {checking ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Search className="w-5 h-5 mr-2" />}
+                      {vi ? 'Kiểm tra' : 'Check'}
+                    </Button>
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      <span className="text-gray-500 self-center">{vi ? 'Thử ví dụ:' : 'Try:'}</span>
+                      {EXAMPLES.map((ex) => (
                         <Button
-                          key={index}
+                          key={ex.en}
                           variant="outline"
                           size="sm"
-                          onClick={() => setSearchQuery(example.text)}
-                          className="flex items-center space-x-1 text-xs"
+                          onClick={() => {
+                            setInput(ex.text);
+                            runCheck(ex.text);
+                          }}
                         >
-                          <example.icon className="w-3 h-3" />
-                          <span>{example.text}</span>
-                          <Badge variant="secondary" className="text-xs">{example.type}</Badge>
+                          {vi ? ex.vi : ex.en}
                         </Button>
                       ))}
                     </div>
                   </div>
-
-                  {showResults && <SearchResults query={searchQuery} riskLevel="safe" onBack={() => setShowResults(false)} />}
+                  <div ref={resultRef}>{result && <CheckResult result={result} onReport={startReport} />}</div>
                 </div>
+              ) : (
+                <ReportForm
+                  key={reportPrefill ? `${reportPrefill.kind}:${reportPrefill.key}` : 'blank'}
+                  initialKind={reportPrefill?.kind}
+                  initialValue={reportPrefill ? (reportPrefill.kind === 'bank_account' ? reportPrefill.key : reportPrefill.raw) : ''}
+                  initialBankCode={reportPrefill?.bankCode}
+                />
               )}
-
-              {activeTab === 'report' && <ReportForm onBack={() => setActiveTab('search')} />}
-              {activeTab === 'image' && <ImageAnalysis />}
             </CardContent>
           </Card>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="px-4 py-8 sm:py-16 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-8 sm:mb-12">
-            {language === 'en' ? 'Community Protection Statistics' : 'Thống kê bảo vệ cộng đồng'}
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">50,000+</div>
-              <div className="text-sm sm:text-base text-gray-600">
-                {language === 'en' ? 'Phone numbers checked' : 'Số điện thoại được kiểm tra'}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">15,000+</div>
-              <div className="text-sm sm:text-base text-gray-600">
-                {language === 'en' ? 'Scam reports' : 'Báo cáo lừa đảo'}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">98%</div>
-              <div className="text-sm sm:text-base text-gray-600">
-                {language === 'en' ? 'Detection accuracy' : 'Độ chính xác phát hiện'}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">24/7</div>
-              <div className="text-sm sm:text-base text-gray-600">
-                {language === 'en' ? 'Continuous monitoring' : 'Giám sát liên tục'}
-              </div>
-            </div>
-          </div>
+      <section className="px-4 pb-10">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Link to="/tro-giup" className="block">
+            <Card className="h-full hover:shadow-lg transition-shadow border-danger-red/40">
+              <CardContent className="p-5">
+                <LifeBuoy className="w-7 h-7 text-danger-red mb-2" aria-hidden="true" />
+                <h3 className="font-semibold text-gray-900">{vi ? 'Đã lỡ bị lừa? Làm gì ngay' : 'Already scammed? Act now'}</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {vi ? 'Các bước trong giờ đầu tiên và nơi trình báo chính thức.' : 'Steps for the first hour and official places to report.'}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/scam-rankings" className="block">
+            <Card className="h-full hover:shadow-lg transition-shadow">
+              <CardContent className="p-5">
+                <BookOpen className="w-7 h-7 text-trust-blue mb-2" aria-hidden="true" />
+                <h3 className="font-semibold text-gray-900">{vi ? 'Thủ đoạn phổ biến' : 'Common scams'}</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {vi ? 'Dấu hiệu nhận biết và cách phòng tránh, có dẫn nguồn.' : 'Warning signs and prevention, with sources.'}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/community-alerts" className="block">
+            <Card className="h-full hover:shadow-lg transition-shadow">
+              <CardContent className="p-5">
+                <AlertTriangle className="w-7 h-7 text-trust-blue mb-2" aria-hidden="true" />
+                <h3 className="font-semibold text-gray-900">{vi ? 'Cảnh báo cộng đồng' : 'Community alerts'}</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {vi ? 'Chỉ hiển thị cảnh báo đã được kiểm duyệt.' : 'Only moderator-reviewed alerts are shown.'}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </section>
 
-      {/* AI Provider Setup */}
-      <section className="px-4 py-4 sm:py-8">
-        <div className="max-w-4xl mx-auto">
-          <AIProviderSetup />
+      <section className="px-4 py-10 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{vi ? 'Vệ Binh Mạng kết luận thế nào' : 'How Vệ Binh Mạng decides'}</h2>
+          <p className="text-gray-600 mb-5 text-sm sm:text-base">
+            {vi
+              ? 'Có bốn mức. Không có mức "an toàn": khi chưa có dữ liệu, câu trả lời luôn là "chưa đủ thông tin".'
+              : 'There are four answers. There is no "safe": without data, the answer is always "not enough information".'}
+          </p>
+          <ul className="space-y-3">
+            {LEVEL_GUIDE.map((l) => (
+              <li key={l.en} className="flex items-start gap-3">
+                <span className={`mt-1.5 h-3 w-3 rounded-full flex-shrink-0 ${l.dot}`} aria-hidden="true" />
+                <div>
+                  <div className="font-semibold text-gray-900">{vi ? l.vi : l.en}</div>
+                  <div className="text-sm text-gray-600">{vi ? l.noteVi : l.noteEn}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-gray-500 mt-6">
+            {vi
+              ? 'Nội dung bạn dán được phân tích ngay trên trình duyệt. Chỉ số điện thoại, link, email hoặc số tài khoản tìm thấy được gửi đi để tra báo cáo cộng đồng, và không được lưu vào cơ sở dữ liệu của Vệ Binh Mạng.'
+              : 'What you paste is analysed in your browser. Only the phone numbers, links, emails or account numbers found are sent to look up community reports, and they are not stored in the Vệ Binh Mạng database.'}
+          </p>
+        </div>
+      </section>
+
+      <section className="px-4 py-8">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Share className="w-5 h-5 text-trust-blue" aria-hidden="true" />
+            <h3 className="font-semibold text-gray-900">{vi ? 'Chia sẻ cho người thân' : 'Share with your family'}</h3>
+          </div>
+          <SocialShare
+            title={vi ? 'Vệ Binh Mạng - Hỏi trước khi chuyển tiền' : 'Vệ Binh Mạng - Ask before you pay'}
+            description={vi ? 'Kiểm tra tin nhắn, số điện thoại, link có dấu hiệu lừa đảo' : 'Check messages, numbers and links for scam signs'}
+            hashtags={['VeBinhMang', 'ChongLuaDao']}
+            className="justify-center"
+          />
         </div>
       </section>
     </div>

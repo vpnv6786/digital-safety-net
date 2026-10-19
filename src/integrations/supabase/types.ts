@@ -9,6 +9,27 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      alert_votes: {
+        Row: {
+          alert_id: string
+          created_at: string
+          user_id: string
+          vote: number
+        }
+        Insert: {
+          alert_id: string
+          created_at?: string
+          user_id: string
+          vote: number
+        }
+        Update: {
+          alert_id?: string
+          created_at?: string
+          user_id?: string
+          vote?: number
+        }
+        Relationships: []
+      }
       alert_history: {
         Row: {
           alert_type: string
@@ -231,6 +252,10 @@ export type Database = {
           last_reported_at: string | null
           report_count: number | null
           risk_score: number | null
+          bank_code: string | null
+          display_value: string | null
+          legacy: boolean
+          normalized_value: string | null
         }
         Insert: {
           created_at?: string
@@ -240,6 +265,10 @@ export type Database = {
           last_reported_at?: string | null
           report_count?: number | null
           risk_score?: number | null
+          bank_code?: string | null
+          display_value?: string | null
+          legacy?: boolean
+          normalized_value?: string | null
         }
         Update: {
           created_at?: string
@@ -249,6 +278,10 @@ export type Database = {
           last_reported_at?: string | null
           report_count?: number | null
           risk_score?: number | null
+          bank_code?: string | null
+          display_value?: string | null
+          legacy?: boolean
+          normalized_value?: string | null
         }
         Relationships: []
       }
@@ -341,6 +374,9 @@ export type Database = {
           total_reports: number | null
           updated_at: string
           warning_signs: string[] | null
+          is_active: boolean
+          sort_order: number | null
+          source_note: string | null
         }
         Insert: {
           created_at?: string
@@ -356,6 +392,9 @@ export type Database = {
           total_reports?: number | null
           updated_at?: string
           warning_signs?: string[] | null
+          is_active?: boolean
+          sort_order?: number | null
+          source_note?: string | null
         }
         Update: {
           created_at?: string
@@ -371,6 +410,9 @@ export type Database = {
           total_reports?: number | null
           updated_at?: string
           warning_signs?: string[] | null
+          is_active?: boolean
+          sort_order?: number | null
+          source_note?: string | null
         }
         Relationships: []
       }
@@ -410,12 +452,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: { _user_id: string; _role: string }
+        Returns: boolean
+      }
+      lookup_entity: {
+        Args: { p_kind: string; p_value: string }
+        Returns: Json
+      }
+      submit_report: {
+        Args: {
+          p_kind: string
+          p_value: string
+          p_category: string
+          p_description: string
+          p_bank_code?: string | null
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

@@ -2,17 +2,16 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
-import Safety from "./pages/Safety";
 import ScamRankings from "./pages/ScamRankings";
 import CommunityAlerts from "./pages/CommunityAlerts";
-import Authorities from "./pages/Authorities";
+import Help from "./pages/Help";
 import AuthPage from "./components/AuthPage";
 import NotFound from "./pages/NotFound";
 
@@ -51,11 +50,7 @@ function App() {
                   <Privacy />
                 </Layout>
               } />
-              <Route path="/safety" element={
-                <Layout>
-                  <Safety />
-                </Layout>
-              } />
+              <Route path="/safety" element={<Navigate to="/tro-giup" replace />} />
               <Route path="/scam-rankings" element={
                 <Layout>
                   <ScamRankings />
@@ -66,11 +61,12 @@ function App() {
                   <CommunityAlerts />
                 </Layout>
               } />
-              <Route path="/authorities" element={
+              <Route path="/tro-giup" element={
                 <Layout>
-                  <Authorities />
+                  <Help />
                 </Layout>
               } />
+              <Route path="/authorities" element={<Navigate to="/tro-giup" replace />} />
               <Route path="*" element={
                 <Layout>
                   <NotFound />

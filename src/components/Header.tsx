@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Home, Users, BarChart3, AlertTriangle, User, LogIn, Menu, X } from 'lucide-react';
+import { Shield, Home, Users, BookOpen, AlertTriangle, LifeBuoy, User, LogIn, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -27,10 +27,9 @@ const Header = () => {
 
   const navigationItems = [
     { to: '/', icon: Home, labelKey: 'Trang chủ', labelEn: 'Home' },
-    { to: '/safety', icon: Shield, labelKey: 'An toàn', labelEn: 'Safety' },
-    { to: '/scam-rankings', icon: BarChart3, labelKey: 'Bảng xếp hạng lừa đảo', labelEn: 'Scam Rankings' },
-    { to: '/community-alerts', icon: AlertTriangle, labelKey: 'Cảnh báo cộng đồng', labelEn: 'Community Alerts' },
-    { to: '/authorities', icon: Users, labelKey: 'Cơ quan chức năng', labelEn: 'Authorities' },
+    { to: '/scam-rankings', icon: BookOpen, labelKey: 'Thủ đoạn', labelEn: 'Scam types' },
+    { to: '/community-alerts', icon: AlertTriangle, labelKey: 'Cảnh báo', labelEn: 'Alerts' },
+    { to: '/tro-giup', icon: LifeBuoy, labelKey: 'Đã bị lừa?', labelEn: 'Scammed?' },
     { to: '/about', icon: Users, labelKey: 'Giới thiệu', labelEn: 'About' },
   ];
 
@@ -43,7 +42,7 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
             <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
-            <span className="text-lg sm:text-xl font-bold text-gray-900">ScamGuard</span>
+            <span className="text-lg sm:text-xl font-bold text-gray-900">Vệ Binh Mạng</span>
           </Link>
 
           {/* Desktop Navigation */}

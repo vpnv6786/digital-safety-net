@@ -7,7 +7,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, Phone, Key, ArrowLeft, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
-import TranslatedText from './TranslatedText';
 
 interface AuthPageProps {
   onBack: () => void;
@@ -167,7 +166,7 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
       <div className="max-w-md mx-auto pt-20">
         <Button variant="ghost" onClick={handleBack} className="mb-4 text-gray-600">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          <TranslatedText>{language === 'en' ? 'Back' : 'Quay lại'}</TranslatedText>
+          {language === 'en' ? 'Back' : 'Quay lại'}
         </Button>
 
         <Card className="shadow-lg border-0">
@@ -176,17 +175,17 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
               <Shield className="h-8 w-8 text-blue-600" />
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
-              ScamGuard
+              Vệ Binh Mạng
             </CardTitle>
             <CardDescription className="text-gray-600">
-              <TranslatedText>
+              
                 {step === 'otp' 
                   ? (language === 'en' ? 'Verify OTP Code' : 'Xác thực mã OTP')
                   : authMode === 'signin' 
                     ? (language === 'en' ? 'Sign in to your account' : 'Đăng nhập tài khoản')
                     : (language === 'en' ? 'Create new account' : 'Tạo tài khoản mới')
                 }
-              </TranslatedText>
+              
             </CardDescription>
           </CardHeader>
 
@@ -200,14 +199,14 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                     onClick={() => setAuthMode('signin')}
                     className="flex-1"
                   >
-                    <TranslatedText>{language === 'en' ? 'Sign In' : 'Đăng nhập'}</TranslatedText>
+                    {language === 'en' ? 'Sign In' : 'Đăng nhập'}
                   </Button>
                   <Button
                     variant={authMode === 'signup' ? 'default' : 'ghost'}
                     onClick={() => setAuthMode('signup')}
                     className="flex-1"
                   >
-                    <TranslatedText>{language === 'en' ? 'Sign Up' : 'Đăng ký'}</TranslatedText>
+                    {language === 'en' ? 'Sign Up' : 'Đăng ký'}
                   </Button>
                 </div>
 
@@ -219,7 +218,7 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                     className="flex-1 text-xs"
                   >
                     <Phone className="h-3 w-3 mr-1" />
-                    <TranslatedText>{language === 'en' ? 'Phone' : 'SĐT'}</TranslatedText>
+                    {language === 'en' ? 'Phone' : 'SĐT'}
                   </Button>
                   <Button
                     variant={method === 'email' ? 'default' : 'ghost'}
@@ -243,7 +242,7 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                   <>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-700">
-                        <TranslatedText>{language === 'en' ? 'Phone Number' : 'Số điện thoại'}</TranslatedText>
+                        {language === 'en' ? 'Phone Number' : 'Số điện thoại'}
                       </label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -258,12 +257,12 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                       </div>
                     </div>
                     <Button onClick={handleSendOTP} disabled={loading} className="w-full">
-                      <TranslatedText>
+                      
                         {loading 
                           ? (language === 'en' ? 'Sending...' : 'Đang gửi...')
                           : (language === 'en' ? 'Send OTP' : 'Gửi mã OTP')
                         }
-                      </TranslatedText>
+                      
                     </Button>
                   </>
                 )}
@@ -284,7 +283,7 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700">
-                          <TranslatedText>{language === 'en' ? 'Password' : 'Mật khẩu'}</TranslatedText>
+                          {language === 'en' ? 'Password' : 'Mật khẩu'}
                         </label>
                         <Input
                           type="password"
@@ -296,14 +295,14 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                       </div>
                     </div>
                     <Button onClick={handleEmailAuth} disabled={loading} className="w-full">
-                      <TranslatedText>
+                      
                         {loading 
                           ? (language === 'en' ? 'Processing...' : 'Đang xử lý...')
                           : authMode === 'signin' 
                             ? (language === 'en' ? 'Sign In' : 'Đăng nhập')
                             : (language === 'en' ? 'Sign Up' : 'Đăng ký')
                         }
-                      </TranslatedText>
+                      
                     </Button>
                   </>
                 )}
@@ -318,7 +317,7 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                       className="w-full flex items-center justify-center space-x-2"
                     >
                       <span>🔍</span>
-                      <TranslatedText>{language === 'en' ? 'Continue with Google' : 'Tiếp tục với Google'}</TranslatedText>
+                      {language === 'en' ? 'Continue with Google' : 'Tiếp tục với Google'}
                     </Button>
                     <Button
                       onClick={() => handleSocialAuth('facebook')}
@@ -327,7 +326,7 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                       className="w-full flex items-center justify-center space-x-2"
                     >
                       <span>📘</span>
-                      <TranslatedText>{language === 'en' ? 'Continue with Facebook' : 'Tiếp tục với Facebook'}</TranslatedText>
+                      {language === 'en' ? 'Continue with Facebook' : 'Tiếp tục với Facebook'}
                     </Button>
                   </div>
                 )}
@@ -343,7 +342,7 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
               <>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">
-                    <TranslatedText>{language === 'en' ? 'OTP Code' : 'Mã OTP'}</TranslatedText>
+                    {language === 'en' ? 'OTP Code' : 'Mã OTP'}
                   </label>
                   <div className="relative">
                     <Key className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -358,12 +357,12 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                     />
                   </div>
                   <p className="text-xs text-gray-500">
-                    <TranslatedText>
+                    
                       {language === 'en' 
                         ? `Enter the 6-digit code sent to ${phone}`
                         : `Nhập mã 6 số được gửi đến ${phone}`
                       }
-                    </TranslatedText>
+                    
                   </p>
                 </div>
 
@@ -379,12 +378,12 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                     disabled={loading || otp.length !== 6}
                     className="w-full"
                   >
-                    <TranslatedText>
+                    
                       {loading 
                         ? (language === 'en' ? 'Verifying...' : 'Đang xác thực...')
                         : (language === 'en' ? 'Verify OTP' : 'Xác thực OTP')
                       }
-                    </TranslatedText>
+                    
                   </Button>
                   <Button
                     variant="outline"
@@ -392,7 +391,7 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
                     disabled={loading}
                     className="w-full"
                   >
-                    <TranslatedText>{language === 'en' ? 'Resend Code' : 'Gửi lại mã'}</TranslatedText>
+                    {language === 'en' ? 'Resend Code' : 'Gửi lại mã'}
                   </Button>
                 </div>
               </>
@@ -400,12 +399,12 @@ const AuthPage = ({ onBack }: AuthPageProps) => {
 
             <div className="text-center pt-4">
               <p className="text-xs text-gray-500">
-                <TranslatedText>
+                
                   {language === 'en' 
                     ? 'By signing in, you agree to our Terms of Service'
                     : 'Bằng cách đăng nhập, bạn đồng ý với Điều khoản sử dụng của chúng tôi'
                   }
-                </TranslatedText>
+                
               </p>
             </div>
           </CardContent>
