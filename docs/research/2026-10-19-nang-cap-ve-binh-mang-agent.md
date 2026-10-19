@@ -579,6 +579,8 @@ Số liệu của nhà cung cấp (Google, McAfee, Netcraft, Apate, MoMo) là s�
 | Chỉ số chính "dừng lại sau cảnh báo", tab Số liệu | Xong | #6 |
 | Luyện tập "thật hay lừa đảo?", luật cho kịch bản người quen bị chiếm tài khoản | Xong | #7 |
 | Chuyển trang web và API sang Cloudflare Workers (dữ liệu vẫn ở Supabase), deploy tự động bằng GitHub Actions | Xong | #8 |
+| Trang "Đã bị lừa?": các bước theo tình huống (đã chuyển tiền, cài app, đưa OTP, gửi CCCD, tài khoản bị chiếm) và soạn đơn trình báo công an ngay trong trình duyệt | Xong | #9 |
+| Agent `intel`: tìm tên miền nhái thương hiệu, cơ quan nhà nước từ nhật ký chứng chỉ và OpenPhish, soạn đề xuất yêu cầu gỡ chờ người duyệt; Agent API chống đề xuất trùng | Xong; chạy thử với OpenPhish thật, crt.sh đang quá tải | #9 |
 | Đặt khoá vào GitHub Secrets, chạy cập nhật database, gán người kiểm duyệt | **Chờ chủ dự án** (xem `docs/DEPLOY.md`, khoảng 20 phút) | — |
 | Domain `antoanso` trong MiteClaw (Zalo OA, Telegram, Messenger) | **Chờ chọn đối tác thí điểm** (cổng khách hàng của MiteClaw) | — |
 | Chế độ người thân bảo vệ | **Chờ chọn kênh thông báo** (Zalo ZNS/OA qua MiteClaw hoặc SMS) | — |

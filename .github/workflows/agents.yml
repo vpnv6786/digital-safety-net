@@ -2,7 +2,8 @@
 # decide in /kiem-duyet. Skips quietly until the repository secrets are set:
 #   AGENT_API_URL     https://<địa chỉ web>/api/agent
 #   AGENT_API_TOKEN   same value as the Worker secret of the same name
-#   ANTHROPIC_API_KEY optional; without it triage only groups reports and content does nothing
+#   ANTHROPIC_API_KEY optional; without it triage only groups reports and content does nothing.
+#                     intel needs no model.
 # Optional repository variable LLM_MODEL overrides the model.
 name: Agents
 
@@ -10,11 +11,12 @@ on:
   schedule:
     - cron: '17 * * * *' # triage, hourly
     - cron: '43 1 * * 1' # content, Mondays 08:43 Vietnam time
+    - cron: '29 22 * * *' # intel, daily 05:29 Vietnam time
   workflow_dispatch:
     inputs:
       agent:
         type: choice
-        options: [triage, content]
+        options: [triage, content, intel]
         default: triage
       dry_run:
         type: boolean
@@ -49,6 +51,8 @@ jobs:
             if [ "${{ inputs.dry_run }}" = "true" ]; then echo "flags=--dry-run" >> "$GITHUB_OUTPUT"; fi
           elif [ "${{ github.event.schedule }}" = "43 1 * * 1" ]; then
             echo "agent=content" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "29 22 * * *" ]; then
+            echo "agent=intel" >> "$GITHUB_OUTPUT"
           else
             echo "agent=triage" >> "$GITHUB_OUTPUT"
           fi

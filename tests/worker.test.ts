@@ -20,6 +20,7 @@ function fakeDeps(overrides: Partial<ApiDeps> = {}): ApiDeps & { counters: Map<s
       pendingAppealCount: async () => 0,
       summary: async () => [],
       insertProposals: async (rows) => rows.map((_, i) => `p${i}`),
+      existingDedupeKeys: async () => [],
     },
     agentToken: 'secret-token',
     salt: 'salt',
@@ -135,5 +136,19 @@ describe('supabase REST client', () => {
     ];
     const db = supabaseRest('https://p', 'k', async () => new Response(JSON.stringify(rows)));
     expect((await agentStore(db).pendingReports(5))[0]).toMatchObject({ entity: '••••1234', evidence_count: 1 });
+  });
+
+  it('looks up dedupe keys by agent, time and key list', async () => {
+    let asked = '';
+    const db = supabaseRest('https://p', 'k', async (url) => {
+      asked = decodeURIComponent(String(url));
+      return new Response(JSON.stringify([{ key: 'vietcombank-xacminh.com' }]));
+    });
+    const keys = await agentStore(db).existingDedupeKeys('intel', ['vietcombank-xacminh.com', 'momo-hotro.top'], new Date('2026-09-19T00:00:00Z'));
+    expect(keys).toEqual(['vietcombank-xacminh.com']);
+    expect(asked).toContain('select=key:payload->>dedupe_key');
+    expect(asked).toContain('agent=eq.intel');
+    expect(asked).toContain('created_at=gte.2026-09-19T00:00:00.000Z');
+    expect(asked).toContain('payload->>dedupe_key=in.("vietcombank-xacminh.com","momo-hotro.top")');
   });
 });

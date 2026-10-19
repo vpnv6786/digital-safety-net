@@ -303,7 +303,8 @@ export function evaluateText(text: string, hasUrl: boolean): Reason[] {
 
 const SUSPICIOUS_WORDS = /(hotro|ho-tro|xacminh|xac-minh|khuyenmai|uudai|login|dangnhap|dang-nhap|verify|support|cskh|baomat|capnhat|online|secure|account)/;
 
-function hostLabels(host: string): string {
+/** The host without its public suffix: where brand and government words are looked for. */
+export function hostLabels(host: string): string {
   return host.replace(/\.(com|net|org|edu|gov|ac|info|biz)?\.?vn$|\.[a-z]+$/, '');
 }
 

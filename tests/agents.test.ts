@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  intelSearchTerms,
+  lookalikeCandidates,
+  parseCrtSh,
+  parseFeed,
+  rdapRegistrar,
+  takedownProposal,
   buildTriageRequest,
   clusterProposals,
   draftProposal,
@@ -91,5 +97,86 @@ describe('content agent', () => {
     expect(ok?.kind).toBe('draft_alert');
     expect(draftProposal(reply({ title: 'x', description: 'y', severity: 'high' }) as never, trend)).toBeNull();
     expect(draftProposal(reply({}, 'refusal') as never, trend)).toBeNull();
+  });
+});
+
+describe('intel agent', () => {
+  const since = new Date('2026-10-18T00:00:00Z');
+
+  it('searches brand and government words but not bare "gov"', () => {
+    const terms = intelSearchTerms();
+    expect(terms).toContain('vietcombank');
+    expect(terms).toContain('dichvucong');
+    expect(terms).not.toContain('gov');
+    expect(new Set(terms).size).toBe(terms.length);
+  });
+
+  it('reads recent certificate names and drops old ones and wildcards', () => {
+    const rows = [
+      { name_value: '*.vietcombank-xacminh.com\nvietcombank-xacminh.com', entry_timestamp: '2026-10-18T09:00:00.123' },
+      { name_value: 'old-vietcombank-login.com', entry_timestamp: '2026-10-01T00:00:00' },
+      { name_value: 'bad name!', entry_timestamp: '2026-10-18T09:00:00' },
+    ];
+    expect(parseCrtSh(rows, since).map((s) => s.host)).toEqual(['vietcombank-xacminh.com', 'vietcombank-xacminh.com']);
+    expect(parseCrtSh({ error: 'busy' }, since)).toEqual([]);
+  });
+
+  it('keeps strong lookalikes from certificates and drops official and weak ones', () => {
+    const hosts = [
+      'vietcombank-xacminh.com', // dash + brand: strong
+      'www.vietcombank-xacminh.com', // same site
+      'ebanking.vietcombank.com.vn', // official
+      'momoshop.vn', // brand word only: too weak for a certificate hit
+      'dichvucong-hoso.online', // fake government
+      'dichvucong.gov.vn', // real government
+      'example.com',
+    ];
+    const found = lookalikeCandidates(hosts.map((host) => ({ host, source: 'ct_log' as const })));
+    expect(found.map((c) => c.key).sort()).toEqual(['dichvucong-hoso.online', 'vietcombank-xacminh.com']);
+    expect(found.find((c) => c.key === 'vietcombank-xacminh.com')).toMatchObject({ brand: 'Vietcombank', officialDomain: 'vietcombank.com.vn' });
+    expect(found.find((c) => c.key === 'dichvucong-hoso.online')).toMatchObject({ code: 'fake_government_domain', officialDomain: null });
+  });
+
+  it('accepts weaker feed hits and keys shared hosting by host', () => {
+    const feed = parseFeed('https://momovn.pages.dev/login\nhttps://shopee-vn.pages.dev/\nnot a url\nhttps://unrelated.example/\n');
+    const found = lookalikeCandidates(feed);
+    expect(found.map((c) => c.key).sort()).toEqual(['momovn.pages.dev', 'shopee-vn.pages.dev']);
+    expect(found.every((c) => c.sharedHost && c.domain === 'pages.dev')).toBe(true);
+    // Strong hits first.
+    expect(found[0].key).toBe('shopee-vn.pages.dev');
+  });
+
+  it('prefers a feed sighting of the same site over a certificate', () => {
+    const found = lookalikeCandidates([
+      { host: 'vietcombank-xacminh.com', source: 'ct_log' },
+      { host: 'vietcombank-xacminh.com', url: 'https://vietcombank-xacminh.com/otp', source: 'phishing_feed' },
+    ]);
+    expect(found).toHaveLength(1);
+    expect(found[0]).toMatchObject({ source: 'phishing_feed', url: 'https://vietcombank-xacminh.com/otp' });
+  });
+
+  it('reads the registrar from RDAP', () => {
+    const rdap = { entities: [{ roles: ['registrar'], vcardArray: ['vcard', [['version', {}, 'text', '4.0'], ['fn', {}, 'text', 'NameCheap, Inc.']]] }] };
+    expect(rdapRegistrar(rdap)).toBe('NameCheap, Inc.');
+    expect(rdapRegistrar({ entities: [] })).toBeUndefined();
+    expect(rdapRegistrar(null)).toBeUndefined();
+  });
+
+  it('drafts a takedown that a moderator must check, keyed for dedupe', () => {
+    const [c] = lookalikeCandidates([{ host: 'vietcombank-xacminh.com', source: 'ct_log', seenAt: '2026-10-18T09:00:00.000Z' }]);
+    const p = takedownProposal(c, 'NameCheap, Inc.');
+    expect(p.kind).toBe('takedown_request');
+    expect(p.target_id).toBeUndefined();
+    expect(p.confidence).toBeLessThan(0.75);
+    expect(p.payload).toMatchObject({ dedupe_key: 'vietcombank-xacminh.com', url: 'https://vietcombank-xacminh.com/', registrar: 'NameCheap, Inc.' });
+    expect(String(p.payload?.draft)).toContain('https://vietcombank.com.vn/');
+    expect(String(p.payload?.draft)).toContain('[Moderator:');
+    expect(p.rationale).toContain('chụp lại');
+    expect(new TextEncoder().encode(JSON.stringify(p.payload)).length).toBeLessThan(4096);
+  });
+
+  it('names the host provider for shared hosting instead of a registrar', () => {
+    const [c] = lookalikeCandidates(parseFeed('https://shopee-vn.pages.dev/'));
+    expect(takedownProposal(c).payload).toMatchObject({ host_provider: 'pages.dev', dedupe_key: 'shopee-vn.pages.dev' });
   });
 });

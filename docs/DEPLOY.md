@@ -97,7 +97,7 @@ Trong log bước *Deploy Worker* có một dòng dạng `https://ve-binh-mang.<
 
 - **Tên miền riêng:** Cloudflare → *Workers & Pages → ve-binh-mang → Settings → Domains & Routes → Add → Custom domain*.
 - **Đăng nhập Google/Facebook:** thêm địa chỉ mới vào Supabase → *Authentication → URL Configuration*. Đăng nhập bằng OTP số điện thoại không cần bước này.
-- **Agent chạy theo lịch:** thêm GitHub Secret `AGENT_API_URL` = `https://<địa chỉ web>/api/agent`. Workflow *Agents* sẽ tự chạy mỗi giờ.
+- **Agent chạy theo lịch:** thêm GitHub Secret `AGENT_API_URL` = `https://<địa chỉ web>/api/agent`. Workflow *Agents* sẽ tự chạy: `triage` mỗi giờ, `content` mỗi thứ Hai, `intel` mỗi sáng (tìm trang giả mạo ngân hàng, cơ quan nhà nước).
 - **Dọn đồ cũ:**
   - Supabase → *Edge Functions*: xoá `send-emergency-alert` nếu còn. Nút khẩn cấp đó chỉ giả lập, không gửi gì.
   - Nếu trước đây đã đăng web qua Lovable, hãy ngừng dùng địa chỉ cũ.

@@ -6,6 +6,10 @@
 //   GET  /summary?days=7   report counts per day, category and status
 //   POST /proposals        { agent, proposals: [{ kind, target_id?, confidence?, rationale, payload? }] }
 //
+// A proposal may carry payload.dedupe_key (for example the host of a phishing
+// site). One with the same key from the same agent in the last 30 days is
+// skipped, so daily runs over slow-moving feeds do not refill the inbox.
+//
 // Proposals change nothing until a moderator accepts them (decide_proposal).
 
 import { redactPersonalData } from '../core/redact.ts';
@@ -27,6 +31,8 @@ export interface AgentStore {
   pendingAppealCount(): Promise<number>;
   summary(days: number): Promise<{ day: string; scam_category: string; status: string; reports: number }[]>;
   insertProposals(rows: ProposalRow[]): Promise<string[]>;
+  /** Which of `keys` this agent already used as payload.dedupe_key since `since`. */
+  existingDedupeKeys(agent: string, keys: string[], since: Date): Promise<string[]>;
 }
 
 export interface ProposalRow {
@@ -65,6 +71,8 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const AGENT_NAME = /^[a-z0-9_-]{1,60}$/;
 const MAX_PROPOSALS = 20;
 const MAX_PAYLOAD_BYTES = 4096;
+const DEDUPE_KEY = /^[a-z0-9._:-]{1,200}$/;
+export const DEDUPE_DAYS = 30;
 
 export function validateProposals(body: unknown): { ok: true; rows: ProposalRow[] } | { ok: false; error: string } {
   if (!body || typeof body !== 'object') return { ok: false, error: 'body must be an object' };
@@ -94,6 +102,10 @@ export function validateProposals(body: unknown): { ok: true; rows: ProposalRow[
     if (typeof data !== 'object' || Array.isArray(data) || new TextEncoder().encode(JSON.stringify(data)).length > MAX_PAYLOAD_BYTES) {
       return { ok: false, error: `proposals[${i}].payload must be an object under ${MAX_PAYLOAD_BYTES} bytes` };
     }
+    const dedupeKey = (data as { dedupe_key?: unknown }).dedupe_key;
+    if (dedupeKey !== undefined && (typeof dedupeKey !== 'string' || !DEDUPE_KEY.test(dedupeKey))) {
+      return { ok: false, error: `proposals[${i}].payload.dedupe_key must match [a-z0-9._:-]{1,200}` };
+    }
     rows.push({
       agent,
       kind,
@@ -104,6 +116,25 @@ export function validateProposals(body: unknown): { ok: true; rows: ProposalRow[
     });
   }
   return { ok: true, rows };
+}
+
+function dedupeKeyOf(row: ProposalRow): string | undefined {
+  return (row.payload as { dedupe_key?: string }).dedupe_key;
+}
+
+/** Drops rows whose dedupe_key this agent used recently, or that repeat one in the same batch. */
+async function withoutDuplicates(rows: ProposalRow[], store: AgentStore, now = new Date()): Promise<ProposalRow[]> {
+  const keys = [...new Set(rows.map(dedupeKeyOf).filter((k): k is string => !!k))];
+  if (keys.length === 0) return rows;
+  const since = new Date(now.getTime() - DEDUPE_DAYS * 864e5);
+  const seen = new Set(await store.existingDedupeKeys(rows[0].agent, keys, since));
+  return rows.filter((row) => {
+    const key = dedupeKeyOf(row);
+    if (!key) return true;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 export async function handleAgentRequest(req: AgentRequest, store: AgentStore): Promise<AgentResponse> {
@@ -127,8 +158,12 @@ export async function handleAgentRequest(req: AgentRequest, store: AgentStore): 
     case 'POST /proposals': {
       const checked = validateProposals(req.body);
       if (checked.ok === false) return { status: 400, body: { error: checked.error } };
-      const ids = await store.insertProposals(checked.rows);
-      return { status: 201, body: { ids, note: 'Proposals wait for a moderator; nothing has changed yet.' } };
+      const rows = await withoutDuplicates(checked.rows, store);
+      const ids = rows.length ? await store.insertProposals(rows) : [];
+      return {
+        status: 201,
+        body: { ids, skipped: checked.rows.length - rows.length, note: 'Proposals wait for a moderator; nothing has changed yet.' },
+      };
     }
     default:
       return { status: 404, body: { error: 'not_found' } };

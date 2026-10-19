@@ -116,5 +116,14 @@ export function agentStore(db: SupabaseRest): AgentStore {
       const inserted = await db.insert<{ id: string }[]>('agent_proposals', rows, 'id');
       return inserted.map((r) => r.id);
     },
+    async existingDedupeKeys(agent, keys, since) {
+      // agent and keys are validated to [a-z0-9._:-], so they need no quoting beyond the list syntax.
+      const rows = await db.select<{ key: string }[]>(
+        `agent_proposals?select=key:payload->>dedupe_key&agent=eq.${encodeURIComponent(agent)}` +
+          `&created_at=gte.${encodeURIComponent(since.toISOString())}` +
+          `&payload->>dedupe_key=in.(${keys.map((k) => encodeURIComponent(`"${k}"`)).join(',')})`,
+      );
+      return rows.map((r) => r.key);
+    },
   };
 }
