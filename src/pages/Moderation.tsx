@@ -9,18 +9,21 @@ import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsModerator } from '@/hooks/useIsModerator';
 import {
+  decideProposal,
   evidenceLinks,
   moderateAlert,
   moderateReport,
   pendingAlerts,
   pendingAppeals,
+  pendingProposals,
   pendingReports,
   resolveAppeal,
+  type AgentProposal,
   type PendingReport,
 } from '@/services/moderationService';
 import { REPORT_CATEGORIES, bankName } from '@core/index.ts';
 
-type Tab = 'reports' | 'appeals' | 'alerts';
+type Tab = 'reports' | 'appeals' | 'alerts' | 'proposals';
 
 function errorText(e: unknown, vi: boolean): string {
   const msg = e instanceof Error ? e.message : String((e as { message?: string })?.message ?? '');
@@ -150,13 +153,15 @@ const Moderation = () => {
   const [reports, setReports] = useState<PendingReport[]>([]);
   const [appeals, setAppeals] = useState<Row[]>([]);
   const [alerts, setAlerts] = useState<Row[]>([]);
+  const [proposals, setProposals] = useState<AgentProposal[]>([]);
   const [loading, setLoading] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [r, a, al] = await Promise.all([pendingReports(), pendingAppeals(), pendingAlerts()]);
+      const [r, a, al, p] = await Promise.all([pendingReports(), pendingAppeals(), pendingAlerts(), pendingProposals()]);
       setReports(r);
+      setProposals(p);
       setAppeals(a as unknown as Row[]);
       setAlerts(al as unknown as Row[]);
     } catch {
@@ -188,6 +193,7 @@ const Moderation = () => {
     { id: 'reports', vi: 'Báo cáo', en: 'Reports', count: reports.length },
     { id: 'appeals', vi: 'Khiếu nại', en: 'Appeals', count: appeals.length },
     { id: 'alerts', vi: 'Cảnh báo', en: 'Alerts', count: alerts.length },
+    { id: 'proposals', vi: 'Đề xuất của agent', en: 'Agent proposals', count: proposals.length },
   ];
 
   return (
@@ -199,7 +205,7 @@ const Moderation = () => {
             ? 'Mọi quyết định được ghi vào nhật ký kèm tên người duyệt. Chỉ xác minh khi có căn cứ: ảnh bằng chứng khớp kịch bản lừa đảo, nhiều người báo cáo độc lập, hoặc nguồn chính thức. Không thể tự duyệt mục do chính mình gửi.'
             : 'Every decision is logged with the moderator. Verify only with grounds: evidence matching a scam script, several independent reporters, or an official source. You cannot rule on your own submissions.'}
         </p>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {tabs.map((t) => (
             <Button key={t.id} variant={tab === t.id ? 'default' : 'outline'} onClick={() => setTab(t.id)}>
               {vi ? t.vi : t.en} ({t.count})
@@ -280,9 +286,54 @@ const Moderation = () => {
           ) : (
             <p className="text-gray-600">{vi ? 'Không có cảnh báo chờ duyệt.' : 'No alerts waiting.'}</p>
           ))}
+        {tab === 'proposals' &&
+          (proposals.length ? (
+            proposals.map((p) => (
+              <SimpleItem
+                key={p.id}
+                row={{ id: p.id, created_at: p.created_at }}
+                vi={vi}
+                title={`${p.agent} · ${PROPOSAL_LABEL[p.kind] ? (vi ? PROPOSAL_LABEL[p.kind].vi : PROPOSAL_LABEL[p.kind].en) : p.kind}${
+                  p.confidence != null ? ` · ${Math.round(p.confidence * 100)}%` : ''
+                }`}
+                body={`${p.rationale}${Object.keys(p.payload ?? {}).length ? `\n\n${JSON.stringify(p.payload, null, 2)}` : ''}${
+                  p.target_id ? `\n\n${vi ? 'Mục' : 'Target'}: ${p.target_id}` : ''
+                }`}
+                actions={[
+                  {
+                    label: vi ? 'Chấp nhận' : 'Accept',
+                    primary: true,
+                    run: async (note) => {
+                      await decideProposal(p.id, 'accepted', note);
+                      load();
+                    },
+                  },
+                  {
+                    label: vi ? 'Bỏ qua' : 'Dismiss',
+                    run: async (note) => {
+                      await decideProposal(p.id, 'dismissed', note);
+                      load();
+                    },
+                  },
+                ]}
+              />
+            ))
+          ) : (
+            <p className="text-gray-600">{vi ? 'Không có đề xuất nào.' : 'No proposals.'}</p>
+          ))}
       </div>
     </div>
   );
+};
+
+const PROPOSAL_LABEL: Record<string, { vi: string; en: string }> = {
+  verify_report: { vi: 'đề xuất xác minh báo cáo', en: 'proposes verifying a report' },
+  reject_report: { vi: 'đề xuất từ chối báo cáo', en: 'proposes rejecting a report' },
+  publish_alert: { vi: 'đề xuất công khai cảnh báo', en: 'proposes publishing an alert' },
+  hide_alert: { vi: 'đề xuất ẩn cảnh báo', en: 'proposes hiding an alert' },
+  draft_alert: { vi: 'soạn cảnh báo mới (chấp nhận = tạo bản nháp chưa công khai)', en: 'drafted an alert (accept = create an unpublished draft)' },
+  cluster_reports: { vi: 'gom nhóm báo cáo', en: 'grouped reports' },
+  takedown_request: { vi: 'đề xuất yêu cầu gỡ trang', en: 'proposes a takedown request' },
 };
 
 export default Moderation;

@@ -81,3 +81,30 @@ export async function submitAppeal(kind: string, value: string, reason: string, 
   if (error) throw error;
   return data;
 }
+
+export interface AgentProposal {
+  id: string;
+  agent: string;
+  kind: string;
+  target_id: string | null;
+  confidence: number | null;
+  rationale: string;
+  payload: Record<string, unknown>;
+  created_at: string;
+}
+
+export async function pendingProposals(): Promise<AgentProposal[]> {
+  const { data, error } = await supabase
+    .from('agent_proposals')
+    .select('id, agent, kind, target_id, confidence, rationale, payload, created_at')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: true })
+    .limit(100);
+  if (error) throw error;
+  return (data ?? []) as unknown as AgentProposal[];
+}
+
+export async function decideProposal(id: string, decision: 'accepted' | 'dismissed', note: string) {
+  const { error } = await supabase.rpc('decide_proposal', { p_proposal_id: id, p_decision: decision, p_note: note || null });
+  if (error) throw error;
+}

@@ -8,3 +8,4 @@ export * from './rules.ts';
 export * from './verdict.ts';
 export * from './check.ts';
 export * from './categories.ts';
+export * from './redact.ts';
