@@ -82,6 +82,7 @@ async function lookup(entity: Entity): Promise<CommunitySignal> {
     lastVerifiedAt: (d.last_verified_at as string | null) ?? null,
     lastReportAt: (d.last_report_at as string | null) ?? null,
     categories: Array.isArray(d.categories) ? (d.categories as string[]) : [],
+    appealPending: d.appeal_pending === true,
   };
 }
 

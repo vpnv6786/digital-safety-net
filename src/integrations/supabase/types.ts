@@ -30,6 +30,51 @@ export type Database = {
         }
         Relationships: []
       }
+      appeals: {
+        Row: {
+          contact: string | null
+          created_at: string
+          display_value: string | null
+          entity_type: string
+          id: string
+          normalized_value: string
+          reason: string
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          contact?: string | null
+          created_at?: string
+          display_value?: string | null
+          entity_type: string
+          id?: string
+          normalized_value: string
+          reason: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          contact?: string | null
+          created_at?: string
+          display_value?: string | null
+          entity_type?: string
+          id?: string
+          normalized_value?: string
+          reason?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       alert_history: {
         Row: {
           alert_type: string
@@ -285,6 +330,33 @@ export type Database = {
         }
         Relationships: []
       }
+      moderation_log: {
+        Row: {
+          action: string
+          actor: string
+          created_at: string
+          id: number
+          note: string | null
+          target_id: string
+        }
+        Insert: {
+          action: string
+          actor: string
+          created_at?: string
+          id?: number
+          note?: string | null
+          target_id: string
+        }
+        Update: {
+          action?: string
+          actor?: string
+          created_at?: string
+          id?: number
+          note?: string | null
+          target_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -479,6 +551,22 @@ export type Database = {
         Args: { _user_id: string; _role: string }
         Returns: boolean
       }
+      moderate_alert: {
+        Args: { p_alert_id: string; p_decision: string; p_note?: string | null }
+        Returns: undefined
+      }
+      moderate_report: {
+        Args: { p_report_id: string; p_decision: string; p_note?: string | null }
+        Returns: undefined
+      }
+      resolve_appeal: {
+        Args: { p_appeal_id: string; p_decision: string; p_note?: string | null }
+        Returns: undefined
+      }
+      submit_appeal: {
+        Args: { p_kind: string; p_value: string; p_reason: string; p_contact?: string | null }
+        Returns: string
+      }
       lookup_entity: {
         Args: { p_kind: string; p_value: string }
         Returns: Json
@@ -490,6 +578,7 @@ export type Database = {
           p_category: string
           p_description: string
           p_bank_code?: string | null
+          p_evidence?: string[]
         }
         Returns: string
       }

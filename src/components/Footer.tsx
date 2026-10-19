@@ -56,6 +56,7 @@ const Footer = () => {
               <li><Link to="/about" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'About' : 'Giới thiệu'}</Link></li>
               <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Contact' : 'Liên hệ'}</Link></li>
               <li><Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Privacy' : 'Quyền riêng tư'}</Link></li>
+              <li><Link to="/khieu-nai" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Appeal a wrong report' : 'Khiếu nại báo cáo nhầm'}</Link></li>
             </ul>
           </div>
 

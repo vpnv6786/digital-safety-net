@@ -186,6 +186,15 @@ const CheckResult: React.FC<CheckResultProps> = ({ result, onReport }) => {
       </Card>
 
       <p className="text-xs text-gray-500">
+        {risky && (
+          <>
+            {vi ? 'Số, trang này là của bạn và bị báo cáo nhầm? ' : 'Is this your number or site, reported by mistake? '}
+            <Link to="/khieu-nai" className="underline">
+              {vi ? 'Gửi khiếu nại' : 'Appeal'}
+            </Link>
+            .{' '}
+          </>
+        )}
         {vi
           ? `Không công cụ nào chắc chắn 100%. Kết luận dựa trên dấu hiệu trong nội dung, danh sách tên miền chính thức, báo cáo của cộng đồng${result.aiUsed ? ' và phần giải thích của AI (AI chỉ có thể nâng tới mức "có dấu hiệu")' : ''}. Khi còn nghi ngờ, hãy tự gọi số chính thức hoặc hỏi người thân.`
           : `No tool is 100% certain. This answer uses signals in the content, official domain lists, community reports${result.aiUsed ? ' and an AI explanation (AI can raise an answer only up to "signs of a scam")' : ''}. When in doubt, call the official number yourself or ask family.`}

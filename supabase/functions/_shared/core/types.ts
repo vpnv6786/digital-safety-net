@@ -74,6 +74,8 @@ export interface CommunitySignal {
   lastVerifiedAt: string | null;
   lastReportAt: string | null;
   categories: string[];
+  /** The owner has asked moderators to review the reports. */
+  appealPending?: boolean;
 }
 
 export interface Verdict {

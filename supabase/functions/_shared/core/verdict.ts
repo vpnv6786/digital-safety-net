@@ -42,6 +42,15 @@ export function communityReasons(entity: Entity, signal: CommunitySignal, now: D
       en: `${signal.unverifiedReporters} people reported this ${labelEn}; not yet verified by a moderator.`,
     });
   }
+  if (signal.appealPending && reasons.length > 0) {
+    reasons.push({
+      code: 'appeal_pending',
+      severity: 'info',
+      source: 'community_unverified',
+      vi: `Chủ ${label} này đang khiếu nại, người kiểm duyệt đang xem xét lại.`,
+      en: `The owner of this ${labelEn} has appealed; moderators are reviewing.`,
+    });
+  }
   return reasons;
 }
 

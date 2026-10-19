@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { blobToBase64, downscaleToJpeg } from '@/lib/image';
 import { runCheck, type CheckResult, type CommunitySignal, type Entity, type Verdict } from '@core/index.ts';
 
 export interface CheckOutcome extends CheckResult {
@@ -24,6 +25,7 @@ async function lookupCommunity(entity: Entity): Promise<CommunitySignal> {
     lastVerifiedAt: (d.last_verified_at as string | null) ?? null,
     lastReportAt: (d.last_report_at as string | null) ?? null,
     categories: Array.isArray(d.categories) ? (d.categories as string[]) : [],
+    appealPending: d.appeal_pending === true,
   };
 }
 
@@ -65,16 +67,7 @@ export async function checkInput(raw: string, opts: { bankCode?: string; image?:
   return { ...local, source: 'browser' };
 }
 
-const MAX_SIDE = 1600;
-
-/** Shrink a screenshot to at most 1600 px on its longest side and encode it as JPEG. */
+/** Shrink a screenshot and encode it for the check function. */
 export async function prepareScreenshot(file: File): Promise<ScreenshotInput> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-  return { mediaType: 'image/jpeg', base64: dataUrl.slice(dataUrl.indexOf(',') + 1) };
+  return { mediaType: 'image/jpeg', base64: await blobToBase64(await downscaleToJpeg(file)) };
 }

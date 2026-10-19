@@ -55,6 +55,12 @@ describe('runCheck: community reports', () => {
     expect(r.verdict.level).toBe('warning');
   });
 
+  it('mentions an open appeal next to the reports', async () => {
+    const r = await runCheck('0912345678', withSignal({ unverifiedReporters: 2, appealPending: true }));
+    expect(r.allReasons.map((x) => x.code)).toContain('appeal_pending');
+    expect(r.verdict.level).toBe('warning');
+  });
+
   it('ignores unverified mass reports against an official domain', async () => {
     const r = await runCheck('https://vietcombank.com.vn', withSignal({ unverifiedReporters: 50 }));
     expect(r.verdict.level).toBe('official');

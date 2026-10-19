@@ -134,10 +134,8 @@ do $$
 declare n int; r jsonb;
 begin
   assert (select count(*) from public.reports) >= 5, 'moderator sees all reports';
-  update public.reports set status = 'verified'
-  where reporter_user_id = '00000000-0000-0000-0000-000000000001';
-  get diagnostics n = row_count;
-  assert n = 1, 'moderator verifies a report';
+  perform public.moderate_report(
+    (select id from public.reports where reporter_user_id = '00000000-0000-0000-0000-000000000001'), 'verified', 'call recording heard');
   r := public.lookup_entity('phone', '0987000111');
   assert (r ->> 'verified_reports')::int = 1 and (r ->> 'unverified_reporters')::int = 1, 'counts after verification';
   assert r ->> 'last_verified_at' is not null, 'verification time recorded';

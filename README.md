@@ -52,6 +52,12 @@ Deploy: `supabase functions deploy check` rồi `supabase secrets set ANTHROPIC_
 - Trình duyệt không đọc, ghi trực tiếp bảng `entities`, `reports`. Tra cứu đi qua `lookup_entity()` (chỉ trả số lượng, không trả danh tính hay nội dung báo cáo); báo cáo đi qua `submit_report()` (bắt đăng nhập, kiểm tra định dạng, mỗi người một lần mỗi mục, tối đa 10 báo cáo/24 giờ).
 - Số tài khoản ngân hàng (dữ liệu nhạy cảm theo NĐ 356/2025) chỉ lưu HMAC và 4 số cuối. Khoá HMAC nằm trong schema `private`, không lộ qua API.
 - Báo cáo chỉ là "đã xác minh" khi người có vai trò `moderator` duyệt. Cảnh báo cộng đồng chưa duyệt chỉ người gửi và người kiểm duyệt thấy.
+- Ảnh bằng chứng nằm trong bucket riêng tư `evidence/<user id>/`, được thu nhỏ và xoá metadata trước khi tải lên. Chỉ người gửi và người kiểm duyệt xem được, qua link ký có hạn 5 phút.
+
+## Kiểm duyệt và khiếu nại
+
+- Trang `/kiem-duyet` chỉ dành cho người có vai trò `moderator`. Người kiểm duyệt chỉ thao tác qua `moderate_report`, `moderate_alert`, `resolve_appeal`: mỗi quyết định được ghi vào `moderation_log` (API không sửa, không xoá được), và không ai tự duyệt mục do chính mình gửi.
+- Trang `/khieu-nai` cho chủ số điện thoại, website, email hoặc tài khoản bị báo cáo nhầm gửi khiếu nại (cần đăng nhập). Trong lúc chờ, kết quả kiểm tra ghi rõ "chủ sở hữu đang khiếu nại". Khi khiếu nại được chấp nhận, mọi báo cáo về mục đó chuyển thành "từ chối".
 
 ## Chạy
 
