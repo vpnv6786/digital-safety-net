@@ -18,7 +18,7 @@ const About = () => {
         },
         {
           title: 'Báo cáo cộng đồng',
-          body: 'Người báo cáo phải đăng nhập bằng số điện thoại. Mỗi người chỉ báo cáo một lần cho một mục. Báo cáo chỉ được tính là "đã xác minh" sau khi người kiểm duyệt xem xét. Chủ số điện thoại hoặc website bị báo cáo nhầm có thể liên hệ để được xem xét lại.',
+          body: 'Người báo cáo phải đăng nhập bằng số điện thoại. Mỗi người chỉ báo cáo một lần cho một mục. Báo cáo chỉ được tính là "đã xác minh" sau khi người kiểm duyệt xem xét. Chủ số điện thoại hoặc website bị báo cáo nhầm có thể gửi khiếu nại tại trang Khiếu nại.',
         },
         {
           title: 'Vệ Binh Mạng không phải',
@@ -36,7 +36,7 @@ const About = () => {
         },
         {
           title: 'Community reports',
-          body: 'Reporters sign in with a phone number. Each person can report an item once. A report counts as "verified" only after a moderator reviews it. Owners of wrongly reported numbers or sites can ask for a review.',
+          body: 'Reporters sign in with a phone number. Each person can report an item once. A report counts as "verified" only after a moderator reviews it. Owners of wrongly reported numbers or sites can appeal on the Appeals page.',
         },
         {
           title: 'What it is not',
@@ -56,9 +56,12 @@ const About = () => {
             </CardContent>
           </Card>
         ))}
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 flex gap-4">
           <Link to="/" className="text-trust-blue underline">
             {vi ? 'Kiểm tra ngay' : 'Check something now'}
+          </Link>
+          <Link to="/khieu-nai" className="text-trust-blue underline">
+            {vi ? 'Khiếu nại báo cáo nhầm' : 'Appeal a wrong report'}
           </Link>
         </p>
       </div>

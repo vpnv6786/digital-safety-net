@@ -12,6 +12,8 @@ import Privacy from "./pages/Privacy";
 import ScamRankings from "./pages/ScamRankings";
 import CommunityAlerts from "./pages/CommunityAlerts";
 import Help from "./pages/Help";
+import Moderation from "./pages/Moderation";
+import Appeal from "./pages/Appeal";
 import AuthPage from "./components/AuthPage";
 import NotFound from "./pages/NotFound";
 
@@ -67,6 +69,16 @@ function App() {
                 </Layout>
               } />
               <Route path="/authorities" element={<Navigate to="/tro-giup" replace />} />
+              <Route path="/khieu-nai" element={
+                <Layout>
+                  <Appeal />
+                </Layout>
+              } />
+              <Route path="/kiem-duyet" element={
+                <Layout>
+                  <Moderation />
+                </Layout>
+              } />
               <Route path="*" element={
                 <Layout>
                   <NotFound />

@@ -13,11 +13,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from './LanguageSelector';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsModerator } from '@/hooks/useIsModerator';
 
 const Header = () => {
   const { user, signOut } = useAuth();
   const { language } = useLanguage();
   const isMobile = useIsMobile();
+  const isModerator = useIsModerator();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
@@ -74,6 +76,11 @@ const Header = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  {isModerator && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/kiem-duyet">{language === 'en' ? 'Moderation' : 'Kiểm duyệt'}</Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={handleSignOut}>
                     {language === 'en' ? 'Logout' : 'Đăng xuất'}
                   </DropdownMenuItem>

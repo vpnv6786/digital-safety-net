@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CreditCard, Globe, Info, Mail, Phone, Send } from 'lucide-react';
+import { CreditCard, Globe, ImageIcon, Info, Mail, Phone, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
-import { REPORT_ERROR_TEXT, reportKey, submitReport } from '@/services/reportService';
+import { MAX_EVIDENCE, REPORT_ERROR_TEXT, reportKey, submitReport } from '@/services/reportService';
 import { BANKS, REPORT_CATEGORIES, type EntityKind } from '@core/index.ts';
 
 const KINDS: { kind: EntityKind; icon: React.ElementType; vi: string; en: string; placeholderVi: string; placeholderEn: string }[] = [
@@ -35,6 +35,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ initialKind = 'phone', initialV
   const [bankCode, setBankCode] = useState<string | undefined>(initialBankCode);
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
+  const [evidence, setEvidence] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -47,7 +48,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ initialKind = 'phone', initialV
     if (!canSubmit) return;
     setSubmitting(true);
     setMessage(null);
-    const result = await submitReport({ kind, value, bankCode, category, description });
+    const result = await submitReport({ kind, value, bankCode, category, description, evidence });
     setSubmitting(false);
     if (result.ok === true) {
       setMessage({
@@ -59,6 +60,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ initialKind = 'phone', initialV
       setValue('');
       setDescription('');
       setCategory('');
+      setEvidence([]);
       onDone?.();
     } else {
       const text = REPORT_ERROR_TEXT[result.error];
@@ -171,12 +173,52 @@ const ReportForm: React.FC<ReportFormProps> = ({ initialKind = 'phone', initialV
         <p className="text-xs text-gray-500">{description.length}/2000</p>
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="report-evidence">
+          {vi ? `Ảnh chụp màn hình làm bằng chứng (tối đa ${MAX_EVIDENCE}, không bắt buộc)` : `Screenshots as evidence (up to ${MAX_EVIDENCE}, optional)`}
+        </Label>
+        <div className="flex flex-wrap items-center gap-2">
+          {evidence.map((file, i) => (
+            <span key={`${file.name}-${i}`} className="inline-flex items-center gap-1 rounded border bg-gray-50 px-2 py-1 text-xs">
+              <ImageIcon className="w-3 h-3" aria-hidden="true" />
+              {file.name.slice(0, 24)}
+              <button
+                type="button"
+                aria-label={vi ? 'Bỏ ảnh' : 'Remove'}
+                onClick={() => setEvidence(evidence.filter((_, j) => j !== i))}
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+          {evidence.length < MAX_EVIDENCE && (
+            <Input
+              id="report-evidence"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              multiple
+              className="max-w-xs"
+              onChange={(e) => {
+                const picked = Array.from(e.target.files ?? []);
+                setEvidence([...evidence, ...picked].slice(0, MAX_EVIDENCE));
+                e.target.value = '';
+              }}
+            />
+          )}
+        </div>
+        <p className="text-xs text-gray-500">
+          {vi
+            ? 'Ảnh được thu nhỏ, xoá thông tin vị trí, và chỉ bạn cùng người kiểm duyệt xem được. Che số CCCD, số dư tài khoản của bạn trước khi gửi.'
+            : 'Images are shrunk, stripped of location data, and visible only to you and moderators. Cover your ID number and balances before sending.'}
+        </p>
+      </div>
+
       <Alert>
         <Info className="h-4 w-4" />
         <AlertDescription className="text-sm">
           {vi
-            ? 'Báo cáo chỉ được tính là "đã xác minh" sau khi người kiểm duyệt xem xét. Báo cáo sai sự thật về người khác có thể vi phạm pháp luật. Tính năng đính kèm ảnh bằng chứng sẽ có ở bản sau.'
-            : 'A report only counts as "verified" after a moderator reviews it. False reports about others can be unlawful. Attaching screenshots comes in a later version.'}
+            ? 'Báo cáo chỉ được tính là "đã xác minh" sau khi người kiểm duyệt xem xét. Báo cáo sai sự thật về người khác có thể vi phạm pháp luật.'
+            : 'A report only counts as "verified" after a moderator reviews it. False reports about others can be unlawful.'}
         </AlertDescription>
       </Alert>
 
