@@ -259,6 +259,20 @@ const TEXT_RULES: TextRule[] = [
     },
   },
   {
+    test: (t) =>
+      /(chuyen giup|chuyen khoan giup|chuyen cho|gui giup|cho (con|em|minh|chau|anh|chi) muon|vay)/.test(t) &&
+      /(tai khoan|stk|so tk)\s*(nay\s*)?(cua|ben)\s*(ban|nguoi quen|dong nghiep)\b|(stk|so tai khoan|tai khoan) nay (cua|nhe|nha|giup)/.test(t),
+    reason: {
+      code: 'third_party_account',
+      severity: 'warning',
+      source: 'rule',
+      typology: 'impersonate_authority',
+      action: 'verify_in_person',
+      vi: 'Người quen nhắn nhờ chuyển tiền vào tài khoản của người khác: tài khoản Zalo, Facebook của họ có thể đã bị chiếm. Hãy gọi lại bằng số đã lưu từ trước.',
+      en: 'A contact asks you to send money to someone else\'s account: their Zalo or Facebook may be hijacked. Call them back on the number you saved earlier.',
+    },
+  },
+  {
     test: (t) => /(goi video|video call)/.test(t) && /(muon tien|chuyen tien|vay tien|chuyen giup)/.test(t),
     reason: {
       code: 'video_money_request',

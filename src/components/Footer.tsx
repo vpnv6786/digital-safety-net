@@ -43,6 +43,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li><Link to="/" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Check' : 'Kiểm tra'}</Link></li>
               <li><Link to="/scam-rankings" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Common scams' : 'Thủ đoạn phổ biến'}</Link></li>
+              <li><Link to="/luyen-tap" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Practice' : 'Luyện tập'}</Link></li>
               <li><Link to="/community-alerts" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Community alerts' : 'Cảnh báo cộng đồng'}</Link></li>
               <li><Link to="/tro-giup" className="text-gray-400 hover:text-white transition-colors">{language === 'en' ? 'Already scammed?' : 'Đã lỡ bị lừa?'}</Link></li>
             </ul>

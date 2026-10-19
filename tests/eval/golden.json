@@ -25,6 +25,7 @@
     {"id": "s22", "label": "scam", "typology": "investment", "text": "Anh ơi bên em là sàn forex quốc tế, nạp tối thiểu 10 triệu, lợi nhuận đảm bảo."},
     {"id": "s23", "label": "scam", "typology": "impersonate_authority", "text": "Đây là Bộ Công an. Căn cước của bạn liên quan vụ án ma túy, giữ bí mật cuộc gọi này và làm theo hướng dẫn."},
     {"id": "s24", "label": "scam", "typology": "fake_app_apk", "text": "Tải file VNeID_capnhat.apk gửi qua Zalo để cập nhật định danh mức 2."},
+    {"id": "s25", "label": "scam", "typology": "impersonate_authority", "text": "Anh ơi em đang kẹt, điện thoại sắp hết pin, anh chuyển giúp em 3 triệu vào tài khoản của bạn em nhé, tối em gửi lại."},
 
     {"id": "l01", "label": "legit", "text": "Ma OTP cua Quy khach la 482913. Tuyet doi KHONG cung cap ma OTP cho bat ky ai, ke ca nhan vien ngan hang."},
     {"id": "l02", "label": "legit", "text": "Vietcombank: TK 0011xxx456 +5,000,000VND luc 09:12 19/10/2026. SD: 12,350,000VND. ND: tien nha thang 10."},
@@ -41,6 +42,8 @@
     {"id": "l13", "label": "legit", "text": "Chúc mừng sinh nhật con gái yêu của mẹ! Quà của con ở trên bàn nhé."},
     {"id": "l14", "label": "legit", "text": "Tháng này công ty trả lương vào ngày 25, anh em kiểm tra tài khoản nhé."},
     {"id": "l15", "label": "legit", "text": "Mình đặt phòng khách sạn qua app rồi, mã đặt chỗ 1234567."},
-    {"id": "l16", "label": "legit", "text": "0912345678"}
+    {"id": "l16", "label": "legit", "text": "0912345678"},
+    {"id": "l17", "label": "legit", "text": "Mẹ ơi tháng này mẹ chuyển giúp con tiền học phí vào tài khoản của con như mọi khi nhé."},
+    {"id": "l18", "label": "legit", "text": "Chị chuyển giúp em tiền điện tháng này vào tài khoản của em nhé, em đóng luôn cho cả nhà."}
   ]
 }

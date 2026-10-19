@@ -14,6 +14,7 @@ import CommunityAlerts from "./pages/CommunityAlerts";
 import Help from "./pages/Help";
 import Moderation from "./pages/Moderation";
 import Appeal from "./pages/Appeal";
+import Practice from "./pages/Practice";
 import AuthPage from "./components/AuthPage";
 import NotFound from "./pages/NotFound";
 
@@ -69,6 +70,11 @@ function App() {
                 </Layout>
               } />
               <Route path="/authorities" element={<Navigate to="/tro-giup" replace />} />
+              <Route path="/luyen-tap" element={
+                <Layout>
+                  <Practice />
+                </Layout>
+              } />
               <Route path="/khieu-nai" element={
                 <Layout>
                   <Appeal />

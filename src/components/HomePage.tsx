@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, BookOpen, Flag, ImageIcon, LifeBuoy, Loader2, Search, Share, Shield, X } from 'lucide-react';
+import { AlertTriangle, BookOpen, Flag, GraduationCap, ImageIcon, LifeBuoy, Loader2, Search, Share, Shield, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -238,7 +238,7 @@ const HomePage = () => {
       </section>
 
       <section className="px-4 pb-10">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link to="/tro-giup" className="block">
             <Card className="h-full hover:shadow-lg transition-shadow border-danger-red/40">
               <CardContent className="p-5">
@@ -246,6 +246,17 @@ const HomePage = () => {
                 <h3 className="font-semibold text-gray-900">{vi ? 'Đã lỡ bị lừa? Làm gì ngay' : 'Already scammed? Act now'}</h3>
                 <p className="text-sm text-gray-600 mt-1">
                   {vi ? 'Các bước trong giờ đầu tiên và nơi trình báo chính thức.' : 'Steps for the first hour and official places to report.'}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/luyen-tap" className="block">
+            <Card className="h-full hover:shadow-lg transition-shadow">
+              <CardContent className="p-5">
+                <GraduationCap className="w-7 h-7 text-trust-blue mb-2" aria-hidden="true" />
+                <h3 className="font-semibold text-gray-900">{vi ? 'Luyện tập 2 phút' : '2-minute practice'}</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {vi ? 'Thật hay lừa đảo? Tập nhận ra dấu hiệu trước khi gặp thật.' : 'Real or scam? Learn the signs before you meet them.'}
                 </p>
               </CardContent>
             </Card>
