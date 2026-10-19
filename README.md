@@ -78,9 +78,7 @@ Biến môi trường tuỳ chọn: `VITE_CONTACT_EMAIL` là email liên hệ hi
 
 ## Triển khai
 
-1. Áp dụng migration lên Supabase (`supabase db push` hoặc trình SQL của dự án).
-2. Gán người kiểm duyệt: `insert into public.user_roles (user_id, role) values ('<uuid>', 'moderator');`
-3. Build và đăng web (`npm run build`).
+Xem [`docs/DEPLOY.md`](docs/DEPLOY.md): cơ sở dữ liệu, người kiểm duyệt, Edge Functions, web, agent theo lịch, hoàn tác.
 
 ## Giấy phép
 

@@ -564,3 +564,24 @@ Không dùng các con số đẹp nhưng không nói gì ("đã chặn X", "phú
 - Safe Browsing v5 / Oblivious HTTP: https://developers.google.com/safe-browsing/ohttp/reference
 
 Số liệu của nhà cung cấp (Google, McAfee, Netcraft, Apate, MoMo) là số tự công bố. Mọi số liệu chính thức của Việt Nam ở đây đều dẫn qua báo chí; chưa tìm được báo cáo gốc của A05 hay NHNN.
+
+---
+
+## 13. Tiến độ thực hiện (cập nhật 19/10/2026)
+
+| Hạng mục | Trạng thái | PR |
+|---|---|---|
+| Giai đoạn 0: vá RLS (A1–A5), kết luận không bao giờ là "an toàn" (A0, A6), chuẩn hoá (A7–A8), gỡ dữ liệu bịa, GPS, khoá API tự nhập, đổi tên Vệ Binh Mạng | Xong | #1 |
+| Edge Function `check`: Web Risk, tuổi tên miền, đọc ảnh chụp màn hình, AI giải thích (tối đa mức "có dấu hiệu"), trần chi phí | Xong; chưa chạy thử model thật | #2 |
+| Ảnh bằng chứng, kiểm duyệt có nhật ký, khiếu nại | Xong | #3 |
+| Agent API theo kiểu kéo, đề xuất chờ người duyệt, bộ mẫu chuẩn | Xong | #4 |
+| Agent `triage` và `content` chạy theo lịch, CI | Xong | #5 |
+| Chỉ số chính "dừng lại sau cảnh báo", tab Số liệu | Xong | #6 |
+| Luyện tập "thật hay lừa đảo?", luật cho kịch bản người quen bị chiếm tài khoản | Xong | #7 |
+| Triển khai lên Supabase, gán người kiểm duyệt, đặt secrets | **Chờ chủ dự án** (xem `docs/DEPLOY.md`) | — |
+| Domain `antoanso` trong MiteClaw (Zalo OA, Telegram, Messenger) | **Chờ chọn đối tác thí điểm** (cổng khách hàng của MiteClaw) | — |
+| Chế độ người thân bảo vệ | **Chờ chọn kênh thông báo** (Zalo ZNS/OA qua MiteClaw hoặc SMS) | — |
+| Hồ sơ đánh giá tác động, điều khoản, lưu trữ trong nước | **Chờ luật sư** | — |
+| Giám sát giả mạo thương hiệu cho tổ chức (B2B), app Android, hợp tác bảo hiểm | Giai đoạn 3, chờ khách hàng đầu tiên | — |
+
+Bộ mẫu chuẩn hiện có 43 mẫu tổng hợp: 100% mẫu lừa đảo bị gắn cờ, 0 mẫu hợp lệ bị báo nhầm. Vì người viết luật cũng soạn bộ mẫu, con số này lạc quan hơn thực tế. Cần thay bằng mẫu thật (đã ẩn danh) từ đợt thí điểm.
