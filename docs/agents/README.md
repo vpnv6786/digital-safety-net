@@ -14,7 +14,7 @@ Agent làm phần việc lặp lại; người giữ mọi quyết định có h
 
 | Bậc | Việc | Ai làm |
 |---|---|---|
-| A0 | Kiểm tra nội dung, trả lời người hỏi | Tự động (Edge Function `check`) |
+| A0 | Kiểm tra nội dung, trả lời người hỏi | Tự động (`/api/check` trên Cloudflare) |
 | A1 | Đọc hàng chờ, gom nhóm, viết đề xuất | Agent, tự động |
 | A2 | Xác minh hoặc từ chối báo cáo, xử lý khiếu nại | Người kiểm duyệt (có thể dựa trên đề xuất) |
 | A2+ | Công khai cảnh báo | Người kiểm duyệt; với bản nháp của agent là hai lần bấm |
@@ -29,22 +29,22 @@ Agent làm phần việc lặp lại; người giữ mọi quyết định có h
 | `content` (cảnh báo) | Mỗi tuần, hoặc khi một thủ đoạn tăng đột biến | `GET /summary?days=14` | `draft_alert` |
 | `qa` (kiểm định) | Trên mọi PR và mỗi lần push lên `main` (`.github/workflows/ci.yml`) | lint, typecheck, `npm test` (gồm bộ mẫu chuẩn), `deno check`, `scripts/test-db.sh` | Không đề xuất; CI đỏ thì không merge |
 
-Agent kiểm tra (trả lời người dân) chính là Edge Function `check`, không cần agent riêng.
+Agent kiểm tra (trả lời người dân) chính là `/api/check`, không cần agent riêng.
 
 ## Agent API
 
-Endpoint: `https://<project>.supabase.co/functions/v1/agent-api/...`. Header bắt buộc: `x-agent-token: <AGENT_API_TOKEN>`.
+Endpoint: `https://<địa chỉ web>/api/agent/...` (cùng Cloudflare Worker với trang web). Header bắt buộc: `x-agent-token: <AGENT_API_TOKEN>`.
 
 ```bash
 # Hàng chờ (đã che dữ liệu)
-curl -s -H "x-agent-token: $AGENT_API_TOKEN" "$BASE/functions/v1/agent-api/queue"
+curl -s -H "x-agent-token: $AGENT_API_TOKEN" "$BASE/api/agent/queue"
 
 # Số báo cáo theo ngày, thủ đoạn, trạng thái
-curl -s -H "x-agent-token: $AGENT_API_TOKEN" "$BASE/functions/v1/agent-api/summary?days=14"
+curl -s -H "x-agent-token: $AGENT_API_TOKEN" "$BASE/api/agent/summary?days=14"
 
 # Gửi đề xuất (tối đa 20 mỗi lần)
 curl -s -X POST -H "x-agent-token: $AGENT_API_TOKEN" -H 'content-type: application/json' \
-  "$BASE/functions/v1/agent-api/proposals" -d '{
+  "$BASE/api/agent/proposals" -d '{
     "agent": "triage",
     "proposals": [
       {"kind": "verify_report", "target_id": "<report id>", "confidence": 0.85,
@@ -61,11 +61,11 @@ curl -s -X POST -H "x-agent-token: $AGENT_API_TOKEN" -H 'content-type: applicati
 | `cluster_reports` | — | `{report_ids: [...], key}` | Chỉ ghi nhận |
 | `takedown_request` | id báo cáo (nếu có) | `{url, registrar?, draft}` | Chỉ ghi nhận; người gửi yêu cầu gỡ |
 
-Triển khai:
+Bật Agent API:
 
 ```bash
-supabase functions deploy agent-api --no-verify-jwt
-supabase secrets set AGENT_API_TOKEN=$(openssl rand -hex 32)
+# Đặt GitHub Secret AGENT_API_TOKEN (một chuỗi ngẫu nhiên dài, ví dụ: openssl rand -hex 32).
+# Workflow Deploy chuyển nó lên Cloudflare. Chưa đặt thì /api/agent trả 503.
 ```
 
 ## Agent tham chiếu chạy được ngay
@@ -73,7 +73,7 @@ supabase secrets set AGENT_API_TOKEN=$(openssl rand -hex 32)
 `agents/triage.ts` và `agents/content.ts` dùng SDK Anthropic chính thức. Model mặc định là `claude-opus-5-5` ở effort `low`, đổi được bằng biến `LLM_MODEL`.
 
 ```bash
-AGENT_API_URL=https://<project>.supabase.co/functions/v1/agent-api AGENT_API_TOKEN=... ANTHROPIC_API_KEY=... \
+AGENT_API_URL=https://<địa chỉ web>/api/agent AGENT_API_TOKEN=... ANTHROPIC_API_KEY=... \
   npm run agent:triage -- --dry-run      # in đề xuất, không gửi
 ```
 
@@ -87,7 +87,7 @@ MiteClaw chạy cục bộ (desktop/gateway). Vì Agent API là kiểu kéo (age
 
 | Việc | Năng lực MiteClaw đã có | Còn thiếu |
 |---|---|---|
-| Trả lời người dân trên Zalo OA, Telegram, Messenger | `internal/channel/zalo.go`, `telegram.go`, `messenger.go`; chế độ khách chỉ đọc (`internal/gateway/guest_abilities.go`); `vision_ocr` cho ảnh | Một công cụ `scam_check` gọi Edge Function `check`, đăng ký là năng lực đọc của khách |
+| Trả lời người dân trên Zalo OA, Telegram, Messenger | `internal/channel/zalo.go`, `telegram.go`, `messenger.go`; chế độ khách chỉ đọc (`internal/gateway/guest_abilities.go`); `vision_ocr` cho ảnh | Một công cụ `scam_check` gọi `/api/check`, đăng ký là năng lực đọc của khách |
 | Chạy agent theo lịch | `internal/cron`, `internal/initiative`, `internal/domainassist` | Công cụ gọi `agent-api` (GET hàng chờ, POST đề xuất) |
 | Duyệt của người | Hộp duyệt, mã `LENH-…` qua Telegram/Zalo | Không cần: việc duyệt diễn ra ở `/kiem-duyet` |
 | Đo chất lượng | `benchmark/local_models`, `internal/cuamind` (mô hình phân loại nhỏ) | Một đầu phân loại "lừa đảo / không" huấn luyện từ bộ mẫu thật sau thí điểm |

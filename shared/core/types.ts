@@ -1,5 +1,5 @@
 // Shared types for the scam-check core. This folder is plain TypeScript with
-// no Deno or browser APIs, so the web app (Vite) and Edge Functions (Deno)
+// no platform APIs, so the web app (Vite), the Cloudflare Worker and the agents
 // run exactly the same logic.
 
 export type EntityKind = 'phone' | 'url' | 'bank_account' | 'email';

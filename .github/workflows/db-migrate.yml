@@ -1,0 +1,42 @@
+# Applies new database migrations to Supabase. Run by hand from the Actions tab
+# AFTER taking a backup: the 2026-10-19 phase 0 migration cannot be undone.
+# Repository secret: SUPABASE_DB_URL (Supabase → Connect → Session pooler URI, with the password).
+name: Database migrations
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Gõ "da-sao-luu" để xác nhận đã sao lưu cơ sở dữ liệu'
+        required: true
+      dry_run:
+        description: 'Chỉ liệt kê, không chạy'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-migrate
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Confirm backup
+        run: |
+          if [ "${{ inputs.confirm }}" != "da-sao-luu" ]; then
+            echo 'Type "da-sao-luu" to confirm a backup exists.'
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+      - name: Install psql if missing
+        run: command -v psql >/dev/null || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+      - name: Run migrations
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then echo "SUPABASE_DB_URL is not set"; exit 1; fi
+          if [ "${{ inputs.dry_run }}" = "true" ]; then ./scripts/migrate.sh --dry-run; else ./scripts/migrate.sh; fi

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { CommunitySignal } from '@core/index.ts';
-import { serverCheck } from '../../supabase/functions/_shared/server/checkServer.ts';
-import { domainAgeReason, domainRegisteredAt, webRiskReason } from '../../supabase/functions/_shared/server/external.ts';
-import { assessmentReason, buildAnalyzeRequest, parseAnalyzeResponse, type Assessment } from '../../supabase/functions/_shared/server/llm.ts';
+import { serverCheck } from '../../shared/server/checkServer.ts';
+import { domainAgeReason, domainRegisteredAt, webRiskReason } from '../../shared/server/external.ts';
+import { assessmentReason, buildAnalyzeRequest, parseAnalyzeResponse, type Assessment } from '../../shared/server/llm.ts';
 
 const NONE: CommunitySignal = { found: false, verifiedReports: 0, unverifiedReporters: 0, lastVerifiedAt: null, lastReportAt: null, categories: [] };
 const lookup = async () => NONE;
@@ -150,7 +150,7 @@ describe('serverCheck', () => {
 });
 
 describe('feedback counters', async () => {
-  const { feedbackCounter } = await import('../../supabase/functions/_shared/server/feedback.ts');
+  const { feedbackCounter } = await import('../../shared/server/feedback.ts');
   it('accepts known levels and choices only', () => {
     expect(feedbackCounter({ level: 'danger', choice: 'stopped' })).toBe('feedback:danger:stopped');
     expect(feedbackCounter({ level: 'danger', choice: 'drop table' })).toBeNull();

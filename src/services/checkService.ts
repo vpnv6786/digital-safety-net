@@ -40,16 +40,27 @@ interface ServerReply {
 
 export class ScreenshotUnavailableError extends Error {}
 
+/** The check API lives on the same Cloudflare Worker as the site; VITE_CHECK_API can point elsewhere. */
+const CHECK_API = (import.meta.env.VITE_CHECK_API as string | undefined) || '/api/check';
+
 /**
  * Check a pasted message, number, link, email or account, or a screenshot.
  * Text checks fall back to the in-browser check when the server is unreachable;
  * screenshots need the server.
  */
 export async function checkInput(raw: string, opts: { bankCode?: string; image?: ScreenshotInput } = {}): Promise<CheckOutcome> {
-  const { data, error } = await supabase.functions.invoke<ServerReply>('check', {
-    body: { text: raw, bankCode: opts.bankCode, image: opts.image },
-  });
-  if (!error && data?.verdict) {
+  let data: ServerReply | null = null;
+  try {
+    const res = await fetch(CHECK_API, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ text: raw, bankCode: opts.bankCode, image: opts.image }),
+    });
+    if (res.ok) data = (await res.json()) as ServerReply;
+  } catch {
+    data = null;
+  }
+  if (data?.verdict) {
     return {
       input: raw,
       isMessage: data.isMessage,
@@ -62,7 +73,7 @@ export async function checkInput(raw: string, opts: { bankCode?: string; image?:
       aiUsed: data.ai?.used,
     };
   }
-  if (opts.image) throw new ScreenshotUnavailableError(error?.message ?? 'check function unavailable');
+  if (opts.image) throw new ScreenshotUnavailableError('check API unavailable');
   const local = await runCheck(raw, lookupCommunity, { bankCode: opts.bankCode });
   return { ...local, source: 'browser' };
 }
@@ -76,5 +87,9 @@ export type FeedbackChoice = 'stopped' | 'continued' | 'unsure' | 'wrong';
 
 /** Count what someone says they will do after an answer. Only the level and the choice are sent. */
 export async function sendFeedback(level: Verdict['level'], choice: FeedbackChoice): Promise<void> {
-  await supabase.functions.invoke('check', { body: { feedback: { level, choice } } });
+  await fetch(CHECK_API, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ feedback: { level, choice } }),
+  });
 }

@@ -1,0 +1,18 @@
+{
+  // Cloudflare Worker for Vệ Binh Mạng: static web app from dist/ plus /api/*.
+  // Deployed by .github/workflows/deploy.yml; see docs/DEPLOY.md.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ve-binh-mang",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-30",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "observability": { "enabled": true },
+  "vars": {
+    "SUPABASE_URL": "https://bxwthkhtnqjvckukvwqh.supabase.co"
+  }
+}

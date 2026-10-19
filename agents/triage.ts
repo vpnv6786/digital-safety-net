@@ -2,7 +2,7 @@
 // groups reports about the same entity. Changes nothing by itself: every
 // proposal waits for a moderator in /kiem-duyet.
 //
-//   AGENT_API_URL=https://<project>.supabase.co/functions/v1/agent-api \
+//   AGENT_API_URL=https://<web address>/api/agent \
 //   AGENT_API_TOKEN=... ANTHROPIC_API_KEY=... npx tsx agents/triage.ts [--dry-run]
 
 import Anthropic from '@anthropic-ai/sdk';

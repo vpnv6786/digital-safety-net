@@ -578,7 +578,8 @@ Số liệu của nhà cung cấp (Google, McAfee, Netcraft, Apate, MoMo) là s�
 | Agent `triage` và `content` chạy theo lịch, CI | Xong | #5 |
 | Chỉ số chính "dừng lại sau cảnh báo", tab Số liệu | Xong | #6 |
 | Luyện tập "thật hay lừa đảo?", luật cho kịch bản người quen bị chiếm tài khoản | Xong | #7 |
-| Triển khai lên Supabase, gán người kiểm duyệt, đặt secrets | **Chờ chủ dự án** (xem `docs/DEPLOY.md`) | — |
+| Chuyển trang web và API sang Cloudflare Workers (dữ liệu vẫn ở Supabase), deploy tự động bằng GitHub Actions | Xong | #8 |
+| Đặt khoá vào GitHub Secrets, chạy cập nhật database, gán người kiểm duyệt | **Chờ chủ dự án** (xem `docs/DEPLOY.md`, khoảng 20 phút) | — |
 | Domain `antoanso` trong MiteClaw (Zalo OA, Telegram, Messenger) | **Chờ chọn đối tác thí điểm** (cổng khách hàng của MiteClaw) | — |
 | Chế độ người thân bảo vệ | **Chờ chọn kênh thông báo** (Zalo ZNS/OA qua MiteClaw hoặc SMS) | — |
 | Hồ sơ đánh giá tác động, điều khoản, lưu trữ trong nước | **Chờ luật sư** | — |

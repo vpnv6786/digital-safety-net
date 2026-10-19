@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { redactPersonalData } from '@core/index.ts';
-import { handleAgentRequest, validateProposals, type AgentStore, type ProposalRow } from '../../supabase/functions/_shared/server/agentApi.ts';
+import { handleAgentRequest, validateProposals, type AgentStore, type ProposalRow } from '../../shared/server/agentApi.ts';
 
 const ID = '11111111-2222-3333-4444-555555555555';
 
