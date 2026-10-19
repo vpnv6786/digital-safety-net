@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, CheckCircle2, Flag, HelpCircle, LifeBuoy, Share2, ShieldCheck, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ACTIONS, bankName, type Entity, type ReasonSource, type VerdictLevel } from '@core/index.ts';
-import type { CheckOutcome } from '@/services/checkService';
+import { sendFeedback, type CheckOutcome, type FeedbackChoice } from '@/services/checkService';
 
 const LEVELS: Record<
   VerdictLevel,
@@ -85,6 +85,12 @@ const CheckResult: React.FC<CheckResultProps> = ({ result, onReport }) => {
   const Icon = level.icon;
   const action = ACTIONS[verdict.action];
   const risky = verdict.level === 'danger' || verdict.level === 'warning';
+  const [answered, setAnswered] = useState<FeedbackChoice | null>(null);
+
+  const answer = (choice: FeedbackChoice) => {
+    setAnswered(choice);
+    sendFeedback(verdict.level, choice).catch(() => undefined);
+  };
 
   const share = async () => {
     const text = vi
@@ -182,6 +188,40 @@ const CheckResult: React.FC<CheckResultProps> = ({ result, onReport }) => {
               </Button>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-4 pb-4">
+          {answered ? (
+            <p className="text-sm text-gray-700" role="status">
+              {answered === 'continued' && risky
+                ? vi
+                  ? 'Cảm ơn bạn. Trước khi làm tiếp, hãy gọi cho một người thân bạn tin, kể lại sự việc. Kẻ gian thường dặn giữ bí mật chính vì điều này.'
+                  : 'Thank you. Before you go on, call someone you trust and tell them what happened. Scammers ask for secrecy for exactly this reason.'
+                : vi
+                  ? 'Cảm ơn bạn. Câu trả lời giúp Vệ Binh Mạng biết kết luận có hữu ích không (chỉ đếm số lượng, không lưu nội dung).'
+                  : 'Thank you. Your answer tells us whether the result helped (only counted, nothing stored).'}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-gray-800">{vi ? 'Bạn sẽ làm gì tiếp theo?' : 'What will you do next?'}</p>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={() => answer('stopped')}>
+                  {vi ? 'Tôi sẽ dừng lại' : "I'll stop"}
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => answer('continued')}>
+                  {vi ? 'Tôi vẫn sẽ làm theo' : "I'll go ahead"}
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => answer('unsure')}>
+                  {vi ? 'Chưa biết' : 'Not sure'}
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => answer('wrong')}>
+                  {vi ? 'Kết quả này sai' : 'This result is wrong'}
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

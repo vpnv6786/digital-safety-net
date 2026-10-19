@@ -597,6 +597,10 @@ export type Database = {
         Args: { _user_id: string; _role: string }
         Returns: boolean
       }
+      metrics_summary: {
+        Args: { p_days?: number }
+        Returns: { day: string; kind: string; count: number }[]
+      }
       moderate_alert: {
         Args: { p_alert_id: string; p_decision: string; p_note?: string | null }
         Returns: undefined

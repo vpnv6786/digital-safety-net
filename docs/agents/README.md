@@ -98,6 +98,15 @@ Cho đến khi có domain đó, các agent tham chiếu ở trên (GitHub Action
 
 ## Chỉ số theo dõi
 
+Tab **Số liệu** trong `/kiem-duyet` hiển thị các chỉ số dưới đây, lấy từ bộ đếm theo ngày (`metrics_summary`, không lưu nội dung kiểm tra):
+
+- **Chỉ số chính**: trong số người nhận kết luận "rất nguy hiểm" hoặc "có dấu hiệu" và có trả lời, bao nhiêu phần trăm nói "Tôi sẽ dừng lại".
+- Tỷ lệ người bấm "Kết quả này sai".
+- Số lượt kiểm tra theo từng mức; số lượt gọi AI.
+- Tỷ lệ chấp nhận đề xuất của từng agent trong 30 ngày.
+
+Các chỉ số còn lại:
+
 - Tỷ lệ đề xuất được chấp nhận, theo agent và theo loại (độ chính xác của agent so với người).
 - Thời gian từ khi có báo cáo tới khi có quyết định (mục tiêu: trung vị dưới 24 giờ).
 - Số phút người kiểm duyệt bỏ ra trên 1.000 lượt kiểm tra.

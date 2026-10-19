@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import type { MetricRow } from '@/lib/metrics';
 
 export interface PendingReport {
   id: string;
@@ -107,4 +108,20 @@ export async function pendingProposals(): Promise<AgentProposal[]> {
 export async function decideProposal(id: string, decision: 'accepted' | 'dismissed', note: string) {
   const { error } = await supabase.rpc('decide_proposal', { p_proposal_id: id, p_decision: decision, p_note: note || null });
   if (error) throw error;
+}
+
+export async function metrics(days = 14): Promise<MetricRow[]> {
+  const { data, error } = await supabase.rpc('metrics_summary', { p_days: days });
+  if (error) throw error;
+  return (data ?? []) as MetricRow[];
+}
+
+export async function proposalStats(): Promise<{ agent: string; status: string }[]> {
+  const { data, error } = await supabase
+    .from('agent_proposals')
+    .select('agent, status')
+    .gte('created_at', new Date(Date.now() - 30 * 864e5).toISOString())
+    .limit(5000);
+  if (error) throw error;
+  return data ?? [];
 }

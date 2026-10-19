@@ -1,5 +1,6 @@
 // POST /functions/v1/check
 // Body: { text?: string, bankCode?: string, image?: { mediaType, base64 } }
+//    or { feedback: { level, choice } } to count what someone will do after an answer.
 // Runs the shared check on the server, adding Web Risk, domain age and an AI
 // explanation when they are configured. Nothing the caller sends is stored.
 //
@@ -19,6 +20,7 @@ import { MAX_INPUT_CHARS } from '../_shared/core/text.ts';
 import { serverCheck, type ServerCheckDeps } from '../_shared/server/checkServer.ts';
 import { domainAgeReason, domainRegisteredAt, webRiskReason } from '../_shared/server/external.ts';
 import { buildAnalyzeRequest, DEFAULT_MODEL, parseAnalyzeResponse, type AnalyzeInput } from '../_shared/server/llm.ts';
+import { feedbackCounter, METRIC_LIMIT } from '../_shared/server/feedback.ts';
 
 const MAX_IMAGE_BASE64 = 5_000_000;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
@@ -105,11 +107,22 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders(origin) });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, origin);
 
-  let body: { text?: unknown; bankCode?: unknown; image?: { mediaType?: unknown; base64?: unknown } };
+  let body: { text?: unknown; bankCode?: unknown; image?: { mediaType?: unknown; base64?: unknown }; feedback?: unknown };
   try {
     body = await req.json();
   } catch {
     return json({ error: 'invalid_json' }, 400, origin);
+  }
+
+  const caller = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+  const callerKind = `caller:${(await sha256(ipSalt + caller)).slice(0, 32)}`;
+
+  if (body.feedback !== undefined) {
+    const counter = feedbackCounter(body.feedback);
+    if (!counter) return json({ error: 'invalid_feedback' }, 400, origin);
+    if (!(await consume(callerKind, intEnv('CHECKS_PER_CALLER_PER_DAY', 200)))) return json({ error: 'rate_limited' }, 429, origin);
+    await consume(counter, METRIC_LIMIT);
+    return json({ ok: true }, 200, origin);
   }
 
   const text = typeof body.text === 'string' ? body.text.slice(0, MAX_INPUT_CHARS) : '';
@@ -124,8 +137,7 @@ Deno.serve(async (req) => {
   }
   if (!text.trim() && !image) return json({ error: 'empty_input' }, 400, origin);
 
-  const caller = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-  if (!(await consume(`caller:${(await sha256(ipSalt + caller)).slice(0, 32)}`, intEnv('CHECKS_PER_CALLER_PER_DAY', 200)))) {
+  if (!(await consume(callerKind, intEnv('CHECKS_PER_CALLER_PER_DAY', 200)))) {
     return json({ error: 'rate_limited' }, 429, origin);
   }
 
@@ -138,6 +150,7 @@ Deno.serve(async (req) => {
   };
 
   const result = await serverCheck({ text, bankCode, image }, deps);
+  await consume(`verdict:${result.verdict.level}`, METRIC_LIMIT);
   return json(
     {
       verdict: result.verdict,

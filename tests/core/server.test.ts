@@ -148,3 +148,13 @@ describe('serverCheck', () => {
     expect(r.ai.skipped).toBe('failed');
   });
 });
+
+describe('feedback counters', async () => {
+  const { feedbackCounter } = await import('../../supabase/functions/_shared/server/feedback.ts');
+  it('accepts known levels and choices only', () => {
+    expect(feedbackCounter({ level: 'danger', choice: 'stopped' })).toBe('feedback:danger:stopped');
+    expect(feedbackCounter({ level: 'danger', choice: 'drop table' })).toBeNull();
+    expect(feedbackCounter({ level: 'safe', choice: 'stopped' })).toBeNull();
+    expect(feedbackCounter('stopped')).toBeNull();
+  });
+});
