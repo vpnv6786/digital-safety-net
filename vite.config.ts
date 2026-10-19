@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -17,6 +18,11 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@core": path.resolve(__dirname, "./supabase/functions/_shared/core"),
     },
+  },
+  test: {
+    include: ["tests/**/*.test.ts"],
+    environment: "node",
   },
 }));
