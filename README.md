@@ -25,10 +25,27 @@ supabase/functions/_shared/core/   Bộ lõi kiểm tra, TypeScript thuần (ch�
   verdict.ts     ghép lý do thành kết luận
 supabase/migrations/               Lược đồ và phân quyền (RLS)
 supabase/tests/                    Test phân quyền, RPC chạy trên PostgreSQL thật
-src/services/checkService.ts       Gọi bộ lõi + RPC lookup_entity
+supabase/functions/_shared/server/ Phần chỉ chạy trên máy chủ: Google Web Risk, tuổi tên miền (RDAP), gọi model
+supabase/functions/check/          Edge Function POST /check (Deno)
+src/services/checkService.ts       Gọi Edge Function check; nếu không được thì chạy bộ lõi ngay trên trình duyệt
 src/services/reportService.ts      Gửi báo cáo qua RPC submit_report
 tests/core/                        Test bộ lõi (Vitest)
 ```
+
+## Edge Function `check`
+
+Chạy bộ lõi trên máy chủ và thêm các tín hiệu mà trình duyệt không lấy được. Mỗi phần tùy chọn đều có thể tắt bằng cách không đặt biến môi trường:
+
+| Biến | Tác dụng |
+|---|---|
+| `ANTHROPIC_API_KEY` | Bật đọc ảnh chụp màn hình và phần giải thích bằng AI. AI chỉ có thể nâng kết luận tới "có dấu hiệu lừa đảo", không bao giờ tới "rất nguy hiểm", và không hạ được mức do luật cố định đặt ra |
+| `LLM_MODEL` | Model, mặc định `claude-opus-5-5` (effort `low`). Đặt `claude-haiku-5-5` nếu cần rẻ hơn |
+| `WEB_RISK_API_KEY` | Tra Google Web Risk (bản dùng cho mục đích thương mại; Safe Browsing API chỉ dành cho mục đích phi thương mại) |
+| `LLM_DAILY_LIMIT`, `VISION_DAILY_LIMIT` | Trần số lần gọi AI mỗi ngày (mặc định 500 và 200); quá trần thì vẫn trả lời bằng phần không dùng AI |
+| `CHECKS_PER_CALLER_PER_DAY` | Giới hạn mỗi địa chỉ IP (lưu dạng băm, xoá sau 2 ngày), mặc định 200 |
+| `ALLOWED_ORIGINS` | Danh sách origin được gọi, mặc định `*` |
+
+Deploy: `supabase functions deploy check` rồi `supabase secrets set ANTHROPIC_API_KEY=... WEB_RISK_API_KEY=...`.
 
 ## Dữ liệu và quyền riêng tư
 
@@ -44,6 +61,7 @@ npm run dev          # http://localhost:8080
 npm test             # test bộ lõi
 npm run typecheck
 ./scripts/test-db.sh # chạy mọi migration và test phân quyền trên PostgreSQL cục bộ (cần PostgreSQL 15+)
+deno check --no-config supabase/functions/check/index.ts   # kiểm kiểu Edge Function
 ```
 
 Biến môi trường tuỳ chọn: `VITE_CONTACT_EMAIL` là email liên hệ hiển thị trên trang. Chưa đặt thì trang ẩn email.

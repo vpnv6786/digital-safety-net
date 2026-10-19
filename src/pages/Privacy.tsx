@@ -11,8 +11,10 @@ const Privacy = () => {
         {
           title: 'Khi bạn kiểm tra',
           body: [
-            'Nội dung bạn dán được phân tích ngay trên trình duyệt.',
-            'Chỉ số điện thoại, tên miền, email hoặc số tài khoản tìm thấy được gửi đi để tra báo cáo cộng đồng. Chúng không được lưu vào cơ sở dữ liệu của Vệ Binh Mạng.',
+            'Nội dung bạn dán hoặc ảnh chụp màn hình được gửi tới máy chủ Vệ Binh Mạng để kiểm tra và không được lưu lại.',
+            'Link trong nội dung được tra với Google Web Risk và dữ liệu đăng ký tên miền (RDAP).',
+            'Khi tính năng AI được bật, nội dung và ảnh được gửi tới Anthropic (Mỹ) để đọc chữ và giải thích. Số tài khoản ngân hàng trong nội dung cũng có thể nằm trong phần được gửi.',
+            'Địa chỉ IP được băm để giới hạn số lượt kiểm tra mỗi ngày và bị xoá sau 2 ngày.',
             'Nhà cung cấp hạ tầng (Supabase) có thể ghi nhật ký kỹ thuật của yêu cầu theo chính sách của họ.',
           ],
         },
@@ -41,8 +43,10 @@ const Privacy = () => {
         {
           title: 'When you check something',
           body: [
-            'What you paste is analysed in your browser.',
-            'Only phone numbers, domains, emails or account numbers found are sent to look up community reports. They are not stored in the Vệ Binh Mạng database.',
+            'What you paste, or your screenshot, is sent to the Vệ Binh Mạng server for checking and is not stored.',
+            'Links in the content are checked against Google Web Risk and domain registration data (RDAP).',
+            'When AI is enabled, the content and image are sent to Anthropic (USA) to read the text and explain it. Bank account numbers in the content may be part of what is sent.',
+            'Your IP address is hashed to limit daily checks and deleted after 2 days.',
             'Our infrastructure provider (Supabase) may keep technical request logs under its own policy.',
           ],
         },

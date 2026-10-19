@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, BookOpen, Flag, LifeBuoy, Loader2, Search, Share, Shield } from 'lucide-react';
+import { AlertTriangle, BookOpen, Flag, ImageIcon, LifeBuoy, Loader2, Search, Share, Shield, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,8 +10,8 @@ import CheckResult from './CheckResult';
 import ReportForm from './ReportForm';
 import SocialShare from './SocialShare';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { checkInput } from '@/services/checkService';
-import { BANKS, type CheckResult as Result, type Entity } from '@core/index.ts';
+import { checkInput, prepareScreenshot, ScreenshotUnavailableError, type CheckOutcome, type ScreenshotInput } from '@/services/checkService';
+import { BANKS, type Entity } from '@core/index.ts';
 
 const EXAMPLES = [
   {
@@ -41,17 +41,43 @@ const HomePage = () => {
   const [input, setInput] = useState('');
   const [bankCode, setBankCode] = useState<string | undefined>();
   const [checking, setChecking] = useState(false);
-  const [result, setResult] = useState<Result | null>(null);
+  const [result, setResult] = useState<CheckOutcome | null>(null);
+  const [screenshot, setScreenshot] = useState<{ preview: string; data: ScreenshotInput } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [reportPrefill, setReportPrefill] = useState<Entity | undefined>();
   const resultRef = useRef<HTMLDivElement>(null);
 
   const digitsOnly = /^[\d\s.-]{6,}$/.test(input.trim());
 
-  const runCheck = async (text = input) => {
-    if (!text.trim()) return;
-    setChecking(true);
+  const pickScreenshot = async (file: File | undefined) => {
+    if (!file) return;
+    setError(null);
     try {
-      setResult(await checkInput(text, digitsOnly ? bankCode : undefined));
+      const data = await prepareScreenshot(file);
+      setScreenshot({ preview: `data:${data.mediaType};base64,${data.base64}`, data });
+    } catch {
+      setError(vi ? 'Không mở được ảnh này.' : 'This image could not be opened.');
+    }
+  };
+
+  const runCheck = async (text = input) => {
+    if (!text.trim() && !screenshot) return;
+    setChecking(true);
+    setError(null);
+    try {
+      setResult(await checkInput(text, { bankCode: digitsOnly ? bankCode : undefined, image: screenshot?.data }));
+    } catch (e) {
+      setResult(null);
+      setError(
+        e instanceof ScreenshotUnavailableError
+          ? vi
+            ? 'Chưa đọc được ảnh lúc này. Bạn có thể gõ hoặc dán lại nội dung tin nhắn để kiểm tra.'
+            : 'The screenshot cannot be read right now. You can type or paste the message text instead.'
+          : vi
+            ? 'Chưa kiểm tra được. Vui lòng thử lại.'
+            : 'The check failed. Please try again.',
+      );
     } finally {
       setChecking(false);
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
@@ -135,8 +161,42 @@ const HomePage = () => {
                       </Select>
                     </div>
                   )}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className="hidden"
+                      onChange={(e) => {
+                        pickScreenshot(e.target.files?.[0]);
+                        e.target.value = '';
+                      }}
+                    />
+                    <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
+                      <ImageIcon className="w-4 h-4 mr-2" />
+                      {vi ? 'Thêm ảnh chụp màn hình' : 'Add a screenshot'}
+                    </Button>
+                    {screenshot && (
+                      <div className="relative">
+                        <img src={screenshot.preview} alt={vi ? 'Ảnh chụp màn hình đã chọn' : 'Selected screenshot'} className="h-16 rounded border" />
+                        <button
+                          type="button"
+                          aria-label={vi ? 'Bỏ ảnh' : 'Remove screenshot'}
+                          className="absolute -top-2 -right-2 rounded-full bg-white border p-0.5"
+                          onClick={() => setScreenshot(null)}
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
+                    <span className="text-xs text-gray-500">
+                      {vi
+                        ? 'Ảnh được gửi lên máy chủ và mô hình AI để đọc chữ, không được lưu lại.'
+                        : 'The image is sent to our server and an AI model to read the text; it is not stored.'}
+                    </span>
+                  </div>
                   <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-                    <Button onClick={() => runCheck()} disabled={!input.trim() || checking} size="lg">
+                    <Button onClick={() => runCheck()} disabled={(!input.trim() && !screenshot) || checking} size="lg">
                       {checking ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Search className="w-5 h-5 mr-2" />}
                       {vi ? 'Kiểm tra' : 'Check'}
                     </Button>
@@ -157,6 +217,11 @@ const HomePage = () => {
                       ))}
                     </div>
                   </div>
+                  {error && (
+                    <p role="alert" className="text-sm text-danger-red">
+                      {error}
+                    </p>
+                  )}
                   <div ref={resultRef}>{result && <CheckResult result={result} onReport={startReport} />}</div>
                 </div>
               ) : (
@@ -231,8 +296,8 @@ const HomePage = () => {
           </ul>
           <p className="text-xs text-gray-500 mt-6">
             {vi
-              ? 'Nội dung bạn dán được phân tích ngay trên trình duyệt. Chỉ số điện thoại, link, email hoặc số tài khoản tìm thấy được gửi đi để tra báo cáo cộng đồng, và không được lưu vào cơ sở dữ liệu của Vệ Binh Mạng.'
-              : 'What you paste is analysed in your browser. Only the phone numbers, links, emails or account numbers found are sent to look up community reports, and they are not stored in the Vệ Binh Mạng database.'}
+              ? 'Nội dung bạn dán được gửi tới máy chủ Vệ Binh Mạng để kiểm tra: tra báo cáo cộng đồng, danh sách link nguy hiểm của Google, tuổi tên miền, và khi được bật, một mô hình AI giải thích. Nội dung không được lưu lại. Nếu máy chủ không phản hồi, việc kiểm tra chạy ngay trên trình duyệt.'
+              : 'What you paste is sent to the Vệ Binh Mạng server to check community reports, Google’s dangerous-link list, domain age and, when enabled, an AI explanation. It is not stored. If the server does not answer, the check runs in your browser.'}
           </p>
         </div>
       </section>
