@@ -25,7 +25,7 @@ Agent làm phần việc lặp lại; người giữ mọi quyết định có h
 | Agent | Lịch | Đọc | Đề xuất được |
 |---|---|---|---|
 | `triage` (sàng lọc) | Mỗi giờ | `GET /queue` | `verify_report`, `reject_report`, `cluster_reports` |
-| `intel` (trinh sát) | Mỗi ngày | Cảnh báo chính thức của công an, ngân hàng, tinnhiemmang.vn; nhật ký Certificate Transparency | `takedown_request`, `draft_alert`; đề xuất thêm luật bằng PR (người review) |
+| `intel` (trinh sát) | Mỗi ngày | Nhật ký Certificate Transparency (crt.sh) và danh sách link lừa đảo công khai của OpenPhish. Chưa đọc cảnh báo của công an, ngân hàng, tinnhiemmang.vn vì các nơi này chưa có nguồn dữ liệu máy đọc được | `takedown_request` |
 | `content` (cảnh báo) | Mỗi tuần, hoặc khi một thủ đoạn tăng đột biến | `GET /summary?days=14` | `draft_alert` |
 | `qa` (kiểm định) | Trên mọi PR và mỗi lần push lên `main` (`.github/workflows/ci.yml`) | lint, typecheck, `npm test` (gồm bộ mẫu chuẩn), `deno check`, `scripts/test-db.sh` | Không đề xuất; CI đỏ thì không merge |
 
@@ -59,7 +59,9 @@ curl -s -X POST -H "x-agent-token: $AGENT_API_TOKEN" -H 'content-type: applicati
 | `publish_alert` / `hide_alert` | id cảnh báo | — | `moderate_alert` |
 | `draft_alert` | — | `{title 5–120, description 20–2000, severity}` | Tạo cảnh báo chưa công khai |
 | `cluster_reports` | — | `{report_ids: [...], key}` | Chỉ ghi nhận |
-| `takedown_request` | id báo cáo (nếu có) | `{url, registrar?, draft}` | Chỉ ghi nhận; người gửi yêu cầu gỡ |
+| `takedown_request` | id báo cáo (nếu có) | `{url, host, source, registrar?, host_provider?, draft}` | Chỉ ghi nhận; người gửi yêu cầu gỡ |
+
+Đề xuất loại nào cũng có thể kèm `payload.dedupe_key` (chữ thường, số, `.`, `_`, `:`, `-`; tối đa 200 ký tự). Agent API bỏ qua đề xuất có khoá trùng với đề xuất của cùng agent trong 30 ngày, hoặc trùng ngay trong cùng một lần gửi, và trả về số đề xuất bị bỏ qua ở trường `skipped`.
 
 Bật Agent API:
 
@@ -79,7 +81,13 @@ AGENT_API_URL=https://<địa chỉ web>/api/agent AGENT_API_TOKEN=... ANTHROPIC
 
 - `triage` gom các báo cáo về cùng một số/trang (không cần model). Khi có khoá API, nó đọc tối đa 20 báo cáo mỗi lần, gợi ý xác minh hoặc từ chối, và chỉ gửi đề xuất có độ tin cậy từ 0,75 trở lên. Đề xuất cho id báo cáo không có trong hàng chờ bị bỏ qua.
 - `content` chỉ soạn cảnh báo khi một thủ đoạn có ít nhất 5 báo cáo trong tuần và tăng gấp đôi so với tuần trước. Bản nháp mô tả kịch bản, không nêu tên số hay trang cụ thể.
-- `.github/workflows/agents.yml` chạy `triage` mỗi giờ và `content` mỗi thứ Hai. Workflow tự bỏ qua khi chưa đặt secrets `AGENT_API_URL` và `AGENT_API_TOKEN`; chạy tay mặc định ở chế độ thử (`dry_run`).
+- `intel` tìm tên miền mới chứa tên 30 ngân hàng, ví, sàn, nhà mạng trong `shared/core/official.ts` hoặc chữ của cơ quan nhà nước (`dichvucong`, `vneid`, …), dùng đúng luật `brand_lookalike` và `fake_government_domain` của `/api/check`. Không cần model.
+  - Nhật ký chứng chỉ: chỉ lấy chứng chỉ ghi trong 24 giờ qua và chỉ giữ các ca mạnh (có gạch nối, punycode, hoặc chữ như `login`, `hotro`), vì chỉ chứa tên thương hiệu thì trùng với quá nhiều trang lương thiện.
+  - OpenPhish: link đã được xác định là lừa đảo, nên giữ cả ca yếu hơn.
+  - Tối đa 20 đề xuất mỗi lần, ca mạnh trước. Mỗi đề xuất có `dedupe_key` (tên miền, hoặc tên máy trên hosting dùng chung như `pages.dev`, `blogspot.com`); Agent API bỏ qua đề xuất trùng khoá của cùng agent trong 30 ngày.
+  - Bản nháp yêu cầu gỡ viết bằng tiếng Anh, gửi bộ phận abuse của nhà đăng ký (tra qua RDAP) hoặc nhà cung cấp hosting. **Agent không bao giờ mở trang nghi vấn và không gửi gì.** Người kiểm duyệt mở trang trong môi trường an toàn, chụp lại, điền phần `[Moderator: …]` rồi tự gửi.
+  - crt.sh hay quá tải; khi nó không trả lời, `intel` chạy tiếp với OpenPhish và chỉ báo lỗi khi cả hai nguồn đều hỏng.
+- `.github/workflows/agents.yml` chạy `triage` mỗi giờ, `content` mỗi thứ Hai và `intel` mỗi ngày lúc 5:29 sáng. Workflow tự bỏ qua khi chưa đặt secrets `AGENT_API_URL` và `AGENT_API_TOKEN`; chạy tay mặc định ở chế độ thử (`dry_run`).
 
 ## Nối với MiteClaw
 

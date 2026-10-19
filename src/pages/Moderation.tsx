@@ -302,9 +302,7 @@ const Moderation = () => {
                 title={`${p.agent} · ${PROPOSAL_LABEL[p.kind] ? (vi ? PROPOSAL_LABEL[p.kind].vi : PROPOSAL_LABEL[p.kind].en) : p.kind}${
                   p.confidence != null ? ` · ${Math.round(p.confidence * 100)}%` : ''
                 }`}
-                body={`${p.rationale}${Object.keys(p.payload ?? {}).length ? `\n\n${JSON.stringify(p.payload, null, 2)}` : ''}${
-                  p.target_id ? `\n\n${vi ? 'Mục' : 'Target'}: ${p.target_id}` : ''
-                }`}
+                body={proposalBody(p, vi)}
                 actions={[
                   {
                     label: vi ? 'Chấp nhận' : 'Accept',
@@ -331,6 +329,16 @@ const Moderation = () => {
     </div>
   );
 };
+
+// A takedown draft is a letter to copy; show it as text, not as an escaped JSON string.
+function proposalBody(p: { rationale: string; payload: Record<string, unknown> | null; target_id: string | null }, vi: boolean): string {
+  const { draft, dedupe_key: _key, ...rest } = p.payload ?? {};
+  const parts = [p.rationale];
+  if (Object.keys(rest).length) parts.push(JSON.stringify(rest, null, 2));
+  if (typeof draft === 'string') parts.push(`${vi ? 'Bản nháp' : 'Draft'}:\n${draft}`);
+  if (p.target_id) parts.push(`${vi ? 'Mục' : 'Target'}: ${p.target_id}`);
+  return parts.join('\n\n');
+}
 
 const PROPOSAL_LABEL: Record<string, { vi: string; en: string }> = {
   verify_report: { vi: 'đề xuất xác minh báo cáo', en: 'proposes verifying a report' },

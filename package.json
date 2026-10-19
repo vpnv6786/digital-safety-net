@@ -13,7 +13,8 @@
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
     "eval": "vitest run tests/eval",
     "agent:triage": "tsx agents/triage.ts",
-    "agent:content": "tsx agents/content.ts"
+    "agent:content": "tsx agents/content.ts",
+    "agent:intel": "tsx agents/intel.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

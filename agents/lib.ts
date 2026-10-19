@@ -1,9 +1,17 @@
 // Pure parts of the reference agents: what to ask the model, how to turn its
 // answer into proposals, and the deterministic checks that need no model.
-// The runners (triage.ts, content.ts) add the network calls.
+// The runners (triage.ts, content.ts, intel.ts) add the network calls.
 
 import type Anthropic from '@anthropic-ai/sdk';
-import { runCheck, type CommunitySignal } from '../shared/core/index.ts';
+import {
+  GOVERNMENT_TOKENS,
+  OFFICIAL_DOMAINS,
+  evaluateEntity,
+  hostLabels,
+  normalizeUrl,
+  runCheck,
+  type CommunitySignal,
+} from '../shared/core/index.ts';
 
 export const DEFAULT_MODEL = 'claude-opus-5-5';
 
@@ -224,4 +232,177 @@ export function draftProposal(message: Pick<Anthropic.Beta.BetaMessage, 'stop_re
   } catch {
     return null;
   }
+}
+
+// --- intel: lookalike domains from certificate logs and phishing feeds ---
+
+export type IntelSource = 'ct_log' | 'phishing_feed';
+
+export interface IntelSighting {
+  host: string;
+  /** The full link when the source gives one (phishing feeds). */
+  url?: string;
+  source: IntelSource;
+  seenAt?: string;
+}
+
+export interface IntelCandidate extends IntelSighting {
+  /** Dedupe key: the registrable domain, or the host on shared hosting. */
+  key: string;
+  /** Registrable domain. On shared hosting this names the host provider. */
+  domain: string;
+  sharedHost: boolean;
+  code: 'brand_lookalike' | 'fake_government_domain';
+  severity: 'danger' | 'warning';
+  brand: string;
+  officialDomain: string | null;
+}
+
+/** Search terms for certificate logs. 'gov' alone matches far too much. */
+export function intelSearchTerms(): string[] {
+  const terms = OFFICIAL_DOMAINS.flatMap((d) => d.tokens).concat(GOVERNMENT_TOKENS.filter((t) => t !== 'gov'));
+  return [...new Set(terms)];
+}
+
+/** Hosts in crt.sh JSON logged at or after `since`. crt.sh timestamps are UTC without a zone. */
+export function parseCrtSh(json: unknown, since: Date): IntelSighting[] {
+  if (!Array.isArray(json)) return [];
+  const out: IntelSighting[] = [];
+  for (const row of json as { name_value?: unknown; entry_timestamp?: unknown }[]) {
+    if (typeof row?.name_value !== 'string' || typeof row.entry_timestamp !== 'string') continue;
+    const seen = new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(row.entry_timestamp) ? row.entry_timestamp : `${row.entry_timestamp}Z`);
+    if (Number.isNaN(seen.getTime()) || seen < since) continue;
+    for (const name of row.name_value.split('\n')) {
+      const host = name.trim().toLowerCase().replace(/^\*\./, '');
+      if (/^[a-z0-9.-]+$/.test(host) && host.includes('.')) out.push({ host, source: 'ct_log', seenAt: seen.toISOString() });
+    }
+  }
+  return out;
+}
+
+/** One link per line, as OpenPhish publishes it. */
+export function parseFeed(text: string): IntelSighting[] {
+  const out: IntelSighting[] = [];
+  for (const line of text.split('\n')) {
+    const url = normalizeUrl(line.trim());
+    if (url) out.push({ host: url.host, url: url.url, source: 'phishing_feed' });
+  }
+  return out;
+}
+
+// Free hosting where every customer gets a subdomain: the host, not the
+// registrable domain, is what gets taken down.
+const SHARED_HOSTS = new Set([
+  'pages.dev', 'workers.dev', 'github.io', 'vercel.app', 'netlify.app', 'web.app', 'firebaseapp.com',
+  'blogspot.com', 'weebly.com', 'wixsite.com', 'glitch.me', 'onrender.com', 'herokuapp.com', 'replit.app',
+  'ngrok.app', 'ngrok-free.app', 'trycloudflare.com', 'azurewebsites.net', 'appspot.com', 'webflow.io',
+]);
+
+/**
+ * Sightings that impersonate a listed brand or a government body, judged by
+ * the same rules /api/check uses. Certificate-log hits must be strong (dash,
+ * punycode, "login"/"hotro"-style words): brand words alone match too many
+ * honest sites. Feed links are already known phishing, so weaker hits count.
+ */
+export function lookalikeCandidates(sightings: IntelSighting[]): IntelCandidate[] {
+  const seen = new Map<string, IntelCandidate>();
+  for (const s of sightings) {
+    const normalized = normalizeUrl(s.url ?? `https://${s.host}/`);
+    if (!normalized) continue;
+    const entity = { kind: 'url' as const, raw: normalized.url, key: normalized.key, url: normalized.url, domain: normalized.domain };
+    const reasons = evaluateEntity(entity);
+    if (reasons.some((r) => r.severity === 'official')) continue;
+    const hit = reasons.find((r) => r.code === 'brand_lookalike' || r.code === 'fake_government_domain');
+    if (!hit || (hit.severity !== 'danger' && hit.severity !== 'warning')) continue;
+    if (s.source === 'ct_log' && hit.severity !== 'danger') continue;
+
+    const host = normalized.host.replace(/^www\./, '');
+    const sharedHost = SHARED_HOSTS.has(normalized.domain);
+    const key = sharedHost ? host : normalized.domain;
+    const brand =
+      hit.code === 'fake_government_domain'
+        ? null
+        : OFFICIAL_DOMAINS.find((d) => d.tokens.some((t) => hostLabels(normalized.host).includes(t))) ?? null;
+    const candidate: IntelCandidate = {
+      ...s,
+      host,
+      key,
+      domain: normalized.domain,
+      sharedHost,
+      code: hit.code as IntelCandidate['code'],
+      severity: hit.severity,
+      brand: brand?.brand ?? 'cơ quan nhà nước',
+      officialDomain: brand?.domain ?? null,
+    };
+    const previous = seen.get(key);
+    // Keep the strongest sighting; a feed link beats a certificate.
+    if (!previous || rank(candidate) > rank(previous)) seen.set(key, candidate);
+  }
+  return [...seen.values()].sort((a, b) => rank(b) - rank(a) || a.key.localeCompare(b.key));
+}
+
+function rank(c: IntelCandidate): number {
+  return (c.severity === 'danger' ? 2 : 0) + (c.source === 'phishing_feed' ? 1 : 0);
+}
+
+/** Registrar name from an RDAP domain answer, if it names one. */
+export function rdapRegistrar(json: unknown): string | undefined {
+  const entities = (json as { entities?: { roles?: unknown; vcardArray?: unknown }[] } | null)?.entities;
+  if (!Array.isArray(entities)) return undefined;
+  const registrar = entities.find((e) => Array.isArray(e.roles) && e.roles.includes('registrar'));
+  const vcard = Array.isArray(registrar?.vcardArray) ? (registrar.vcardArray[1] as unknown[]) : undefined;
+  const fn = vcard?.find((f): f is [string, unknown, string, string] => Array.isArray(f) && f[0] === 'fn');
+  return typeof fn?.[3] === 'string' && fn[3].trim() ? fn[3].trim().slice(0, 200) : undefined;
+}
+
+export const MAX_INTEL_PROPOSALS = 20;
+
+const SOURCE_LABEL: Record<IntelSource, { vi: string; en: string }> = {
+  ct_log: { vi: 'chứng chỉ SSL mới cấp (nhật ký Certificate Transparency)', en: 'a newly issued TLS certificate (Certificate Transparency log)' },
+  phishing_feed: { vi: 'danh sách link lừa đảo công khai của OpenPhish', en: 'the OpenPhish public phishing feed' },
+};
+
+/**
+ * A takedown proposal. The draft is addressed to the registrar or host's abuse
+ * desk, in English because most are abroad. A moderator checks the site and
+ * sends it by hand: nothing here contacts anyone.
+ */
+export function takedownProposal(c: IntelCandidate, registrar?: string): Proposal {
+  const target = c.url ?? `https://${c.host}/`;
+  const impersonates = c.officialDomain ? `${c.brand} (official site: https://${c.officialDomain}/)` : 'a Vietnamese government agency (real ones use .gov.vn)';
+  const draft = [
+    `Subject: Phishing site impersonating ${c.officialDomain ? c.brand : 'a Vietnamese government agency'}: ${c.host}`,
+    '',
+    'Hello,',
+    '',
+    `${target} impersonates ${impersonates}. It was found through ${SOURCE_LABEL[c.source].en}${c.seenAt ? ` on ${c.seenAt.slice(0, 10)}` : ''} and checked by a person at Vệ Binh Mạng, a free anti-scam service in Vietnam.`,
+    '',
+    '[Moderator: add what you saw, e.g. a fake login form asking for card numbers or OTP codes, with a screenshot.]',
+    '',
+    'Please suspend this domain or content under your abuse policy.',
+    '',
+    'Thank you,',
+    'Vệ Binh Mạng',
+  ].join('\n');
+  const rationale = [
+    c.code === 'fake_government_domain'
+      ? `${c.host} mang tên giống cơ quan nhà nước nhưng không phải .gov.vn.`
+      : `${c.host} chứa tên ${c.brand} nhưng không phải tên miền chính thức (${c.officialDomain}).`,
+    `Nguồn: ${SOURCE_LABEL[c.source].vi}.`,
+    'Hãy mở trang trong môi trường an toàn và chụp lại trước khi gửi yêu cầu gỡ; tên miền chỉ giống tên thương hiệu thì chưa đủ.',
+  ].join(' ');
+  return {
+    kind: 'takedown_request',
+    confidence: c.source === 'phishing_feed' ? (c.severity === 'danger' ? 0.85 : 0.7) : 0.6,
+    rationale,
+    payload: {
+      dedupe_key: c.key,
+      url: target,
+      host: c.host,
+      source: c.source,
+      ...(c.sharedHost ? { host_provider: c.domain } : {}),
+      ...(registrar ? { registrar } : {}),
+      draft,
+    },
+  };
 }
