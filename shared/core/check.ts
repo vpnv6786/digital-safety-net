@@ -1,5 +1,5 @@
 // The whole check, minus I/O: the caller supplies a lookup function, so the web
-// app can call the database RPC and an Edge Function can call it server-side.
+// app can call the database RPC and the Worker can call it server-side.
 
 import type { CommunitySignal, Entity, Reason, Verdict } from './types.ts';
 import { classifyInput } from './normalize.ts';

@@ -1,6 +1,6 @@
 // Server-side check: the shared core plus signals the browser cannot get
 // (Web Risk, domain age, the model). Dependencies are injected so tests and
-// the Edge Function share this code.
+// the Cloudflare Worker share this code.
 
 import { runCheck, type CheckResult, type CommunityLookup } from '../core/check.ts';
 import { decide } from '../core/verdict.ts';

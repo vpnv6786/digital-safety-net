@@ -3,7 +3,7 @@
 // The runners (triage.ts, content.ts) add the network calls.
 
 import type Anthropic from '@anthropic-ai/sdk';
-import { runCheck, type CommunitySignal } from '../supabase/functions/_shared/core/index.ts';
+import { runCheck, type CommunitySignal } from '../shared/core/index.ts';
 
 export const DEFAULT_MODEL = 'claude-opus-5-5';
 

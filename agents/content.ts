@@ -5,7 +5,7 @@
 //   AGENT_API_URL=... AGENT_API_TOKEN=... ANTHROPIC_API_KEY=... npx tsx agents/content.ts [--dry-run]
 
 import Anthropic from '@anthropic-ai/sdk';
-import { REPORT_CATEGORIES } from '../supabase/functions/_shared/core/index.ts';
+import { REPORT_CATEGORIES } from '../shared/core/index.ts';
 import { agentApi, requireEnv } from './client.ts';
 import { DEFAULT_MODEL, buildDraftRequest, draftProposal, risingCategories } from './lib.ts';
 

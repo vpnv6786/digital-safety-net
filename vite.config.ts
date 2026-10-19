@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@core": path.resolve(__dirname, "./supabase/functions/_shared/core"),
+      "@core": path.resolve(__dirname, "./shared/core"),
     },
   },
   test: {

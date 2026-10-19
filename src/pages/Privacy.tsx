@@ -15,7 +15,7 @@ const Privacy = () => {
             'Link trong nội dung được tra với Google Web Risk và dữ liệu đăng ký tên miền (RDAP).',
             'Khi tính năng AI được bật, nội dung và ảnh được gửi tới Anthropic (Mỹ) để đọc chữ và giải thích. Số tài khoản ngân hàng trong nội dung cũng có thể nằm trong phần được gửi.',
             'Địa chỉ IP được băm để giới hạn số lượt kiểm tra mỗi ngày và bị xoá sau 2 ngày.',
-            'Nhà cung cấp hạ tầng (Supabase) có thể ghi nhật ký kỹ thuật của yêu cầu theo chính sách của họ.',
+            'Các nhà cung cấp hạ tầng (Cloudflare chạy trang web và máy chủ kiểm tra, Supabase lưu dữ liệu) có thể ghi nhật ký kỹ thuật của yêu cầu theo chính sách của họ.',
           ],
         },
         {
@@ -47,7 +47,7 @@ const Privacy = () => {
             'Links in the content are checked against Google Web Risk and domain registration data (RDAP).',
             'When AI is enabled, the content and image are sent to Anthropic (USA) to read the text and explain it. Bank account numbers in the content may be part of what is sent.',
             'Your IP address is hashed to limit daily checks and deleted after 2 days.',
-            'Our infrastructure provider (Supabase) may keep technical request logs under its own policy.',
+            'Our infrastructure providers (Cloudflare runs the site and check server, Supabase stores data) may keep technical request logs under their own policies.',
           ],
         },
         {

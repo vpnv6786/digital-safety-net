@@ -24,8 +24,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@core/*": ["./supabase/functions/_shared/core/*"]
+      "@core/*": ["./shared/core/*"]
     }
   },
-  "include": ["src", "supabase/functions/_shared", "tests", "agents"]
+  "include": ["src", "shared", "tests", "agents", "worker"]
 }

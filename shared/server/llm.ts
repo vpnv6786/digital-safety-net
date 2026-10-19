@@ -2,9 +2,10 @@
 // explain it in plain words. It never decides alone: its level is capped at
 // "warning", and it cannot remove a deterministic reason.
 //
-// This file builds the request and parses the reply; the Edge Function sends
-// it with the Anthropic SDK. Keeping I/O out of here lets Vitest cover it.
+// This file builds the request and parses the reply; the Worker sends it with
+// the Anthropic SDK. Keeping I/O out of here lets Vitest cover it.
 
+import type Anthropic from '@anthropic-ai/sdk';
 import type { Reason, Typology } from '../core/types.ts';
 
 export const DEFAULT_MODEL = 'claude-opus-5-5';
@@ -53,8 +54,8 @@ export interface AnalyzeInput {
   knownFindings: string[];
 }
 
-export function buildAnalyzeRequest(input: AnalyzeInput, model: string = DEFAULT_MODEL) {
-  const content: unknown[] = [];
+export function buildAnalyzeRequest(input: AnalyzeInput, model: string = DEFAULT_MODEL): Anthropic.Beta.MessageCreateParamsNonStreaming {
+  const content: Anthropic.Beta.BetaContentBlockParam[] = [];
   if (input.image) {
     content.push({ type: 'image', source: { type: 'base64', media_type: input.image.mediaType, data: input.image.base64 } });
   }

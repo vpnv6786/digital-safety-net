@@ -23,11 +23,8 @@ jobs:
       - name: Unit tests and golden-set quality gate
         run: npm test
       - run: npm run build
-      - uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.5.x
-      - name: Type-check Edge Functions
-        run: deno check --no-config supabase/functions/check/index.ts supabase/functions/agent-api/index.ts
+      - name: Bundle the Cloudflare Worker (no deploy)
+        run: npx wrangler deploy --dry-run --outdir "$RUNNER_TEMP/worker"
       - name: Install PostgreSQL if missing
         run: ls /usr/lib/postgresql/*/bin/initdb >/dev/null 2>&1 || (sudo apt-get update && sudo apt-get install -y postgresql)
       - name: Migrations and access-control tests

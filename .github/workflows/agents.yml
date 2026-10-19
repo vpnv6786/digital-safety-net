@@ -1,7 +1,7 @@
 # Runs the reference operating agents. They only write proposals; moderators
 # decide in /kiem-duyet. Skips quietly until the repository secrets are set:
-#   AGENT_API_URL     https://<project>.supabase.co/functions/v1/agent-api
-#   AGENT_API_TOKEN   same value as the Edge Function secret
+#   AGENT_API_URL     https://<địa chỉ web>/api/agent
+#   AGENT_API_TOKEN   same value as the Worker secret of the same name
 #   ANTHROPIC_API_KEY optional; without it triage only groups reports and content does nothing
 # Optional repository variable LLM_MODEL overrides the model.
 name: Agents

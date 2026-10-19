@@ -18,21 +18,22 @@ Không có mức "an toàn". Khi tra cứu lỗi, câu trả lời nói rõ là 
 ## Cấu trúc
 
 ```
-supabase/functions/_shared/core/   Bộ lõi kiểm tra, TypeScript thuần (chạy trong trình duyệt và Edge Function)
+shared/core/                       Bộ lõi kiểm tra, TypeScript thuần (chạy trong trình duyệt, Worker và agent)
   normalize.ts   chuẩn hoá số điện thoại (E.164, đầu số 11 số cũ), link, email, số tài khoản; tách thực thể từ tin nhắn
   rules.ts       luật nhận diện kịch bản lừa đảo và link rủi ro
   official.ts    tên miền chính thức và danh bạ liên hệ đã kiểm tra (có ngày, nguồn)
   verdict.ts     ghép lý do thành kết luận
 supabase/migrations/               Lược đồ và phân quyền (RLS)
 supabase/tests/                    Test phân quyền, RPC chạy trên PostgreSQL thật
-supabase/functions/_shared/server/ Phần chỉ chạy trên máy chủ: Google Web Risk, tuổi tên miền (RDAP), gọi model
-supabase/functions/check/          Edge Function POST /check (Deno)
-src/services/checkService.ts       Gọi Edge Function check; nếu không được thì chạy bộ lõi ngay trên trình duyệt
+shared/server/                     Phần chạy trên máy chủ: API, Google Web Risk, tuổi tên miền (RDAP), gọi model, gọi Supabase
+worker/index.ts                    Cloudflare Worker: phục vụ trang web (dist/) và /api/check, /api/agent/*
+wrangler.jsonc                     Cấu hình Cloudflare
+src/services/checkService.ts       Gọi /api/check; nếu không được thì chạy bộ lõi ngay trên trình duyệt
 src/services/reportService.ts      Gửi báo cáo qua RPC submit_report
 tests/core/                        Test bộ lõi (Vitest)
 ```
 
-## Edge Function `check`
+## API `/api/check` (Cloudflare Worker)
 
 Chạy bộ lõi trên máy chủ và thêm các tín hiệu mà trình duyệt không lấy được. Mỗi phần tùy chọn đều có thể tắt bằng cách không đặt biến môi trường:
 
@@ -45,11 +46,11 @@ Chạy bộ lõi trên máy chủ và thêm các tín hiệu mà trình duyệt 
 | `CHECKS_PER_CALLER_PER_DAY` | Giới hạn mỗi địa chỉ IP (lưu dạng băm, xoá sau 2 ngày), mặc định 200 |
 | `ALLOWED_ORIGINS` | Danh sách origin được gọi, mặc định `*` |
 
-Deploy: `supabase functions deploy check` rồi `supabase secrets set ANTHROPIC_API_KEY=... WEB_RISK_API_KEY=...`.
+Các khoá bí mật được đặt trong GitHub Secrets; workflow Deploy tự chuyển chúng lên Cloudflare. Xem [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 ## Vận hành bằng agent
 
-Agent đọc hàng chờ (đã che dữ liệu) qua Edge Function `agent-api` và chỉ ghi đề xuất. Người kiểm duyệt chấp nhận hoặc bỏ qua ở `/kiem-duyet`. Chi tiết: [`docs/agents/README.md`](docs/agents/README.md). Bộ mẫu chuẩn: `npm run eval`.
+Agent đọc hàng chờ (đã che dữ liệu) qua `/api/agent` và chỉ ghi đề xuất. Người kiểm duyệt chấp nhận hoặc bỏ qua ở `/kiem-duyet`. Chi tiết: [`docs/agents/README.md`](docs/agents/README.md). Bộ mẫu chuẩn: `npm run eval`.
 
 ## Dữ liệu và quyền riêng tư
 
@@ -71,14 +72,14 @@ npm run dev          # http://localhost:8080
 npm test             # test bộ lõi
 npm run typecheck
 ./scripts/test-db.sh # chạy mọi migration và test phân quyền trên PostgreSQL cục bộ (cần PostgreSQL 15+)
-deno check --no-config supabase/functions/check/index.ts   # kiểm kiểu Edge Function
+npm run build && npx wrangler dev   # chạy trang web + API trên máy, cần file .dev.vars (xem docs/DEPLOY.md)
 ```
 
 Biến môi trường tuỳ chọn: `VITE_CONTACT_EMAIL` là email liên hệ hiển thị trên trang. Chưa đặt thì trang ẩn email.
 
 ## Triển khai
 
-Xem [`docs/DEPLOY.md`](docs/DEPLOY.md): cơ sở dữ liệu, người kiểm duyệt, Edge Functions, web, agent theo lịch, hoàn tác.
+Xem [`docs/DEPLOY.md`](docs/DEPLOY.md): Cloudflare (trang web + API) và Supabase (dữ liệu), từng bước.
 
 ## Giấy phép
 

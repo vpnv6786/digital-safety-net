@@ -8,7 +8,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@core/*": ["./supabase/functions/_shared/core/*"]
+      "@core/*": ["./shared/core/*"]
     },
     "noImplicitAny": false,
     "noUnusedParameters": false,
