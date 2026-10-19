@@ -27,5 +27,5 @@
       "@core/*": ["./supabase/functions/_shared/core/*"]
     }
   },
-  "include": ["src", "supabase/functions/_shared", "tests"]
+  "include": ["src", "supabase/functions/_shared", "tests", "agents"]
 }
