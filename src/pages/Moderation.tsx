@@ -22,8 +22,9 @@ import {
   type PendingReport,
 } from '@/services/moderationService';
 import { REPORT_CATEGORIES, bankName } from '@core/index.ts';
+import MetricsPanel from '@/components/MetricsPanel';
 
-type Tab = 'reports' | 'appeals' | 'alerts' | 'proposals';
+type Tab = 'reports' | 'appeals' | 'alerts' | 'proposals' | 'metrics';
 
 function errorText(e: unknown, vi: boolean): string {
   const msg = e instanceof Error ? e.message : String((e as { message?: string })?.message ?? '');
@@ -211,6 +212,9 @@ const Moderation = () => {
               {vi ? t.vi : t.en} ({t.count})
             </Button>
           ))}
+          <Button variant={tab === 'metrics' ? 'default' : 'outline'} onClick={() => setTab('metrics')}>
+            {vi ? 'Số liệu' : 'Metrics'}
+          </Button>
           <Button variant="ghost" onClick={load} disabled={loading}>
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : vi ? 'Tải lại' : 'Reload'}
           </Button>
@@ -286,6 +290,8 @@ const Moderation = () => {
           ) : (
             <p className="text-gray-600">{vi ? 'Không có cảnh báo chờ duyệt.' : 'No alerts waiting.'}</p>
           ))}
+        {tab === 'metrics' && <MetricsPanel vi={vi} />}
+
         {tab === 'proposals' &&
           (proposals.length ? (
             proposals.map((p) => (

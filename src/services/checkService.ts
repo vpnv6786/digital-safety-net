@@ -71,3 +71,10 @@ export async function checkInput(raw: string, opts: { bankCode?: string; image?:
 export async function prepareScreenshot(file: File): Promise<ScreenshotInput> {
   return { mediaType: 'image/jpeg', base64: await blobToBase64(await downscaleToJpeg(file)) };
 }
+
+export type FeedbackChoice = 'stopped' | 'continued' | 'unsure' | 'wrong';
+
+/** Count what someone says they will do after an answer. Only the level and the choice are sent. */
+export async function sendFeedback(level: Verdict['level'], choice: FeedbackChoice): Promise<void> {
+  await supabase.functions.invoke('check', { body: { feedback: { level, choice } } });
+}
